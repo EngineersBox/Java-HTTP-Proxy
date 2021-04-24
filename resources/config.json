@@ -1,0 +1,34 @@
+{
+	"servlet": {
+		"threading": {
+			"poolSize": 10,
+			"schedulingPolicy": "FIFO"
+		},
+		"connections": {
+			"dropAfter": 30000,
+			"dropOnFailedDNSLookup": false
+		},
+		"packets": {
+			"dropOnMalformed": false
+		},
+		"cacheSize": 25
+	},
+	"policies": {
+		"enforcement": {
+			"whitelistBehaviour": {
+				"ip": "BLACKLIST",
+				"url": "WHITELIST"
+			},
+			"allowRedirects": true
+		},
+		"whitelist": {
+			"ip": [],
+			"url": []
+		},
+		"blacklist": {
+			"ip": [],
+			"url": []
+		}
+	},
+	"targetBaseUrl": "http://www.bom.gov.au/"
+}
