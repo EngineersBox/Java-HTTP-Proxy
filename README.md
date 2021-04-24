@@ -7,6 +7,10 @@ A HTTP proxy written in C with link and ref reformatting
 
 ## Usage
 
+### VM Arguments
+
+* `-Dconfig.path=<PATH>`: Specify the path to the `config.json` file. Defaults to `./config.json`
+
 ## Tests
 
 ## File structure
@@ -14,50 +18,160 @@ A HTTP proxy written in C with link and ref reformatting
 ## Configuration
 
 The proxy utilises JSON configuration files to specify the required behaviour it should enact.
-There are two main configuration files involed:
+There are two main configuration sections involed:
 
-* `policies.json`
-* `servlet.json`
+* policies
+* servlet
 
-### Policies
+An example configuration file:
 
-If you are familiar with the JSON Schema "standard" then a Draft 4 vesion can be found below. Otherwise, there is an explaination after it deteailing each of the feilds 
+```json
+{
+  "servlet": {
+    "threading": {
+      "poolSize": 10,
+      "schedulingPolicy": "FIFO"
+    },
+    "connections": {
+      "dropAfter": 30000,
+      "dropOnFailedDNSLookup": false
+    },
+    "packets": {
+      "dropOnMalformed": false
+    },
+    "cacheSize": 25
+  },
+  "policies": {
+    "enforcement": {
+      "whitelistBehaviour": {
+        "ip": "BLACKLIST",
+        "url": "WHITELIST"
+      },
+      "allowRedirects": true
+    },
+    "whitelist": {
+      "ip": [],
+      "url": []
+    },
+    "blacklist": {
+      "ip": [],
+      "url": []
+    }
+  },
+  "targetBaseUrl": "http://www.bom.gov.au/"
+}
+```
+
+JSON Schema describing the configuration file
 
 ```json
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "enforcement": {
+    "servlet": {
       "type": "object",
       "properties": {
-        "use_whitelist": {
+        "threading": {
           "type": "object",
           "properties": {
-            "ip": {
-              "type": "boolean"
+            "poolSize": {
+              "type": "integer"
             },
-            "url": {
-              "type": "boolean"
+            "schedulingPolicy": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "poolSize",
+            "schedulingPolicy"
+          ]
+        },
+        "connections": {
+          "type": "object",
+          "properties": {
+            "dropAfter": {
+              "type": "integer"
             },
-            "block_otherwise": {
+            "dropOnFailedDNSLookup": {
               "type": "boolean"
             }
           },
           "required": [
-            "ip",
-            "url",
-            "block_otherwise"
+            "dropAfter",
+            "dropOnFailedDNSLookup"
           ]
         },
-        "use_blacklist": {
+        "packets": {
+          "type": "object",
+          "properties": {
+            "dropOnMalformed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "dropOnMalformed"
+          ]
+        },
+        "cacheSize": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "threading",
+        "connections",
+        "packets",
+        "cacheSize"
+      ]
+    },
+    "policies": {
+      "type": "object",
+      "properties": {
+        "enforcement": {
+          "type": "object",
+          "properties": {
+            "whitelistBehaviour": {
+              "type": "object",
+              "properties": {
+                "ip": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "ip",
+                "url"
+              ]
+            },
+            "allowRedirects": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "whitelistBehaviour",
+            "allowRedirects"
+          ]
+        },
+        "whitelist": {
           "type": "object",
           "properties": {
             "ip": {
-              "type": "boolean"
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
             },
             "url": {
-              "type": "boolean"
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
             }
           },
           "required": [
@@ -65,74 +179,51 @@ If you are familiar with the JSON Schema "standard" then a Draft 4 vesion can be
             "url"
           ]
         },
-        "allow_redirects": {
-          "type": "boolean"
+        "blacklist": {
+          "type": "object",
+          "properties": {
+            "ip": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "required": [
+            "ip",
+            "url"
+          ]
         }
       },
       "required": [
-        "use_whitelist",
-        "use_blacklist",
-        "allow_redirects"
+        "enforcement",
+        "whitelist",
+        "blacklist"
       ]
     },
-    "whitelist": {
-      "type": "object",
-      "properties": {
-        "ip": {
-          "type": "array",
-          "items": [
-            {
-              "type": "string"
-            }
-          ]
-        },
-        "url": {
-          "type": "array",
-          "items": [
-            {
-              "type": "string"
-            }
-          ]
-        }
-      },
-      "required": [
-        "ip",
-        "url"
-      ]
-    },
-    "blacklist": {
-      "type": "object",
-      "properties": {
-        "ip": {
-          "type": "array",
-          "items": [
-            {
-              "type": "string"
-            }
-          ]
-        },
-        "url": {
-          "type": "array",
-          "items": [
-            {
-              "type": "string"
-            }
-          ]
-        }
-      },
-      "required": [
-        "ip",
-        "url"
-      ]
+    "targetBaseUrl": {
+      "type": "string"
     }
   },
   "required": [
-    "enforcement",
-    "whitelist",
-    "blacklist"
+    "servlet",
+    "policies",
+    "targetBaseUrl"
   ]
 }
 ```
+
+### Policies
 
 Configuring the proxy to service certain egress/ingress policies is done via a JSON configuration. This config
 details how the proxy should act to IP addresses and URLs when accepting, forwarding, connecting and reformatting.
@@ -184,69 +275,6 @@ You can use this at any point within an IP or URL, for example:
 * `52.3[0-12].102.*/*`
 
 ### Servlet Config
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
-  "properties": {
-    "threading": {
-      "type": "object",
-      "properties": {
-        "pool_size": {
-          "type": "integer"
-        },
-        "scheduling_policy": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "pool_size",
-        "scheduling_policy"
-      ]
-    },
-    "connections": {
-      "type": "object",
-      "properties": {
-        "drop_after": {
-          "type": "integer"
-        },
-        "drop_on_failed_dns_lookup": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "drop_after",
-        "drop_on_failed_dns_lookup"
-      ]
-    },
-    "packets": {
-      "type": "object",
-      "properties": {
-        "max_body_size": {
-          "type": "integer"
-        },
-        "drop_on_malformed": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "max_body_size",
-        "drop_on_malformed"
-      ]
-    },
-    "cache_size": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "threading",
-    "connections",
-    "packets",
-    "cache_size"
-  ]
-}
-```
 
 #### Threading
 

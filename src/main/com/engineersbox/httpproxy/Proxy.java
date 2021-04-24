@@ -8,13 +8,20 @@ import java.io.IOException;
 
 public class Proxy {
 
-    protected static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger(Proxy.class);
 
     private static Config config;
+    private static final String CONFIG_PATH_ARG_NAME = "config.path";
+    private static final String DEFAULT_CONFIG_PATH = "config.json";
 
     public static void main(String[] args) {
+        String configFilePath = System.getProperty(CONFIG_PATH_ARG_NAME);
+        if (configFilePath == null) {
+            configFilePath = DEFAULT_CONFIG_PATH;
+        }
+        logger.info(configFilePath);
         try {
-            config = Config.fromFile("resources/config.json");
+            config = Config.fromFile(configFilePath);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
