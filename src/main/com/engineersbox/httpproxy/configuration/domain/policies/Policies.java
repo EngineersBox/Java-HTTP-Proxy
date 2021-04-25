@@ -2,29 +2,28 @@ package com.engineersbox.httpproxy.configuration.domain.policies;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import java.util.List;
+
 public class Policies {
     public final Enforcement enforcement;
-    public final RuleSet whitelist;
-    public final RuleSet blacklist;
+    public final List<RuleSet> rulesets;
 
-    public Policies(final Enforcement enforcement, final RuleSet whitelist, final RuleSet blacklist) {
+    public Policies(final Enforcement enforcement, final List<RuleSet> rulesets) {
         this.enforcement = enforcement;
-        this.whitelist = whitelist;
-        this.blacklist = blacklist;
+        this.rulesets = rulesets;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        Policies policies = (Policies) o;
+        final Policies policies = (Policies) o;
 
         return new EqualsBuilder()
                 .append(enforcement, policies.enforcement)
-                .append(whitelist, policies.whitelist)
-                .append(blacklist, policies.blacklist)
+                .append(rulesets, policies.rulesets)
                 .isEquals();
     }
 }

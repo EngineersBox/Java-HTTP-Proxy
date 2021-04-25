@@ -3,24 +3,27 @@ package com.engineersbox.httpproxy.configuration.domain.servlet;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public class Threading {
-    public final int poolSize;
+    public final int acceptorPoolSize;
+    public final int handlerPoolSize;
     public final SchedulingPolicy schedulingPolicy;
 
-    public Threading(final int poolSize, final SchedulingPolicy schedulingPolicy) {
-        this.poolSize = poolSize;
+    public Threading(final int acceptorPoolSize, final int handlerPoolSize, final SchedulingPolicy schedulingPolicy) {
+        this.acceptorPoolSize = acceptorPoolSize;
+        this.handlerPoolSize = handlerPoolSize;
         this.schedulingPolicy = schedulingPolicy;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        Threading threading = (Threading) o;
+        final Threading threading = (Threading) o;
 
         return new EqualsBuilder()
-                .append(poolSize, threading.poolSize)
+                .append(acceptorPoolSize, threading.acceptorPoolSize)
+                .append(handlerPoolSize, threading.handlerPoolSize)
                 .append(schedulingPolicy, threading.schedulingPolicy)
                 .isEquals();
     }

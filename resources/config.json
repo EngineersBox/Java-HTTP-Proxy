@@ -1,15 +1,22 @@
 {
 	"servlet": {
 		"threading": {
-			"poolSize": 10,
+			"acceptorPoolSize": 10,
+			"handlerPoolSize": 10,
 			"schedulingPolicy": "FIFO"
 		},
 		"connections": {
+			"acceptorQueueSize": 10,
+			"handlerQueueSize": 10,
 			"dropAfter": 30000,
 			"dropOnFailedDNSLookup": false
 		},
 		"packets": {
 			"dropOnMalformed": false
+		},
+		"binding": {
+			"host": "localhost",
+			"port": 3000
 		},
 		"cacheSize": 25
 	},
@@ -21,14 +28,16 @@
 			},
 			"allowRedirects": true
 		},
-		"whitelist": {
-			"ip": [],
-			"url": []
-		},
-		"blacklist": {
-			"ip": [],
-			"url": []
-		}
+		"rulesets": [
+			{
+				"type": "URL",
+				"isWildcard": true,
+				"pattern": "http://console.[dev,prod].test.com/"
+			}
+		]
 	},
-	"targetBaseUrl": "http://www.bom.gov.au/"
+	"target": {
+		"host": "www.bom.gov.au",
+		"port": 80
+	}
 }

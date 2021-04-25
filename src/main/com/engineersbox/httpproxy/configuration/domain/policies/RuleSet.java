@@ -2,28 +2,29 @@ package com.engineersbox.httpproxy.configuration.domain.policies;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.List;
-
 public class RuleSet {
-    public final List<String> ip;
-    public final List<String> url;
+    public final RuleType ruleType;
+    public final boolean isWildcard;
+    public final String pattern;
 
-    public RuleSet(List<String> ip, List<String> url) {
-        this.ip = ip;
-        this.url = url;
+    public RuleSet(final RuleType ruleType, final boolean isWildcard, final String pattern) {
+        this.ruleType = ruleType;
+        this.isWildcard = isWildcard;
+        this.pattern = pattern;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        RuleSet ruleSet = (RuleSet) o;
+        final RuleSet ruleSet = (RuleSet) o;
 
         return new EqualsBuilder()
-                .append(ip, ruleSet.ip)
-                .append(url, ruleSet.url)
+                .append(isWildcard, ruleSet.isWildcard)
+                .append(ruleType, ruleSet.ruleType)
+                .append(pattern, ruleSet.pattern)
                 .isEquals();
     }
 }
