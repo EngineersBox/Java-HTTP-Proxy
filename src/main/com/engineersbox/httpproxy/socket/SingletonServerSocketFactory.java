@@ -11,7 +11,9 @@ import org.apache.logging.log4j.Logger;
 public class SingletonServerSocketFactory extends ServerSocketFactory {
 
     private static final Logger logger = LogManager.getLogger(SingletonSocketFactory.class);
+
     private static final int MAX_ACCEPTOR_QUEUE_SIZE = 10;
+
     private int validateQueueSize(int queueSize) {
         if (queueSize > MAX_ACCEPTOR_QUEUE_SIZE) {
             logger.warn("Queue size exceeds maximum: " + queueSize + " > " + MAX_ACCEPTOR_QUEUE_SIZE + ", defaulting to: " + MAX_ACCEPTOR_QUEUE_SIZE);

@@ -1,6 +1,7 @@
 package com.engineersbox.httpproxy.threading;
 
 import com.engineersbox.httpproxy.configuration.Config;
+import com.engineersbox.httpproxy.connection.handler.BaseTrafficHandler;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class PoolManager {
+public class PoolManager implements ThreadManager {
 
     private final Logger logger = LogManager.getLogger(PoolManager.class);
 
@@ -24,11 +25,13 @@ public class PoolManager {
         this.logger.info("Reserved handler fixed thread pool of size: " + config.servlet.threading.handlerPoolSize);
     }
 
-    public void submitAcceptor(final Runnable task) {
+    @Override
+    public void submitAcceptor(final BaseTrafficHandler task) {
         this.acceptorExecutorService.execute(task);
     }
 
-    public void submitHandler(final Runnable task) {
+    @Override
+    public void submitHandler(final BaseTrafficHandler task) {
         this.handlerExecutorService.execute(task);
     }
 

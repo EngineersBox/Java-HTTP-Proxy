@@ -13,18 +13,12 @@ public class SingletonSocketFactory extends SocketFactory {
     private static final Logger logger = LogManager.getLogger(SingletonSocketFactory.class);
 
 
-    private void rfc2616Connect(final Socket socket, final String hostname, final int hostport) throws IOException {
-        final String connectProtocolInit = "CONNECT " + hostname + ":" + hostport + "\n\n";
-        socket.getOutputStream().write(connectProtocolInit.getBytes());
-    }
-
     @Override
     public Socket createSocket(final String host, final int port) throws IOException {
         final Socket socket =  new Socket(
             host,
             port
         );
-        rfc2616Connect(socket, host, port);
         return socket;
     }
 
@@ -40,7 +34,6 @@ public class SingletonSocketFactory extends SocketFactory {
             localhost,
             localport
         );
-        rfc2616Connect(socket, host, port);
         return socket;
     }
 
@@ -50,7 +43,6 @@ public class SingletonSocketFactory extends SocketFactory {
             host,
             port
         );
-        rfc2616Connect(socket, host.getHostAddress(), port);
         return socket;
     }
 
@@ -66,7 +58,6 @@ public class SingletonSocketFactory extends SocketFactory {
             localhost,
             localport
         );
-        rfc2616Connect(socket, host.getHostAddress(), port);
         return socket;
     }
 }
