@@ -36,7 +36,7 @@ An example configuration file:
       "dropAfter": 30000,
       "dropOnFailedDNSLookup": false
     },
-    "packets": {
+    "messages": {
       "dropOnMalformed": false
     },
     "cacheSize": 25
@@ -102,7 +102,7 @@ JSON Schema describing the configuration file
             "dropOnFailedDNSLookup"
           ]
         },
-        "packets": {
+        "messages": {
           "type": "object",
           "properties": {
             "dropOnMalformed": {
@@ -120,7 +120,7 @@ JSON Schema describing the configuration file
       "required": [
         "threading",
         "connections",
-        "packets",
+        "messages",
         "cacheSize"
       ]
     },

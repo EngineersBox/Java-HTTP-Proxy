@@ -9,10 +9,12 @@
 			"acceptorQueueSize": 10,
 			"handlerQueueSize": 10,
 			"dropAfter": 30000,
-			"dropOnFailedDNSLookup": false
+			"dropOnFailedDNSLookup": false,
+			"readerBufferSize": 10000
 		},
-		"packets": {
-			"dropOnMalformed": false
+		"messages": {
+			"maxBodySize": 65535,
+			"dropOnMalformed": true
 		},
 		"binding": {
 			"host": "localhost",

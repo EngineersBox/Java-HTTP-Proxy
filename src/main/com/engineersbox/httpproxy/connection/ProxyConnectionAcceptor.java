@@ -1,11 +1,15 @@
 package com.engineersbox.httpproxy.connection;
 
+import com.engineersbox.httpproxy.configuration.ConfigModule;
 import com.engineersbox.httpproxy.connection.handler.BackwardTrafficHandler;
 import com.engineersbox.httpproxy.connection.handler.BaseTrafficHandler;
 import com.engineersbox.httpproxy.connection.handler.ForwardTrafficHandler;
 import com.engineersbox.httpproxy.exceptions.FailedToCreateServerSocketException;
+import com.engineersbox.httpproxy.formatting.FormattingModule;
 import com.engineersbox.httpproxy.socket.SingletonSocketFactory;
 import com.engineersbox.httpproxy.threading.ThreadManager;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +39,7 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
         final InputStream inClient = localSocket.getInputStream();
         try {
             server = new SingletonSocketFactory().createSocket(host, port);
-            logger.info("Retrieved socket from factory");
+            logger.debug("Retrieved socket from factory");
         } catch (IOException e) {
             PrintWriter out = new PrintWriter(new OutputStreamWriter(outClient));
             out.flush();
@@ -44,21 +48,33 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
                     e
             );
         }
+
         final OutputStream outServer = server.getOutputStream();
         final InputStream inServer = server.getInputStream();
-        this.poolManager.submitHandler(new BackwardTrafficHandler(
-                outServer,
-                inClient,
-                host
-        ));
-        logger.info("Submitted BackwardTrafficHandler to PoolManager");
-        this.poolManager.submitHandler(new ForwardTrafficHandler(
-                inServer,
-                outClient,
-                server,
-                localSocket
-        ));
-        logger.info("Submitted ForwardTrafficHandler to PoolManager");
+        final Injector injector = Guice.createInjector(
+                new ConfigModule(),
+                new FormattingModule(),
+                new ConnectionModule()
+        );
+        this.poolManager.submitHandler(
+            injector.getInstance(BackwardTrafficHandler.class)
+                .withStreams(
+                    outServer,
+                    inClient,
+                    host
+                )
+        );
+        logger.debug("Submitted BackwardTrafficHandler to PoolManager");
+        this.poolManager.submitHandler(
+            injector.getInstance(ForwardTrafficHandler.class)
+                .withStreams(
+                    inServer,
+                    outClient,
+                    server,
+                    localSocket
+                )
+        );
+        logger.debug("Submitted ForwardTrafficHandler to PoolManager");
     }
 
     @Override
