@@ -10,7 +10,7 @@
 			"handlerQueueSize": 10,
 			"dropAfter": 30000,
 			"dropOnFailedDNSLookup": false,
-			"readerBufferSize": 10000
+			"readerBufferSize": 1024
 		},
 		"messages": {
 			"maxBodySize": 65535,

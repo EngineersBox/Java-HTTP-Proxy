@@ -35,13 +35,14 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
     @Override
     public void task() throws Exception {
         final Socket server;
+        localSocket.setReceiveBufferSize(1024);
         final OutputStream outClient = localSocket.getOutputStream();
         final InputStream inClient = localSocket.getInputStream();
         try {
             server = new SingletonSocketFactory().createSocket(host, port);
             logger.debug("Retrieved socket from factory");
         } catch (IOException e) {
-            PrintWriter out = new PrintWriter(new OutputStreamWriter(outClient));
+            final PrintWriter out = new PrintWriter(new OutputStreamWriter(localSocket.getOutputStream()));
             out.flush();
             throw new FailedToCreateServerSocketException(
                     "Could not create socket for [Host: " + this.host + "] [Port: " + this.port + "]",

@@ -1,17 +1,23 @@
 package com.engineersbox.httpproxy.connection.stream;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.engineersbox.httpproxy.exceptions.SocketStreamReadError;
+import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
+import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
-public interface ContentCollector {
+public interface ContentCollector<T extends HTTPStartLine> {
 
     void withStream(final InputStream stream);
 
-    Pair<byte[], Integer> synchronousReadAll() throws IOException;
+    void withStartLine(final Class<T> classOfT);
 
-    CompletableFuture<Pair<byte[], Integer>> futureReadAll() throws IOException;
+    HTTPMessage<T> synchronousReadHeaders() throws SocketStreamReadError;
+
+    void synchronousReadBody(final HTTPMessage<T> message) throws SocketStreamReadError;
+
+    CompletableFuture<HTTPMessage<T>> futureReadAll() throws IOException;
 
 }

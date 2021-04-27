@@ -21,22 +21,28 @@ public class ProxyServlet implements AbstractServlet {
     @Inject
     private ThreadManager poolManager;
 
+    private ServerSocket serverSocket;
+
     @Override
     public void init() {
+        try {
+            this.serverSocket = new SingletonServerSocketFactory()
+                .createServerSocket(
+                    config.servlet.binding.port,
+                    config.servlet.connections.acceptorQueueSize
+                );
+        } catch (final IOException e) {
+            logger.error(e, e);
+        }
     }
 
     @Override
     public void serve() {
-        final ServerSocket serverSocket;
         try {
-            serverSocket = new SingletonServerSocketFactory().createServerSocket(
-                    config.servlet.binding.port,
-                    config.servlet.connections.acceptorQueueSize
-            );
             while (true) {
                 poolManager.submitAcceptor(
                     new ProxyConnectionAcceptor(
-                        serverSocket.accept(),
+                        this.serverSocket.accept(),
                         config.target.host,
                         config.target.port,
                         poolManager

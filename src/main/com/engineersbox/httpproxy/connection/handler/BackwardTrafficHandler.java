@@ -7,7 +7,6 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
 import com.google.inject.Inject;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +22,7 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
 
     private final BaseHTTPFormatter<HTTPRequestStartLine> httpFormatter;
     private final BaseContentFormatter contentFormatter;
-    private final ContentCollector contentCollector;
+    private final ContentCollector<HTTPRequestStartLine> contentCollector;
 
     private OutputStream outToServer;
     private InputStream inFromClient;
@@ -33,7 +32,7 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
     private byte[] request;
 
     @Inject
-    public BackwardTrafficHandler(final BaseHTTPFormatter<HTTPRequestStartLine> httpFormatter, final BaseContentFormatter contentFormatter, final ContentCollector contentCollector) {
+    public BackwardTrafficHandler(final BaseHTTPFormatter<HTTPRequestStartLine> httpFormatter, final BaseContentFormatter contentFormatter, final ContentCollector<HTTPRequestStartLine> contentCollector) {
         this.httpFormatter = httpFormatter;
         this.contentFormatter = contentFormatter;
         this.contentCollector = contentCollector;
@@ -43,50 +42,37 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
         this.outToServer = outToServer;
         this.inFromClient = inFromClient;
         this.host = host;
-        this.contentCollector.withStream(inFromClient);
+        this.contentCollector.withStream(this.inFromClient);
+        this.contentCollector.withStartLine(HTTPRequestStartLine.class);
         return this;
     }
 
     private byte[] createGETRequest() {
-        final String fmtReq = new String(this.request, 0, this.read, StandardCharsets.UTF_8);
+        final String fmtReq = new String(this.request, StandardCharsets.UTF_8);
         final String[] splitFmtReq = fmtReq.split(HTTPSymbols.HTTP_NEWLINE_DELIMITER);
-        logger.info(Arrays.toString(splitFmtReq));
         return (
-            splitFmtReq[0] + "\r\n"
-            + "Host: " + this.host + "\r\n"
-            + "User-Agent: HTTP Proxy\r\n"
-            + "Accept: */*\r\n"
-            + "\r\n"
+            splitFmtReq[0] + HTTPSymbols.HTTP_NEWLINE_DELIMITER
+            + "Host: " + this.host + HTTPSymbols.HTTP_NEWLINE_DELIMITER
+            + "User-Agent: HTTP Proxy" + HTTPSymbols.HTTP_NEWLINE_DELIMITER
+            + "Accept: */*" + HTTPSymbols.HTTP_NEWLINE_DELIMITER
+            + HTTPSymbols.HTTP_NEWLINE_DELIMITER
         ).getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
     public void task() throws Exception {
-        logger.info("HERE");
-        final Pair<byte[], Integer> result =  this.contentCollector.synchronousReadAll();
-        logger.info("HERE");
-        this.request = result.getLeft();
-        this.read = result.getRight();
-        logger.debug("Read from client: " + this.read);
-
-        final HTTPMessage<HTTPRequestStartLine> message =  httpFormatter.fromRaw(new String(this.request, 0, this.read, StandardCharsets.UTF_8), HTTPRequestStartLine.class);
+        HTTPMessage<HTTPRequestStartLine> message = this.contentCollector.synchronousReadHeaders();
         message.headers.replace("User-Agent", "HTTP Proxy");
+        this.request = message.toRaw();
         byte[] rawMessage = message.toRaw();
-
         logger.info("Length: " + rawMessage.length + " Raw message: " + new String(rawMessage, 0, rawMessage.length, StandardCharsets.UTF_8));
-        logger.info("Message after raw: " + message);
 
         this.request = createGETRequest();
-        this.outToServer.write(this.request, 0, request.length);
+        this.outToServer.write(this.request);
         this.outToServer.flush();
+        logger.info("Finished writing to server");
     }
 
     @Override
-    public void after() {
-        try {
-            this.outToServer.close();
-        } catch (IOException e) {
-            logger.error(e, e);
-        }
-    }
+    public void after() {}
 }

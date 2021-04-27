@@ -10,6 +10,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,12 +25,24 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         this.config = config;
     }
 
+    private String[] formatSegmentedStartLine(final String raw) throws InvalidStartLineFormatException {
+        String[] segmentedRaw = raw.split(HTTPSymbols.START_LINE_DELIMITER);
+        if (segmentedRaw.length < 3) {
+            throw new InvalidStartLineFormatException("Expected 3 segments in start line got " + segmentedRaw.length + " for value: " + raw);
+        } else if (segmentedRaw.length > 3) {
+            segmentedRaw = new String[]{
+                    segmentedRaw[0],
+                    segmentedRaw[1],
+                    String.join(HTTPSymbols.START_LINE_DELIMITER, ArrayUtils.subarray(segmentedRaw, 2, segmentedRaw.length)),
+
+            };
+        }
+        return segmentedRaw;
+    }
+
     @SuppressWarnings("unchecked")
     private T parseRequestStartLine(final String raw) throws InvalidStartLineFormatException, InvalidHTTPVersionException {
-        final String[] segmentedRaw = raw.split(HTTPSymbols.START_LINE_DELIMITER);
-        if (segmentedRaw.length != 3) {
-            throw new InvalidStartLineFormatException("Expected 3 segements in start line got " + segmentedRaw.length + " for value: " + raw);
-        }
+        final String[] segmentedRaw = formatSegmentedStartLine(raw);
         return (T) new HTTPRequestStartLine(
                 HTTPMethod.valueOf(segmentedRaw[0]),
                 segmentedRaw[1],
@@ -39,18 +52,15 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
 
     @SuppressWarnings("unchecked")
     private T parseResponseStartLine(final String raw) throws InvalidStartLineFormatException, InvalidHTTPVersionException {
-        final String[] segmentedRaw = raw.split(HTTPSymbols.START_LINE_DELIMITER);
-        if (segmentedRaw.length != 3) {
-            throw new InvalidStartLineFormatException("Expected 3 segements in start line got " + segmentedRaw.length + " for value: " + raw);
-        }
-        final int statusCode = Integer.parseInt(segmentedRaw[0]);
+        final String[] segmentedRaw = formatSegmentedStartLine(raw);
+        final int statusCode = Integer.parseInt(segmentedRaw[1]);
         if (statusCode < 100 || statusCode > 599) {
             throw new InvalidStartLineFormatException("Invalid status code " + statusCode + ", required to be in range 100-599");
         }
         return (T) new HTTPResponseStartLine(
                 statusCode,
-                segmentedRaw[1],
-                HTTPVersion.fromRaw(segmentedRaw[2])
+                segmentedRaw[2],
+                HTTPVersion.fromRaw(segmentedRaw[0])
         );
     }
 
@@ -73,7 +83,15 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @Override
-    public HTTPMessage<T> fromRaw(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+    public HTTPMessage<T> fromRaw(final byte[] raw, final int rawLength, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+        return fromRawString(
+            new String(raw, 0, rawLength, StandardCharsets.UTF_8),
+            classOfT
+        );
+    }
+
+    @Override
+    public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         final String[] splitMetadataBody = raw.split(HTTPSymbols.HTTP_NEWLINE_DELIMITER + HTTPSymbols.HTTP_NEWLINE_DELIMITER);
         if (splitMetadataBody.length > 2 || splitMetadataBody.length < 1) {
             throw new InvalidHTTPMessageFormatException("Expected two sections for HEADERS and BODY, got " + splitMetadataBody.length + " sections instead");

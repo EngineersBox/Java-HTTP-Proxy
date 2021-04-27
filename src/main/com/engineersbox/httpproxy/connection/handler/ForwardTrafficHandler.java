@@ -3,7 +3,8 @@ package com.engineersbox.httpproxy.connection.handler;
 import com.engineersbox.httpproxy.connection.stream.ContentCollector;
 import com.engineersbox.httpproxy.formatting.content.BaseContentFormatter;
 import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
-import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
+import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
+import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -11,20 +12,20 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ForwardTrafficHandler extends BaseTrafficHandler {
 
     private final Logger logger = LogManager.getLogger(BackwardTrafficHandler.class);
 
-    private final BaseHTTPFormatter<HTTPRequestStartLine> httpFormatter;
+    private final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter;
     private final BaseContentFormatter contentFormatter;
-    private final ContentCollector contentCollector;
+    private final ContentCollector<HTTPResponseStartLine> contentCollector;
 
     private InputStream inFromServer;
     private OutputStream outToClient;
@@ -40,7 +41,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
     );
 
     @Inject
-    public ForwardTrafficHandler(final BaseHTTPFormatter<HTTPRequestStartLine> httpFormatter, final BaseContentFormatter contentFormatter, final ContentCollector contentCollector) {
+    public ForwardTrafficHandler(final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter, final BaseContentFormatter contentFormatter, final ContentCollector<HTTPResponseStartLine> contentCollector) {
         this.httpFormatter = httpFormatter;
         this.contentFormatter = contentFormatter;
         this.contentCollector = contentCollector;
@@ -51,19 +52,21 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
         this.outToClient = outToClient;
         this.server = server;
         this.client = client;
-        this.contentCollector.withStream(inFromServer);
+        this.contentCollector.withStream(this.inFromServer);
+        this.contentCollector.withStartLine(HTTPResponseStartLine.class);
         return this;
     }
 
     @Override
     public void task() throws Exception {
-        final Pair<byte[], Integer> result =  this.contentCollector.synchronousReadAll();
-        this.response = result.getLeft();
-        this.read = result.getRight();
-        logger.debug("Read from server: " + this.read);
+        HTTPMessage<HTTPResponseStartLine> message = this.contentCollector.synchronousReadHeaders();
+        this.contentCollector.synchronousReadBody(message);
+        this.response = message.toRaw();
+        this.read = this.response.length;
+        logger.debug("Read from server: " + new String(this.response, StandardCharsets.UTF_8));
 //        contentFormatter.withContentString(new String(this.response, 0, this.read, StandardCharsets.UTF_8));
 //        contentFormatter.replaceAllMatchingText(this.toReplace);
-        outToClient.write(this.response, 0, this.read);
+        outToClient.write(this.response);
         outToClient.flush();
     }
 
@@ -72,8 +75,6 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
         try {
             server.close();
             client.close();
-            outToClient.close();
-            inFromServer.close();
             logger.info("Closed connections");
         } catch (final IOException e) {
             logger.error(e.getMessage(), e);
