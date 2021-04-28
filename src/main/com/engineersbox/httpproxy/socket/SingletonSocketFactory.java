@@ -1,5 +1,6 @@
 package com.engineersbox.httpproxy.socket;
 
+import com.engineersbox.httpproxy.configuration.domain.servlet.Connections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,6 +12,12 @@ import java.net.Socket;
 public class SingletonSocketFactory extends SocketFactory {
 
     private static final Logger logger = LogManager.getLogger(SingletonSocketFactory.class);
+    private Connections connectionsConfig;
+
+    public SingletonSocketFactory withSocketConfigs(final Connections connectionsConfig) {
+        this.connectionsConfig = connectionsConfig;
+        return this;
+    }
 
     @Override
     public Socket createSocket(final String host, final int port) throws IOException {
@@ -18,6 +25,8 @@ public class SingletonSocketFactory extends SocketFactory {
             host,
             port
         );
+        socket.setSoTimeout(this.connectionsConfig.dropAfter);
+        socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
         return socket;
     }
 
@@ -33,6 +42,8 @@ public class SingletonSocketFactory extends SocketFactory {
             localhost,
             localport
         );
+        socket.setSoTimeout(this.connectionsConfig.dropAfter);
+        socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
         return socket;
     }
 
@@ -42,6 +53,8 @@ public class SingletonSocketFactory extends SocketFactory {
             host,
             port
         );
+        socket.setSoTimeout(this.connectionsConfig.dropAfter);
+        socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
         return socket;
     }
 
@@ -57,6 +70,8 @@ public class SingletonSocketFactory extends SocketFactory {
             localhost,
             localport
         );
+        socket.setSoTimeout(this.connectionsConfig.dropAfter);
+        socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
         return socket;
     }
 }

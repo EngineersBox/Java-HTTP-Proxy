@@ -39,7 +39,7 @@
 		]
 	},
 	"target": {
-		"host": "www.google.com",
+		"host": "www.bom.gov.au",
 		"port": 80
 	}
 }

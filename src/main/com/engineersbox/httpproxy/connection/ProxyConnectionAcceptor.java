@@ -1,6 +1,7 @@
 package com.engineersbox.httpproxy.connection;
 
 import com.engineersbox.httpproxy.configuration.ConfigModule;
+import com.engineersbox.httpproxy.configuration.domain.servlet.Connections;
 import com.engineersbox.httpproxy.connection.handler.BackwardTrafficHandler;
 import com.engineersbox.httpproxy.connection.handler.BaseTrafficHandler;
 import com.engineersbox.httpproxy.connection.handler.ForwardTrafficHandler;
@@ -20,6 +21,8 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
 
     private final Logger logger = LogManager.getLogger(ProxyConnectionAcceptor.class);
 
+    private Connections connectionsConfig;
+
     private final Socket localSocket;
     private final String host;
     private final int port;
@@ -32,14 +35,20 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
         this.poolManager = poolManager;
     }
 
+    public ProxyConnectionAcceptor withSocketConfigs(final Connections connectionsConfig) {
+        this.connectionsConfig = connectionsConfig;
+        return this;
+    }
+
     @Override
     public void task() throws Exception {
         final Socket server;
-        localSocket.setReceiveBufferSize(1024);
         final OutputStream outClient = localSocket.getOutputStream();
         final InputStream inClient = localSocket.getInputStream();
         try {
-            server = new SingletonSocketFactory().createSocket(host, port);
+            server = new SingletonSocketFactory()
+                    .withSocketConfigs(this.connectionsConfig)
+                    .createSocket(host, port);
             logger.debug("Retrieved socket from factory");
         } catch (IOException e) {
             final PrintWriter out = new PrintWriter(new OutputStreamWriter(localSocket.getOutputStream()));

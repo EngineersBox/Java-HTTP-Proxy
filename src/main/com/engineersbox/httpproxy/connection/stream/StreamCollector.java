@@ -8,6 +8,8 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.CharSet;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,39 +44,50 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
         this.classOfT = classOfT;
     }
 
+    private boolean validateRequestTermination(final boolean passedHeaders) {
+        if (classOfT.isAssignableFrom(HTTPRequestStartLine.class)) {
+            return !passedHeaders;
+        }
+        return true;
+    }
+
     private boolean validateLineRead(final String line) {
-        return classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? !StringUtils.isEmpty(line) : line != null;
+        if (classOfT.isAssignableFrom(HTTPRequestStartLine.class)) {
+            return !line.equals(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER);
+        }
+        return line != null;
     }
 
     private void sensitizedStreamRead(final StringBuilder sb, final BufferedReader br) throws IOException {
         int read = 0;
         int maxRead = Integer.MAX_VALUE;
         String line;
-        boolean pastHeaders = false;
-        boolean sectionDelimiter = false;
-        while (read <= maxRead && validateLineRead(line = br.readLine())) {
-            if (line.contains(HTTPSymbols.CONTENT_LENGTH_HEADER)) {
+        boolean passedHeaders = false;
+        final CRLFRetentiveLineReader retentiveLineReader = new CRLFRetentiveLineReader(br);
+        while (read < maxRead
+                && validateRequestTermination(passedHeaders)
+                && validateLineRead(line = retentiveLineReader.readLine(maxRead))) {
+            if (!passedHeaders && line.contains(HTTPSymbols.CONTENT_LENGTH_HEADER)) {
                 final String contentLengthHeader = line.split(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER)[1];
-                maxRead = Integer.parseInt(contentLengthHeader);
+                maxRead = Integer.parseInt(StringUtils.removeEnd(contentLengthHeader, HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER));
             }
             sb.append(line);
-            if (!pastHeaders && StringUtils.isEmpty(line)) {
-                pastHeaders = true;
-                sectionDelimiter = true;
-                sb.append(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
-            }
-            if (!pastHeaders) {
-                sb.append(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
+            if (!passedHeaders) {
+                if (line.equals(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)) {
+                    passedHeaders = true;
+                }
                 continue;
             }
-            if (sectionDelimiter) {
-                sectionDelimiter = false;
-            } else {
-                sb.append(HTTPSymbols.HTTP_BODY_NEWLINE_DELIMITER);
-            }
-            read += line.getBytes(StandardCharsets.UTF_8).length + 1;
+            read += line.getBytes(StandardCharsets.UTF_8).length;
         }
-        logger.debug("Read " + read + " bytes from stream");
+        logger.debug("Read " + sb.toString().getBytes(StandardCharsets.UTF_8).length + " bytes from stream");
+    }
+
+    private String handlePaddedPrefix(final StringBuilder sb) {
+        if (!CharSet.ASCII_ALPHA.contains(sb.charAt(0))) {
+            return sb.substring(1);
+        }
+        return sb.toString();
     }
 
     @Override
@@ -91,7 +104,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
             throw new SocketStreamReadError(e);
         }
         try {
-            return this.httpFormatter.fromRawString(sb.toString(), this.classOfT);
+            return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), this.classOfT);
         } catch (InvalidHTTPMessageFormatException | InvalidHTTPBodyException | InvalidHTTPHeaderException | InvalidStartLineFormatException | InvalidHTTPVersionException e) {
             // TODO: Return an HTTP 500 error when this occurs
             throw new SocketStreamReadError(e);

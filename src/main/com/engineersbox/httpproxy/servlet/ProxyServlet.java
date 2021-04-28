@@ -27,6 +27,7 @@ public class ProxyServlet implements AbstractServlet {
     public void init() {
         try {
             this.serverSocket = new SingletonServerSocketFactory()
+                .withSocketConfigs(this.config.servlet.connections)
                 .createServerSocket(
                     config.servlet.binding.port,
                     config.servlet.connections.acceptorQueueSize
@@ -46,7 +47,7 @@ public class ProxyServlet implements AbstractServlet {
                         config.target.host,
                         config.target.port,
                         poolManager
-                    )
+                    ).withSocketConfigs(this.config.servlet.connections)
                 );
             }
         } catch (final IOException e) {
