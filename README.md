@@ -27,38 +27,49 @@ An example configuration file:
 
 ```json
 {
-  "servlet": {
-    "threading": {
-      "poolSize": 10,
-      "schedulingPolicy": "FIFO"
-    },
-    "connections": {
-      "dropAfter": 30000,
-      "dropOnFailedDNSLookup": false
-    },
-    "messages": {
-      "dropOnMalformed": false
-    },
-    "cacheSize": 25
-  },
-  "policies": {
-    "enforcement": {
-      "whitelistBehaviour": {
-        "ip": "BLACKLIST",
-        "url": "WHITELIST"
-      },
-      "allowRedirects": true
-    },
-    "whitelist": {
-      "ip": [],
-      "url": []
-    },
-    "blacklist": {
-      "ip": [],
-      "url": []
-    }
-  },
-  "targetBaseUrl": "http://www.bom.gov.au/"
+	"servlet": {
+		"threading": {
+			"acceptorPoolSize": 10,
+			"handlerPoolSize": 10,
+			"schedulingPolicy": "FIFO"
+		},
+		"connections": {
+			"acceptorQueueSize": 10,
+			"handlerQueueSize": 10,
+			"dropAfter": 30000,
+			"dropOnFailedDNSLookup": false,
+			"readerBufferSize": 1024
+		},
+		"messages": {
+			"maxBodySize": 65535,
+			"dropOnMalformed": true
+		},
+		"binding": {
+			"host": "localhost",
+			"port": 3000
+		},
+		"cacheSize": 25
+	},
+	"policies": {
+		"enforcement": {
+			"whitelistBehaviour": {
+				"ip": "BLACKLIST",
+				"url": "WHITELIST"
+			},
+			"allowRedirects": true
+		},
+		"rulesets": [
+			{
+				"type": "URL",
+				"isWildcard": true,
+				"pattern": "http://console.[dev,prod].test.com/"
+			}
+		]
+	},
+	"target": {
+		"host": "www.bom.gov.au",
+		"port": 80
+	}
 }
 ```
 
@@ -66,160 +77,181 @@ JSON Schema describing the configuration file
 
 ```json
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
-  "properties": {
-    "servlet": {
-      "type": "object",
-      "properties": {
-        "threading": {
-          "type": "object",
-          "properties": {
-            "poolSize": {
-              "type": "integer"
-            },
-            "schedulingPolicy": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "poolSize",
-            "schedulingPolicy"
-          ]
-        },
-        "connections": {
-          "type": "object",
-          "properties": {
-            "dropAfter": {
-              "type": "integer"
-            },
-            "dropOnFailedDNSLookup": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "dropAfter",
-            "dropOnFailedDNSLookup"
-          ]
-        },
-        "messages": {
-          "type": "object",
-          "properties": {
-            "dropOnMalformed": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "dropOnMalformed"
-          ]
-        },
-        "cacheSize": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "threading",
-        "connections",
-        "messages",
-        "cacheSize"
-      ]
-    },
-    "policies": {
-      "type": "object",
-      "properties": {
-        "enforcement": {
-          "type": "object",
-          "properties": {
-            "whitelistBehaviour": {
-              "type": "object",
-              "properties": {
-                "ip": {
-                  "type": "string"
-                },
-                "url": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "ip",
-                "url"
-              ]
-            },
-            "allowRedirects": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "whitelistBehaviour",
-            "allowRedirects"
-          ]
-        },
-        "whitelist": {
-          "type": "object",
-          "properties": {
-            "ip": {
-              "type": "array",
-              "items": [
-                {
-                  "type": "string"
-                }
-              ]
-            },
-            "url": {
-              "type": "array",
-              "items": [
-                {
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "required": [
-            "ip",
-            "url"
-          ]
-        },
-        "blacklist": {
-          "type": "object",
-          "properties": {
-            "ip": {
-              "type": "array",
-              "items": [
-                {
-                  "type": "string"
-                }
-              ]
-            },
-            "url": {
-              "type": "array",
-              "items": [
-                {
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "required": [
-            "ip",
-            "url"
-          ]
-        }
-      },
-      "required": [
-        "enforcement",
-        "whitelist",
-        "blacklist"
-      ]
-    },
-    "targetBaseUrl": {
-      "type": "string"
-    }
-  },
-  "required": [
-    "servlet",
-    "policies",
-    "targetBaseUrl"
-  ]
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"servlet": {
+			"type": "object",
+			"properties": {
+				"threading": {
+					"type": "object",
+					"properties": {
+						"acceptorPoolSize": {
+							"type": "integer"
+						},
+						"handlerPoolSize": {
+							"type": "integer"
+						},
+						"schedulingPolicy": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"acceptorPoolSize",
+						"handlerPoolSize",
+						"schedulingPolicy"
+					]
+				},
+				"connections": {
+					"type": "object",
+					"properties": {
+						"acceptorQueueSize": {
+							"type": "integer"
+						},
+						"handlerQueueSize": {
+							"type": "integer"
+						},
+						"dropAfter": {
+							"type": "integer"
+						},
+						"dropOnFailedDNSLookup": {
+							"type": "boolean"
+						},
+						"readerBufferSize": {
+							"type": "integer"
+						}
+					},
+					"required": [
+						"acceptorQueueSize",
+						"handlerQueueSize",
+						"dropAfter",
+						"dropOnFailedDNSLookup",
+						"readerBufferSize"
+					]
+				},
+				"messages": {
+					"type": "object",
+					"properties": {
+						"maxBodySize": {
+							"type": "integer"
+						},
+						"dropOnMalformed": {
+							"type": "boolean"
+						}
+					},
+					"required": [
+						"maxBodySize",
+						"dropOnMalformed"
+					]
+				},
+				"binding": {
+					"type": "object",
+					"properties": {
+						"host": {
+							"type": "string"
+						},
+						"port": {
+							"type": "integer"
+						}
+					},
+					"required": [
+						"host",
+						"port"
+					]
+				},
+				"cacheSize": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"threading",
+				"connections",
+				"messages",
+				"binding",
+				"cacheSize"
+			]
+		},
+		"policies": {
+			"type": "object",
+			"properties": {
+				"enforcement": {
+					"type": "object",
+					"properties": {
+						"whitelistBehaviour": {
+							"type": "object",
+							"properties": {
+								"ip": {
+									"type": "string"
+								},
+								"url": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"ip",
+								"url"
+							]
+						},
+						"allowRedirects": {
+							"type": "boolean"
+						}
+					},
+					"required": [
+						"whitelistBehaviour",
+						"allowRedirects"
+					]
+				},
+				"rulesets": {
+					"type": "array",
+					"items": [
+						{
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"isWildcard": {
+									"type": "boolean"
+								},
+								"pattern": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"type",
+								"isWildcard",
+								"pattern"
+							]
+						}
+					]
+				}
+			},
+			"required": [
+				"enforcement",
+				"rulesets"
+			]
+		},
+		"target": {
+			"type": "object",
+			"properties": {
+				"host": {
+					"type": "string"
+				},
+				"port": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"host",
+				"port"
+			]
+		}
+	},
+	"required": [
+		"servlet",
+		"policies",
+		"target"
+	]
 }
 ```
 

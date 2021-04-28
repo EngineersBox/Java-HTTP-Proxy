@@ -7,6 +7,7 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -59,10 +60,10 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
 
     @Override
     public void task() throws Exception {
-        HTTPMessage<HTTPResponseStartLine> message = this.contentCollector.synchronousReadHeaders();
-        this.contentCollector.synchronousReadBody(message);
+        HTTPMessage<HTTPResponseStartLine> message = this.contentCollector.synchronousReadAll();
         this.response = message.toRaw();
         this.read = this.response.length;
+        logger.debug("ENC: " + StringEscapeUtils.escapeJava(new String(this.response, StandardCharsets.UTF_8)));
         logger.debug("Read from server: " + new String(this.response, StandardCharsets.UTF_8));
 //        contentFormatter.withContentString(new String(this.response, 0, this.read, StandardCharsets.UTF_8));
 //        contentFormatter.replaceAllMatchingText(this.toReplace);

@@ -28,7 +28,7 @@ public class HTTPResponseStartLine extends HTTPStartLine {
             this.version.version,
             String.valueOf(this.statusCode),
             this.statusMessage
-        ).concat(HTTPSymbols.HTTP_NEWLINE_DELIMITER).getBytes(StandardCharsets.UTF_8);
+        ).concat(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER).getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

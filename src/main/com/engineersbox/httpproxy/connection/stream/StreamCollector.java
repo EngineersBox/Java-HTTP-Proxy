@@ -6,7 +6,9 @@ import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
+import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,61 +42,65 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
         this.classOfT = classOfT;
     }
 
-    private String readHeaders(final BufferedReader br) throws IOException {
-        final StringBuilder sb = new StringBuilder();
+    private boolean validateLineRead(final String line) {
+        return classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? !StringUtils.isEmpty(line) : line != null;
+    }
+
+    private void sensitizedStreamRead(final StringBuilder sb, final BufferedReader br) throws IOException {
+        int read = 0;
+        int maxRead = Integer.MAX_VALUE;
         String line;
-        while (!(line = br.readLine()).equals("")) {
-            sb.append(line).append(HTTPSymbols.HTTP_NEWLINE_DELIMITER);
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public HTTPMessage<T> synchronousReadHeaders() throws SocketStreamReadError {
-        final HTTPMessage<T> message;
-        final BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-        try {
-            final String headers = readHeaders(br);
-            message = this.httpFormatter.fromRawString(headers, this.classOfT);
-            logger.debug("Finished reading headers from stream");
-        } catch (final IOException | InvalidHTTPMessageFormatException | InvalidStartLineFormatException | InvalidHTTPVersionException | InvalidHTTPHeaderException | InvalidHTTPBodyException e) {
-            // TODO: Return an HTTP 500 error when this occurs
-            throw new SocketStreamReadError(e);
-        }
-        return message;
-    }
-
-    @Override
-    public void synchronousReadBody(final HTTPMessage<T> message) throws SocketStreamReadError {
-        int totalRead = 0;
-        final ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[this.config.servlet.connections.readerBufferSize];
-        try {
-            int readIn;
-            final int maxRead = Integer.parseInt(message.headers.get("Content-Length"));
-            while ((readIn = stream.read(buffer)) != -1 && totalRead <= maxRead) {
-                logger.debug("READ VAL: " + readIn);
-                result.write(buffer, 0, readIn);
-                totalRead += readIn;
-                buffer = new byte[this.config.servlet.connections.readerBufferSize];
-                logger.debug("Read in " + readIn + " bytes from stream");
+        boolean pastHeaders = false;
+        boolean sectionDelimiter = false;
+        while (read <= maxRead && validateLineRead(line = br.readLine())) {
+            if (line.contains(HTTPSymbols.CONTENT_LENGTH_HEADER)) {
+                final String contentLengthHeader = line.split(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER)[1];
+                maxRead = Integer.parseInt(contentLengthHeader);
             }
-            logger.debug("Finished reading from stream");
+            sb.append(line);
+            if (!pastHeaders && StringUtils.isEmpty(line)) {
+                pastHeaders = true;
+                sectionDelimiter = true;
+                sb.append(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
+            }
+            if (!pastHeaders) {
+                sb.append(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
+                continue;
+            }
+            if (sectionDelimiter) {
+                sectionDelimiter = false;
+            } else {
+                sb.append(HTTPSymbols.HTTP_BODY_NEWLINE_DELIMITER);
+            }
+            read += line.getBytes(StandardCharsets.UTF_8).length + 1;
+        }
+        logger.debug("Read " + read + " bytes from stream");
+    }
+
+    @Override
+    public HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError {
+        final BufferedReader br = new BufferedReader(
+                new InputStreamReader(stream),
+                this.config.servlet.connections.readerBufferSize
+        );
+        final StringBuilder sb = new StringBuilder();
+        try {
+            sensitizedStreamRead(sb, br);
         } catch (final IOException e) {
             // TODO: Return an HTTP 500 error when this occurs
             throw new SocketStreamReadError(e);
         }
-        message.body = new String(result.toByteArray(), 0, totalRead, StandardCharsets.UTF_8);
+        try {
+            return this.httpFormatter.fromRawString(sb.toString(), this.classOfT);
+        } catch (InvalidHTTPMessageFormatException | InvalidHTTPBodyException | InvalidHTTPHeaderException | InvalidStartLineFormatException | InvalidHTTPVersionException e) {
+            // TODO: Return an HTTP 500 error when this occurs
+            throw new SocketStreamReadError(e);
+        }
     }
-
     @Override
     public CompletableFuture<HTTPMessage<T>> futureReadAll() {
-        return CompletableFuture.supplyAsync(this::synchronousReadHeaders)
-                .exceptionally((_ignored) -> null)
-                .thenCompose(result -> CompletableFuture.supplyAsync(() -> {
-                    synchronousReadBody(result);
-                    return result;
-                })).exceptionally((_ignored) -> null);
+        return CompletableFuture.supplyAsync(this::synchronousReadAll)
+                .exceptionally((_ignored) -> null);
     }
 
 }

@@ -10,11 +10,9 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class BackwardTrafficHandler extends BaseTrafficHandler {
 
@@ -49,20 +47,20 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
 
     private byte[] createGETRequest() {
         final String fmtReq = new String(this.request, StandardCharsets.UTF_8);
-        final String[] splitFmtReq = fmtReq.split(HTTPSymbols.HTTP_NEWLINE_DELIMITER);
+        final String[] splitFmtReq = fmtReq.split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
+        logger.info("FIRST: " + splitFmtReq[0] + " || " + splitFmtReq[0].length());
         return (
-            splitFmtReq[0] + HTTPSymbols.HTTP_NEWLINE_DELIMITER
-            + "Host: " + this.host + HTTPSymbols.HTTP_NEWLINE_DELIMITER
-            + "User-Agent: HTTP Proxy" + HTTPSymbols.HTTP_NEWLINE_DELIMITER
-            + "Accept: */*" + HTTPSymbols.HTTP_NEWLINE_DELIMITER
-            + HTTPSymbols.HTTP_NEWLINE_DELIMITER
+            splitFmtReq[0] + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER
+            + "Host: localhost:3000" + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER
+            + "User-Agent: HTTPProxy" + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER
+            + "Accept: */*" + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER
+            + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER
         ).getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
     public void task() throws Exception {
-        HTTPMessage<HTTPRequestStartLine> message = this.contentCollector.synchronousReadHeaders();
-        message.headers.replace("User-Agent", "HTTP Proxy");
+        HTTPMessage<HTTPRequestStartLine> message = this.contentCollector.synchronousReadAll();
         this.request = message.toRaw();
         byte[] rawMessage = message.toRaw();
         logger.info("Length: " + rawMessage.length + " Raw message: " + new String(rawMessage, 0, rawMessage.length, StandardCharsets.UTF_8));

@@ -31,7 +31,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
         for (final Map.Entry<String, String> header: this.headers.entrySet()) {
             sb.append(header.getKey()).append(": ").append(header.getValue()).append(delimiter);
         }
-        return sb.toString();
+        return sb.append(delimiter).toString();
     }
 
     private byte[] concatAll(final byte[] ...bytes) {
@@ -50,7 +50,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
 
     public byte[] toRaw() {
         final byte[] startLineBytes = this.startLine.toRaw();
-        final byte[] headersBytes = headersToString(HTTPSymbols.HTTP_NEWLINE_DELIMITER)
+        final byte[] headersBytes = headersToString(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
                 .getBytes(StandardCharsets.UTF_8);
         final byte[] bodyBytes = body == null ? new byte[0] : body.getBytes(StandardCharsets.UTF_8);
         return concatAll(

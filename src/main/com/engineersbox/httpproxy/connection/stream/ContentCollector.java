@@ -14,9 +14,7 @@ public interface ContentCollector<T extends HTTPStartLine> {
 
     void withStartLine(final Class<T> classOfT);
 
-    HTTPMessage<T> synchronousReadHeaders() throws SocketStreamReadError;
-
-    void synchronousReadBody(final HTTPMessage<T> message) throws SocketStreamReadError;
+    HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError;
 
     CompletableFuture<HTTPMessage<T>> futureReadAll() throws IOException;
 
