@@ -4,6 +4,7 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPVersion;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class HTTPResponseStartLine extends HTTPStartLine {
@@ -28,7 +29,8 @@ public class HTTPResponseStartLine extends HTTPStartLine {
             this.version.version,
             String.valueOf(this.statusCode),
             this.statusMessage
-        ).concat(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER).getBytes(StandardCharsets.UTF_8);
+        ).concat(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
+        .getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

@@ -2,21 +2,30 @@ package com.engineersbox.httpproxy.connection.stream;
 
 import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.exceptions.*;
+import com.engineersbox.httpproxy.formatting.content.GZIPCompression;
 import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
+import com.google.common.primitives.Bytes;
 import com.google.inject.Inject;
-import org.apache.commons.lang3.CharSet;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
+import java.net.Socket;
+import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.zip.GZIPInputStream;
 
 public class StreamCollector<T extends HTTPStartLine> implements ContentCollector<T> {
 
@@ -27,6 +36,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
 
     private InputStream stream;
     private Class<T> classOfT;
+    private Socket socket;
 
     @Inject
     public StreamCollector(final Config config, final BaseHTTPFormatter<T> httpFormatter) {
@@ -44,67 +54,109 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
         this.classOfT = classOfT;
     }
 
-    private boolean validateRequestTermination(final boolean passedHeaders) {
-        if (classOfT.isAssignableFrom(HTTPRequestStartLine.class)) {
-            return !passedHeaders;
-        }
-        return true;
+    @Override
+    public void withSocket(final Socket socket) {
+        this.socket = socket;
     }
 
-    private boolean validateLineRead(final String line) {
-        if (classOfT.isAssignableFrom(HTTPRequestStartLine.class)) {
-            return !line.equals(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER);
-        }
-        return line != null;
+    private String splitHeader(final String header) {
+        return header.split(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER)[1];
     }
 
-    private void sensitizedStreamRead(final StringBuilder sb, final BufferedReader br) throws IOException {
+    private boolean hasHeader(final String line, final String header) {
+        return line.contains(header + HTTPSymbols.HEADER_KEY_VALUE_DELIMITER);
+    }
+
+    private void logFoundHeader(final String header, final String value) {
+        logger.debug("Found " + header + " header with value " + value.trim());
+    }
+
+    private byte[] sensitizedStreamRead(final StringBuilder sb, final CRLFRetentiveLineReader retentiveLineReader) throws IOException {
         int read = 0;
-        int maxRead = Integer.MAX_VALUE;
-        String line;
-        boolean passedHeaders = false;
-        final CRLFRetentiveLineReader retentiveLineReader = new CRLFRetentiveLineReader(br);
-        while (read < maxRead
-                && validateRequestTermination(passedHeaders)
-                && validateLineRead(line = retentiveLineReader.readLine(maxRead))) {
-            if (!passedHeaders && line.contains(HTTPSymbols.CONTENT_LENGTH_HEADER)) {
-                final String contentLengthHeader = line.split(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER)[1];
-                maxRead = Integer.parseInt(StringUtils.removeEnd(contentLengthHeader, HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER));
+        String line = null;
+        Pair<String, List<Byte>> lineBytes;
+        List<Byte> bytes = new ArrayList<>();
+        final StreamContentProperties scp = new StreamContentProperties(this.classOfT);
+        while (scp.validateNextRead(line) && scp.validateLineRead((lineBytes = retentiveLineReader.readLineBytes()).getLeft())) {
+            line = lineBytes.getLeft();
+            if (!scp.passedHeaders) {
+                if (!scp.isCompressed && hasHeader(line, HTTPSymbols.CONTENT_ENCODING_HEADER)) {
+                    final String contentEncodingHeader = splitHeader(line);
+                    scp.isCompressed = contentEncodingHeader.equals(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)
+                            || contentEncodingHeader.equals(HTTPSymbols.CONTENT_ENCODING_X_GZIP_KEY);
+                    logFoundHeader(
+                        HTTPSymbols.CONTENT_ENCODING_HEADER,
+                        splitHeader(line)
+                    );
+                }
+                if (!scp.hasTransferEncodingHeader && hasHeader(line, HTTPSymbols.TRANSFER_ENCODING_HEADER)) {
+                    final String transferEncodingHeader = splitHeader(line);
+                    scp.hasTransferEncodingHeader = !transferEncodingHeader.equals(HTTPSymbols.TRANSFER_ENCODING_IDENTITY);
+                    logFoundHeader(
+                        HTTPSymbols.TRANSFER_ENCODING_HEADER,
+                        transferEncodingHeader
+                    );
+                }
             }
-            sb.append(line);
-            if (!passedHeaders) {
+           if (!scp.passedHeaders || !scp.isCompressed || scp.hasTextEncoding) {
+               sb.append(line);
+           }
+            bytes.addAll(lineBytes.getRight());
+           if (!scp.passedHeaders && hasHeader(line, HTTPSymbols.CONTENT_TYPE_HEADER)) {
+                final String contentTypeHeader = splitHeader(line);
+                if (line.contains(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)) {
+                    final String contentTypeCharset = contentTypeHeader.split(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)[1];
+                    scp.charset = Charset.forName(StringUtils.removeEnd(contentTypeCharset, HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER));
+                }
+                if (!HTTPSymbols.CONTENT_TYPE_TEXT_TYPE_REGEX.matcher(contentTypeHeader).matches()) {
+                    scp.hasTextEncoding = false;
+                }
+                logFoundHeader(
+                        HTTPSymbols.CONTENT_TYPE_HEADER,
+                        splitHeader(line)
+                );
+            }
+            if (!scp.passedHeaders) {
                 if (line.equals(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)) {
-                    passedHeaders = true;
+                    scp.passedHeaders = true;
                 }
                 continue;
             }
-            read += line.getBytes(StandardCharsets.UTF_8).length;
+            read += line.getBytes().length;
         }
-        logger.debug("Read " + sb.toString().getBytes(StandardCharsets.UTF_8).length + " bytes from stream");
+        logger.debug("Read " + read + " bytes from "
+                + (this.classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? "client" : "server")
+                + " input stream");
+        if (scp.isCompressed) {
+            sb.append(GZIPCompression.unzip(Bytes.toArray(bytes)));
+        }
+        return Bytes.toArray(bytes);
     }
 
     private String handlePaddedPrefix(final StringBuilder sb) {
-        if (!CharSet.ASCII_ALPHA.contains(sb.charAt(0))) {
-            return sb.substring(1);
-        }
-        return sb.toString();
+        return sb.charAt(0) == HTTPSymbols.NULL_BYTE ? sb.substring(1) : sb.toString();
     }
 
     @Override
     public HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError {
-        final BufferedReader br = new BufferedReader(
-                new InputStreamReader(stream),
-                this.config.servlet.connections.readerBufferSize
-        );
-        final StringBuilder sb = new StringBuilder();
         try {
-            sensitizedStreamRead(sb, br);
+            this.socket.setSoTimeout(this.config.servlet.connections.dropAfter);
+        } catch (final SocketException e) {
+            throw new SocketStreamReadError(e);
+        }
+        final CRLFRetentiveLineReader retentiveLineReader = new CRLFRetentiveLineReader(stream);
+        final StringBuilder sb = new StringBuilder();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final byte[] bodyBytes;
+        try {
+            bodyBytes = sensitizedStreamRead(sb, retentiveLineReader);
         } catch (final IOException e) {
             // TODO: Return an HTTP 500 error when this occurs
+            System.out.println(DatatypeConverter.printHexBinary(baos.toByteArray()));
             throw new SocketStreamReadError(e);
         }
         try {
-            return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), this.classOfT);
+            return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), this.classOfT).withBodyBytes(bodyBytes);
         } catch (InvalidHTTPMessageFormatException | InvalidHTTPBodyException | InvalidHTTPHeaderException | InvalidStartLineFormatException | InvalidHTTPVersionException e) {
             // TODO: Return an HTTP 500 error when this occurs
             throw new SocketStreamReadError(e);

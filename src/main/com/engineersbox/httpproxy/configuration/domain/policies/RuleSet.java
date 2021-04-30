@@ -3,12 +3,12 @@ package com.engineersbox.httpproxy.configuration.domain.policies;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public class RuleSet {
-    public final RuleType ruleType;
+    public final RuleType type;
     public final boolean isWildcard;
     public final String pattern;
 
-    public RuleSet(final RuleType ruleType, final boolean isWildcard, final String pattern) {
-        this.ruleType = ruleType;
+    public RuleSet(final RuleType type, final boolean isWildcard, final String pattern) {
+        this.type = type;
         this.isWildcard = isWildcard;
         this.pattern = pattern;
     }
@@ -23,7 +23,7 @@ public class RuleSet {
 
         return new EqualsBuilder()
                 .append(isWildcard, ruleSet.isWildcard)
-                .append(ruleType, ruleSet.ruleType)
+                .append(type, ruleSet.type)
                 .append(pattern, ruleSet.pattern)
                 .isEquals();
     }

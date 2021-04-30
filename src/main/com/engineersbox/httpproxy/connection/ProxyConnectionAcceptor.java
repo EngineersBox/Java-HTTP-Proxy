@@ -42,6 +42,7 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
 
     @Override
     public void task() throws Exception {
+        logger.info("Accepted client connection");
         final Socket server;
         final OutputStream outClient = localSocket.getOutputStream();
         final InputStream inClient = localSocket.getInputStream();
@@ -49,7 +50,7 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
             server = new SingletonSocketFactory()
                     .withSocketConfigs(this.connectionsConfig)
                     .createSocket(host, port);
-            logger.debug("Retrieved socket from factory");
+            logger.info("Established connection to server");
         } catch (IOException e) {
             final PrintWriter out = new PrintWriter(new OutputStreamWriter(localSocket.getOutputStream()));
             out.flush();
@@ -71,7 +72,8 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
                 .withStreams(
                     outServer,
                     inClient,
-                    host
+                    host,
+                    localSocket
                 )
         );
         logger.debug("Submitted BackwardTrafficHandler to PoolManager");

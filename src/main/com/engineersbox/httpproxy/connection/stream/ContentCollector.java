@@ -6,13 +6,14 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
 
 public interface ContentCollector<T extends HTTPStartLine> {
 
     void withStream(final InputStream stream);
-
     void withStartLine(final Class<T> classOfT);
+    void withSocket(final Socket socket);
 
     HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError;
 

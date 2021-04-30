@@ -26,7 +26,10 @@ public class Proxy {
 
     public static void main(String[] args) {
         try {
-            config = Config.fromFile(CONFIG_FILE_PATH != null ? CONFIG_FILE_PATH : DEFAULT_CONFIG_PATH);
+            final String cfgPath = CONFIG_FILE_PATH != null ? CONFIG_FILE_PATH : DEFAULT_CONFIG_PATH;
+            logger.info("Importing config from: " + cfgPath);
+            config = Config.fromFile(cfgPath);
+            config.logConfig();
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }

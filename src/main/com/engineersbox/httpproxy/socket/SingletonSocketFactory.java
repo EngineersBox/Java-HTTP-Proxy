@@ -12,7 +12,13 @@ import java.net.Socket;
 public class SingletonSocketFactory extends SocketFactory {
 
     private static final Logger logger = LogManager.getLogger(SingletonSocketFactory.class);
-    private Connections connectionsConfig;
+    private Connections connectionsConfig = new Connections(
+            10,
+            10,
+            0,
+            false,
+            1024
+    );
 
     public SingletonSocketFactory withSocketConfigs(final Connections connectionsConfig) {
         this.connectionsConfig = connectionsConfig;

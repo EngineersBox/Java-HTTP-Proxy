@@ -3,11 +3,11 @@ package com.engineersbox.httpproxy.configuration.domain.servlet;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public class Binding {
-    public final String hostname;
+    public final String host;
     public final int port;
 
-    public Binding(final String hostname, final int port) {
-        this.hostname = hostname;
+    public Binding(final String host, final int port) {
+        this.host = host;
         this.port = port;
     }
 
@@ -21,7 +21,7 @@ public class Binding {
 
         return new EqualsBuilder()
                 .append(port, binding.port)
-                .append(hostname, binding.hostname)
+                .append(host, binding.host)
                 .isEquals();
     }
 }

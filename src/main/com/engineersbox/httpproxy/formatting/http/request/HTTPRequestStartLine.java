@@ -29,7 +29,8 @@ public class HTTPRequestStartLine extends HTTPStartLine {
             this.method.toString(),
             this.target,
             this.version.version
-        ).concat(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER).getBytes(StandardCharsets.UTF_8);
+        ).concat(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
+        .getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

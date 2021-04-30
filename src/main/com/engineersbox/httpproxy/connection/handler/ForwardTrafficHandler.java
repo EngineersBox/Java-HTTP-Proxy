@@ -7,22 +7,20 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 public class ForwardTrafficHandler extends BaseTrafficHandler {
 
-    private final Logger logger = LogManager.getLogger(BackwardTrafficHandler.class);
+    private final Logger logger = LogManager.getLogger(ForwardTrafficHandler.class);
 
     private final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter;
     private final BaseContentFormatter contentFormatter;
@@ -55,6 +53,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
         this.client = client;
         this.contentCollector.withStream(this.inFromServer);
         this.contentCollector.withStartLine(HTTPResponseStartLine.class);
+        this.contentCollector.withSocket(server);
         return this;
     }
 
@@ -66,15 +65,18 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
 //        contentFormatter.withContentString(new String(this.response, 0, this.read, StandardCharsets.UTF_8));
 //        contentFormatter.replaceAllMatchingText(this.toReplace);
         outToClient.write(this.response);
+        logger.debug("Wrote " + this.read + " bytes to client output stream");
         outToClient.flush();
+        logger.trace("Flushed client input stream");
     }
 
     @Override
     public void after() {
         try {
             server.close();
+            logger.info("Closed server connection");
             client.close();
-            logger.info("Closed connections");
+            logger.info("Closed client connection");
         } catch (final IOException e) {
             logger.error(e.getMessage(), e);
         }

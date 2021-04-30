@@ -1,16 +1,24 @@
 package com.engineersbox.httpproxy.formatting.http.common;
 
+import com.engineersbox.httpproxy.connection.stream.ContentCollector;
+import com.engineersbox.httpproxy.formatting.content.GZIPCompression;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HTTPMessage<T extends HTTPStartLine> {
 
+    private final Logger logger = LogManager.getLogger(HTTPMessage.class);
+
     public T startLine;
     public Map<String, String> headers;
     public String body;
+    public byte[] bodyBytes;
 
     public HTTPMessage(final T startLine) {
         this(startLine, new HashMap<>());
@@ -24,6 +32,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
         this.startLine = startLine;
         this.headers = headers;
         this.body = body;
+        this.bodyBytes = body.getBytes();
     }
 
     private String headersToString(final String delimiter) {
@@ -48,16 +57,41 @@ public class HTTPMessage<T extends HTTPStartLine> {
         return returnableBytes;
     }
 
+    private byte[] getBody() {
+        if (body == null) {
+            return new byte[0];
+        }
+        if (!this.headers.containsKey(HTTPSymbols.CONTENT_ENCODING_HEADER)) {
+            return body.getBytes();
+        }
+        if (!this.headers.get(HTTPSymbols.CONTENT_ENCODING_HEADER).contains(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)) {
+            return body.getBytes();
+        }
+        try {
+            final byte[] bytes = GZIPCompression.zip(this.body);
+            this.headers.put(HTTPSymbols.CONTENT_LENGTH_HEADER, String.valueOf(bytes.length));
+            return bytes;
+        } catch (IOException e) {
+            logger.error(e, e);
+        }
+        return body.getBytes();
+    }
+
     public byte[] toRaw() {
         final byte[] startLineBytes = this.startLine.toRaw();
+        final byte[] bodyBytes = getBody();
         final byte[] headersBytes = headersToString(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
                 .getBytes(StandardCharsets.UTF_8);
-        final byte[] bodyBytes = body == null ? new byte[0] : body.getBytes(StandardCharsets.UTF_8);
         return concatAll(
             startLineBytes,
             headersBytes,
             bodyBytes
         );
+    }
+
+    public HTTPMessage<T> withBodyBytes(final byte[] bodyBytes) {
+        this.bodyBytes = bodyBytes.clone();
+        return this;
     }
 
     @Override

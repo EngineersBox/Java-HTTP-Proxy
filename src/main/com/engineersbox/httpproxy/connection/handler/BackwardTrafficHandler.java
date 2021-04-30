@@ -12,8 +12,10 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 public class BackwardTrafficHandler extends BaseTrafficHandler {
@@ -40,25 +42,30 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
         this.contentCollector = contentCollector;
     }
 
-    public BackwardTrafficHandler withStreams(final OutputStream outToServer, final InputStream inFromClient, final String host) {
+    public BackwardTrafficHandler withStreams(final OutputStream outToServer, final InputStream inFromClient, final String host, final Socket client) {
         this.outToServer = outToServer;
         this.inFromClient = inFromClient;
         this.host = host;
         this.contentCollector.withStream(this.inFromClient);
         this.contentCollector.withStartLine(HTTPRequestStartLine.class);
+        this.contentCollector.withSocket(client);
         return this;
     }
 
     @Override
     public void task() throws Exception {
         HTTPMessage<HTTPRequestStartLine> message = this.contentCollector.synchronousReadAll();
-        message.headers.replace("Host", config.target.host);
+        message.headers.replace("Host", this.config.target.host);
         message.headers.replace("User-Agent", "HTTPProxy");
+        message.headers.put("Connection", "close");
+//        message.headers.remove("Accept-Encoding");
         this.request = message.toRaw();
+        this.read = this.request.length;
         byte[] rawMessage = message.toRaw();
         this.outToServer.write(rawMessage);
+        logger.debug("Wrote " + this.read + " bytes to server output stream");
         this.outToServer.flush();
-        logger.info("Finished writing to server");
+        logger.trace("Flushed server input stream");
     }
 
     @Override

@@ -12,7 +12,13 @@ import org.apache.logging.log4j.Logger;
 public class SingletonServerSocketFactory extends ServerSocketFactory {
 
     private static final Logger logger = LogManager.getLogger(SingletonSocketFactory.class);
-    private Connections connectionsConfig;
+    private Connections connectionsConfig = new Connections(
+            10,
+            10,
+            0,
+            false,
+            1024
+    );
 
     private static final int MAX_ACCEPTOR_QUEUE_SIZE = 10;
 

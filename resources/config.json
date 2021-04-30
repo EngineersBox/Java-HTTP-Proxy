@@ -8,7 +8,7 @@
 		"connections": {
 			"acceptorQueueSize": 10,
 			"handlerQueueSize": 10,
-			"dropAfter": 30000,
+			"dropAfter": 1000,
 			"dropOnFailedDNSLookup": false,
 			"readerBufferSize": 1024
 		},
