@@ -2,10 +2,11 @@ package com.engineersbox.httpproxy;
 
 import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.configuration.ConfigModule;
+import com.engineersbox.httpproxy.connection.ConnectionModule;
 import com.engineersbox.httpproxy.formatting.FormattingModule;
 import com.engineersbox.httpproxy.servlet.ProxyModule;
 import com.engineersbox.httpproxy.servlet.ProxyServlet;
-import com.engineersbox.httpproxy.threading.PoolManager;
+import com.engineersbox.httpproxy.connection.threading.PoolManager;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +43,7 @@ public class Proxy {
         injector = Guice.createInjector(
                 new ConfigModule(),
                 new FormattingModule(),
+                new ConnectionModule(),
                 new ProxyModule()
         );
         final ProxyServlet proxyServlet = injector.getInstance(ProxyServlet.class);

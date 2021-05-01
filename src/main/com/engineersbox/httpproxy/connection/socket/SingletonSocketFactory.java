@@ -1,4 +1,4 @@
-package com.engineersbox.httpproxy.socket;
+package com.engineersbox.httpproxy.connection.socket;
 
 import com.engineersbox.httpproxy.configuration.domain.servlet.Connections;
 import org.apache.logging.log4j.LogManager;

@@ -7,8 +7,9 @@ import com.engineersbox.httpproxy.connection.handler.BaseTrafficHandler;
 import com.engineersbox.httpproxy.connection.handler.ForwardTrafficHandler;
 import com.engineersbox.httpproxy.exceptions.FailedToCreateServerSocketException;
 import com.engineersbox.httpproxy.formatting.FormattingModule;
-import com.engineersbox.httpproxy.socket.SingletonSocketFactory;
-import com.engineersbox.httpproxy.threading.ThreadManager;
+import com.engineersbox.httpproxy.connection.socket.SingletonSocketFactory;
+import com.engineersbox.httpproxy.connection.threading.ThreadManager;
+import com.engineersbox.httpproxy.resolver.ResolverModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -97,7 +98,8 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
                 new ConfigModule(),
                 new FormattingModule(),
                 new ConnectionModule(),
-                new TrafficHandlerModule()
+                new TrafficHandlerModule(),
+                new ResolverModule()
         );
         this.poolManager.submitHandler(
             injector.getInstance(BackwardTrafficHandler.class)

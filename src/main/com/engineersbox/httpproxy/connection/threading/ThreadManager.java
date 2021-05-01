@@ -1,4 +1,4 @@
-package com.engineersbox.httpproxy.threading;
+package com.engineersbox.httpproxy.connection.threading;
 
 import com.engineersbox.httpproxy.connection.handler.BaseTrafficHandler;
 

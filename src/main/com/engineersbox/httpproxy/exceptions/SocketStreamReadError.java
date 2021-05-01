@@ -1,6 +1,6 @@
 package com.engineersbox.httpproxy.exceptions;
 
-public class SocketStreamReadError extends RuntimeException{
+public class SocketStreamReadError extends SocketException {
 
     public SocketStreamReadError(final String message) {
         super(message);

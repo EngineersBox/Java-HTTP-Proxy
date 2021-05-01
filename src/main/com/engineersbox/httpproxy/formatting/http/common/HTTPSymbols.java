@@ -7,6 +7,7 @@ public class HTTPSymbols {
     public static final String START_LINE_DELIMITER = " ";
     public static final String HEADER_KEY_VALUE_DELIMITER = ": ";
     public static final char NULL_BYTE = '\0';
+    public static final String HEADER_VALUE_LIST_DELIMITER = ";";
 
     public static final Pattern HEADER_REGEX = Pattern.compile("([\\w-]+)" + HEADER_KEY_VALUE_DELIMITER + "(.*)");
 

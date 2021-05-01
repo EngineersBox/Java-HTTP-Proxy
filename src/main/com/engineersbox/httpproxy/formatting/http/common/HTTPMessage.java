@@ -33,7 +33,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
         this.startLine = startLine;
         this.headers = headers;
         this.body = body;
-        this.bodyBytes = body.getBytes();
+        this.bodyBytes = body == null ? null : body.getBytes();
     }
 
     private String headersToString(final String delimiter) {
@@ -91,14 +91,11 @@ public class HTTPMessage<T extends HTTPStartLine> {
     }
 
     public byte[] toRaw() {
-        final byte[] startLineBytes = this.startLine.toRaw();
-        final byte[] bb = getBody();
-        final byte[] headersBytes = headersToString(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
-                .getBytes(StandardCharsets.UTF_8);
         return concatAll(
-            startLineBytes,
-            headersBytes,
-            bb
+                this.startLine.toRaw(),
+                headersToString(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
+                        .getBytes(StandardCharsets.UTF_8),
+                getBody()
         );
     }
 

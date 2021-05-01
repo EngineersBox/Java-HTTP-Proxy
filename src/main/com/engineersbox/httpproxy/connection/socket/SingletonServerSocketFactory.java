@@ -1,4 +1,4 @@
-package com.engineersbox.httpproxy.socket;
+package com.engineersbox.httpproxy.connection.socket;
 
 import javax.net.ServerSocketFactory;
 import java.io.IOException;

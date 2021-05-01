@@ -1,9 +1,9 @@
 package com.engineersbox.httpproxy.servlet;
 
 import com.engineersbox.httpproxy.configuration.Config;
-import com.engineersbox.httpproxy.socket.SingletonServerSocketFactory;
+import com.engineersbox.httpproxy.connection.socket.SingletonServerSocketFactory;
 import com.engineersbox.httpproxy.connection.ProxyConnectionAcceptor;
-import com.engineersbox.httpproxy.threading.ThreadManager;
+import com.engineersbox.httpproxy.connection.threading.ThreadManager;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

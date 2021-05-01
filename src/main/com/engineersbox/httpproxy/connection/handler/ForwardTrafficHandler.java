@@ -5,6 +5,7 @@ import com.engineersbox.httpproxy.formatting.content.BaseContentFormatter;
 import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
+import com.engineersbox.httpproxy.resolver.ResourceResolver;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -24,6 +25,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
     private final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter;
     private final BaseContentFormatter contentFormatter;
     private final ContentCollector<HTTPResponseStartLine> contentCollector;
+    private final ResourceResolver resolver;
 
     private InputStream inFromServer;
     private OutputStream outToClient;
@@ -42,6 +44,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
     public ForwardTrafficHandler(final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter,
                                  final BaseContentFormatter contentFormatter,
                                  final ContentCollector<HTTPResponseStartLine> contentCollector,
+                                 final ResourceResolver resolver,
                                  @Named("Server In") final InputStream inServer,
                                  @Named("Client Out") final OutputStream outClient,
                                  @Named("Server Socket") final Socket server,
@@ -49,6 +52,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
         this.httpFormatter = httpFormatter;
         this.contentFormatter = contentFormatter;
         this.contentCollector = contentCollector;
+        this.resolver = resolver;
         this.inFromServer = inServer;
         this.outToClient = outClient;
         this.server = server;
@@ -61,6 +65,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
     @Override
     public void task() throws Exception {
         HTTPMessage<HTTPResponseStartLine> message = this.contentCollector.synchronousReadAll();
+        final HTTPMessage<HTTPResponseStartLine> resolvedMessage = this.resolver.match(message);
         this.response = message.toRaw();
         this.read = this.response.length;
 //        contentFormatter.withContentString(new String(this.response, 0, this.read, StandardCharsets.UTF_8));
