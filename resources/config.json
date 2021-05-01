@@ -13,7 +13,7 @@
 			"readerBufferSize": 1024
 		},
 		"messages": {
-			"maxBodySize": 65535,
+			"maxBodySize": 600000,
 			"dropOnMalformed": true
 		},
 		"binding": {

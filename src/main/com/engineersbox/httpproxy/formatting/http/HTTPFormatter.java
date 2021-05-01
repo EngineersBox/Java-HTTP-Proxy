@@ -91,6 +91,23 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @Override
+    public HTTPMessage<T> fromRaw(final byte[] raw, final byte[] bodyBytes, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+        return fromRawString(
+                new String(raw, charset),
+                bodyBytes,
+                classOfT
+        );
+    }
+
+    @Override
+    public HTTPMessage<T> fromRawString(final String raw, final byte[] bodyBytes, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+        final HTTPMessage<T> message = fromRawString(raw, classOfT);
+        message.withBodyBytes(bodyBytes);
+        logger.trace("Added raw bytes to message");
+        return message;
+    }
+
+    @Override
     public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         final String[] splitMetadataBody = raw.split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER, 2);
         if (splitMetadataBody.length < 1) {

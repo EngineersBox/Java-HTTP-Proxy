@@ -9,8 +9,10 @@ import com.engineersbox.httpproxy.exceptions.FailedToCreateServerSocketException
 import com.engineersbox.httpproxy.formatting.FormattingModule;
 import com.engineersbox.httpproxy.socket.SingletonSocketFactory;
 import com.engineersbox.httpproxy.threading.ThreadManager;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.name.Names;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,10 +25,16 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
 
     private Connections connectionsConfig;
 
+    private Socket server;
     private final Socket localSocket;
     private final String host;
     private final int port;
     private final ThreadManager poolManager;
+
+    private InputStream inClient;
+    private InputStream inServer;
+    private OutputStream outClient;
+    private OutputStream outServer;
 
     public ProxyConnectionAcceptor(final Socket localSocket, final String host, final int port, final ThreadManager poolManager) {
         this.localSocket = localSocket;
@@ -40,14 +48,37 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
         return this;
     }
 
+    class TrafficHandlerModule extends AbstractModule {
+        @Override
+        protected void configure() {
+            bind(InputStream.class)
+                    .annotatedWith(Names.named("Client In"))
+                    .toInstance(inClient);
+            bind(InputStream.class)
+                    .annotatedWith(Names.named("Server In"))
+                    .toInstance(inServer);
+            bind(OutputStream.class)
+                    .annotatedWith(Names.named("Client Out"))
+                    .toInstance(outClient);
+            bind(OutputStream.class)
+                    .annotatedWith(Names.named("Server Out"))
+                    .toInstance(outServer);
+            bind(Socket.class)
+                    .annotatedWith(Names.named("Client Socket"))
+                    .toInstance(localSocket);
+            bind(Socket.class)
+                    .annotatedWith(Names.named("Server Socket"))
+                    .toInstance(server);
+        }
+    }
+
     @Override
     public void task() throws Exception {
         logger.info("Accepted client connection");
-        final Socket server;
-        final OutputStream outClient = localSocket.getOutputStream();
-        final InputStream inClient = localSocket.getInputStream();
+        this.outClient = localSocket.getOutputStream();
+        this.inClient = localSocket.getInputStream();
         try {
-            server = new SingletonSocketFactory()
+            this.server = new SingletonSocketFactory()
                     .withSocketConfigs(this.connectionsConfig)
                     .createSocket(host, port);
             logger.info("Established connection to server");
@@ -60,31 +91,20 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
             );
         }
 
-        final OutputStream outServer = server.getOutputStream();
-        final InputStream inServer = server.getInputStream();
+        this.outServer = server.getOutputStream();
+        this.inServer = server.getInputStream();
         final Injector injector = Guice.createInjector(
                 new ConfigModule(),
                 new FormattingModule(),
-                new ConnectionModule()
+                new ConnectionModule(),
+                new TrafficHandlerModule()
         );
         this.poolManager.submitHandler(
             injector.getInstance(BackwardTrafficHandler.class)
-                .withStreams(
-                    outServer,
-                    inClient,
-                    host,
-                    localSocket
-                )
         );
         logger.debug("Submitted BackwardTrafficHandler to PoolManager");
         this.poolManager.submitHandler(
             injector.getInstance(ForwardTrafficHandler.class)
-                .withStreams(
-                    inServer,
-                    outClient,
-                    server,
-                    localSocket
-                )
         );
         logger.debug("Submitted ForwardTrafficHandler to PoolManager");
     }

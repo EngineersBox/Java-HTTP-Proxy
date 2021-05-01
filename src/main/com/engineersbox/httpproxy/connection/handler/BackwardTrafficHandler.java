@@ -8,6 +8,7 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,29 +28,32 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
     private final ContentCollector<HTTPRequestStartLine> contentCollector;
     private final Config config;
 
-    private OutputStream outToServer;
-    private InputStream inFromClient;
-    private String host;
+    private final OutputStream outToServer;
+    private final InputStream inFromClient;
+
+    private final Socket client;
 
     private int read;
     private byte[] request;
 
     @Inject
-    public BackwardTrafficHandler(final Config config, final BaseHTTPFormatter<HTTPRequestStartLine> httpFormatter, final BaseContentFormatter contentFormatter, final ContentCollector<HTTPRequestStartLine> contentCollector) {
+    public BackwardTrafficHandler(final Config config,
+                                  final BaseHTTPFormatter<HTTPRequestStartLine> httpFormatter,
+                                  final BaseContentFormatter contentFormatter,
+                                  final ContentCollector<HTTPRequestStartLine> contentCollector,
+                                  @Named("Client In") final InputStream inClient,
+                                  @Named("Server Out") final OutputStream outServer,
+                                  @Named("Client Socket") final Socket client) {
         this.config = config;
         this.httpFormatter = httpFormatter;
         this.contentFormatter = contentFormatter;
         this.contentCollector = contentCollector;
-    }
-
-    public BackwardTrafficHandler withStreams(final OutputStream outToServer, final InputStream inFromClient, final String host, final Socket client) {
-        this.outToServer = outToServer;
-        this.inFromClient = inFromClient;
-        this.host = host;
+        this.outToServer = outServer;
+        this.inFromClient = inClient;
+        this.client = client;
         this.contentCollector.withStream(this.inFromClient);
         this.contentCollector.withStartLine(HTTPRequestStartLine.class);
-        this.contentCollector.withSocket(client);
-        return this;
+        this.contentCollector.withSocket(this.client);
     }
 
     @Override

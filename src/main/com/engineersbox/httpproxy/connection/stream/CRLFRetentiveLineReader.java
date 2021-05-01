@@ -22,6 +22,29 @@ public class CRLFRetentiveLineReader {
         this.stream = stream;
     }
 
+    /**
+     * Reads byte-by-byte from InputStream until it finds one of 3 line termination configurations:
+     * <ol>
+     *     <li>{@code CR (\r)}</li>
+     *     <li>{@code LF (\n)}</li>
+     *     <li>{@code CRLF (\r\n)}</li>
+     * </ol>
+     *
+     * Once a line terminator has been reached it terminates the read and returns. The read line <strong>INCLUDES</strong>
+     * the line terminator in the string and byte list. Each line read stores the resulting string and the raw bytes as a
+     * {@code List<<Byte>>}, returned as a {@code Pair<String, List<Byte>>}.
+     *
+     * <br/><br/>
+     *
+     * This method exists to handle the issues with reading compressed data with a <code>BufferedReader</code>, in that
+     * line reads have their terminators omitted from the returned string, which can malform/corrupt compressed body data.
+     *
+     * Additionally, it is not possible to reconstruct these line endings as there is no way to tell which one of the
+     * three possible endings was encountered
+     *
+     * @return {@code Pair<String, List<Byte>>} Line as a string and raw line bytes
+     * @throws IOException If an I/O error occurs
+     */
     public Pair<String, List<Byte>> readLineBytes() throws IOException {
         if (asciiLiteral == LINE_READ_EXCEEDED) {
             asciiLiteral = stream.read();

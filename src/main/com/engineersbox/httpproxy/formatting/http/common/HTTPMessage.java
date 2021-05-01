@@ -1,12 +1,13 @@
 package com.engineersbox.httpproxy.formatting.http.common;
 
-import com.engineersbox.httpproxy.connection.stream.ContentCollector;
 import com.engineersbox.httpproxy.formatting.content.GZIPCompression;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,11 +51,23 @@ public class HTTPMessage<T extends HTTPStartLine> {
         byte[] returnableBytes = new byte[]{};
         for (final byte[] bytesElem : bytes) {
             returnableBytes = ArrayUtils.addAll(
-                returnableBytes,
-                bytesElem
+                    returnableBytes,
+                    bytesElem
             );
         }
         return returnableBytes;
+    }
+
+    private Charset getCharset() {
+        if (!this.headers.containsKey(HTTPSymbols.CONTENT_TYPE_HEADER)) {
+            return StandardCharsets.UTF_8;
+        }
+        final String contentTypeHeader = this.headers.get(HTTPSymbols.CONTENT_TYPE_HEADER);
+        if (!contentTypeHeader.contains(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)) {
+            return StandardCharsets.UTF_8;
+        }
+        final String contentTypeCharset = contentTypeHeader.split(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)[1];
+        return  Charset.forName(StringUtils.removeEnd(contentTypeCharset, HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER));
     }
 
     private byte[] getBody() {
@@ -62,30 +75,30 @@ public class HTTPMessage<T extends HTTPStartLine> {
             return new byte[0];
         }
         if (!this.headers.containsKey(HTTPSymbols.CONTENT_ENCODING_HEADER)) {
-            return body.getBytes();
+            return body.getBytes(getCharset());
         }
         if (!this.headers.get(HTTPSymbols.CONTENT_ENCODING_HEADER).contains(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)) {
-            return body.getBytes();
+            return body.getBytes(getCharset());
         }
         try {
-            final byte[] bytes = GZIPCompression.zip(this.body);
+            final byte[] bytes = GZIPCompression.zip(this.body, getCharset());
             this.headers.put(HTTPSymbols.CONTENT_LENGTH_HEADER, String.valueOf(bytes.length));
             return bytes;
         } catch (IOException e) {
             logger.error(e, e);
         }
-        return body.getBytes();
+        return body.getBytes(getCharset());
     }
 
     public byte[] toRaw() {
         final byte[] startLineBytes = this.startLine.toRaw();
-        final byte[] bodyBytes = getBody();
+        final byte[] bb = getBody();
         final byte[] headersBytes = headersToString(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
                 .getBytes(StandardCharsets.UTF_8);
         return concatAll(
             startLineBytes,
             headersBytes,
-            bodyBytes
+            bb
         );
     }
 

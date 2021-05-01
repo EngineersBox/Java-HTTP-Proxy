@@ -7,6 +7,7 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -14,9 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 public class ForwardTrafficHandler extends BaseTrafficHandler {
 
@@ -40,21 +39,23 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
     );
 
     @Inject
-    public ForwardTrafficHandler(final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter, final BaseContentFormatter contentFormatter, final ContentCollector<HTTPResponseStartLine> contentCollector) {
+    public ForwardTrafficHandler(final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter,
+                                 final BaseContentFormatter contentFormatter,
+                                 final ContentCollector<HTTPResponseStartLine> contentCollector,
+                                 @Named("Server In") final InputStream inServer,
+                                 @Named("Client Out") final OutputStream outClient,
+                                 @Named("Server Socket") final Socket server,
+                                 @Named("Client Socket") final Socket client) {
         this.httpFormatter = httpFormatter;
         this.contentFormatter = contentFormatter;
         this.contentCollector = contentCollector;
-    }
-
-    public ForwardTrafficHandler withStreams(final InputStream inFromServer, OutputStream outToClient, final Socket server, final Socket client) {
-        this.inFromServer = inFromServer;
-        this.outToClient = outToClient;
+        this.inFromServer = inServer;
+        this.outToClient = outClient;
         this.server = server;
         this.client = client;
         this.contentCollector.withStream(this.inFromServer);
         this.contentCollector.withStartLine(HTTPResponseStartLine.class);
-        this.contentCollector.withSocket(server);
-        return this;
+        this.contentCollector.withSocket(this.server);
     }
 
     @Override

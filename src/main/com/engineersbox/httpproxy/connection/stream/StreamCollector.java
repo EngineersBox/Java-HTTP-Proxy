@@ -60,7 +60,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
     }
 
     private String splitHeader(final String header) {
-        return header.split(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER)[1];
+        return header.split(HTTPSymbols.HEADER_KEY_VALUE_DELIMITER)[1].trim();
     }
 
     private boolean hasHeader(final String line, final String header) {
@@ -101,7 +101,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
            if (!scp.passedHeaders || !scp.isCompressed || scp.hasTextEncoding) {
                sb.append(line);
            }
-            bytes.addAll(lineBytes.getRight());
            if (!scp.passedHeaders && hasHeader(line, HTTPSymbols.CONTENT_TYPE_HEADER)) {
                 final String contentTypeHeader = splitHeader(line);
                 if (line.contains(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)) {
@@ -122,13 +121,16 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                 }
                 continue;
             }
+            if (scp.isCompressed) {
+                bytes.addAll(lineBytes.getRight());
+            }
             read += line.getBytes().length;
         }
         logger.debug("Read " + read + " bytes from "
                 + (this.classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? "client" : "server")
                 + " input stream");
         if (scp.isCompressed) {
-            sb.append(GZIPCompression.unzip(Bytes.toArray(bytes)));
+            sb.append(GZIPCompression.unzip(Bytes.toArray(bytes), scp.charset));
         }
         return Bytes.toArray(bytes);
     }
@@ -146,17 +148,15 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
         }
         final CRLFRetentiveLineReader retentiveLineReader = new CRLFRetentiveLineReader(stream);
         final StringBuilder sb = new StringBuilder();
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final byte[] bodyBytes;
         try {
             bodyBytes = sensitizedStreamRead(sb, retentiveLineReader);
         } catch (final IOException e) {
             // TODO: Return an HTTP 500 error when this occurs
-            System.out.println(DatatypeConverter.printHexBinary(baos.toByteArray()));
             throw new SocketStreamReadError(e);
         }
         try {
-            return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), this.classOfT).withBodyBytes(bodyBytes);
+            return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), bodyBytes, this.classOfT);
         } catch (InvalidHTTPMessageFormatException | InvalidHTTPBodyException | InvalidHTTPHeaderException | InvalidStartLineFormatException | InvalidHTTPVersionException e) {
             // TODO: Return an HTTP 500 error when this occurs
             throw new SocketStreamReadError(e);
