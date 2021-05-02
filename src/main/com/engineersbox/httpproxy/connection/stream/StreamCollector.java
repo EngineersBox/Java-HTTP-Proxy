@@ -80,6 +80,9 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                     final String contentEncodingHeader = splitHeader(line);
                     scp.isCompressed = contentEncodingHeader.equals(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)
                             || contentEncodingHeader.equals(HTTPSymbols.CONTENT_ENCODING_X_GZIP_KEY);
+                    if (!contentEncodingHeader.contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY)) {
+                        scp.hasContentEncoding = true;
+                    }
                     logFoundHeader(
                         HTTPSymbols.CONTENT_ENCODING_HEADER,
                         splitHeader(line)
@@ -94,7 +97,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                     );
                 }
             }
-           if (!scp.passedHeaders || !scp.isCompressed || scp.hasTextEncoding) {
+           if (!scp.passedHeaders || !scp.isCompressed || !scp.hasContentEncoding) {
                sb.append(line);
                read += line.getBytes().length;
            }
@@ -103,9 +106,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                 if (line.contains(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)) {
                     final String contentTypeCharset = contentTypeHeader.split(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)[1];
                     scp.charset = Charset.forName(StringUtils.removeEnd(contentTypeCharset, HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER));
-                }
-                if (!HTTPSymbols.CONTENT_TYPE_TEXT_TYPE_REGEX.matcher(contentTypeHeader).matches()) {
-                    scp.hasTextEncoding = false;
                 }
                 logFoundHeader(
                         HTTPSymbols.CONTENT_TYPE_HEADER,

@@ -71,6 +71,10 @@ public class HTTPMessage<T extends HTTPStartLine> {
     }
 
     private byte[] getBody() {
+        final String contentTypeHeader = this.headers.get(HTTPSymbols.CONTENT_TYPE_HEADER);
+        if (contentTypeHeader != null && !HTTPSymbols.CONTENT_TYPE_TEXT_TYPE_REGEX.matcher(contentTypeHeader).matches()) {
+            return this.bodyBytes;
+        }
         if (body == null) {
             return new byte[0];
         }

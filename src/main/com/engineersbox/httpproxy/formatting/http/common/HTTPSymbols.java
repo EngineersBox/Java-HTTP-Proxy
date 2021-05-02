@@ -19,6 +19,7 @@ public class HTTPSymbols {
     public static final String CONTENT_ENCODING_HEADER = "Content-Encoding";
     public static final String CONTENT_ENCODING_GZIP_KEY = "gzip";
     public static final String CONTENT_ENCODING_X_GZIP_KEY = "x-" + CONTENT_ENCODING_GZIP_KEY;
+    public static final String CONTENT_ENCODING_IDENTITY = "identity";
 
     public static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     public static final String TRANSFER_ENCODING_IDENTITY = "identity";
