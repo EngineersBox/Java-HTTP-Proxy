@@ -37,6 +37,9 @@ public class ResponseContentResource {
 
     @ContentType({"text/html"})
     public HTTPMessage<HTTPResponseStartLine> handleHTMLResponse(final HTTPMessage<HTTPResponseStartLine> message) {
+        this.contentFormatter.withContentString(message.body);
+        this.contentFormatter.replaceAllMatchingText(this.toReplace);
+        message.setBody(this.contentFormatter.getContentString());
         return message;
     }
 

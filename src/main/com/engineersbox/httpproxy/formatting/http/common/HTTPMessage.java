@@ -18,7 +18,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
 
     public final T startLine;
     public final Map<String, String> headers;
-    public final String body;
+    public String body;
     public byte[] bodyBytes;
 
     public HTTPMessage(final T startLine) {
@@ -99,6 +99,10 @@ public class HTTPMessage<T extends HTTPStartLine> {
 
     public void withBodyBytes(final byte[] bodyBytes) {
         this.bodyBytes = bodyBytes.clone();
+    }
+
+    public void setBody(final String newBody) {
+        this.body = newBody;
     }
 
     @Override

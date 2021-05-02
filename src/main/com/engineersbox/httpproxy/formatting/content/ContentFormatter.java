@@ -47,4 +47,10 @@ public class ContentFormatter implements BaseContentFormatter {
         toReplace.forEach(pair -> replaceMatchingText(pair.getLeft(), pair.getRight()));
     }
 
+    @Override
+    public String getContentString() {
+        this.contentString = this.document.toString();
+        return this.contentString;
+    }
+
 }

@@ -12,4 +12,6 @@ public interface BaseContentFormatter {
 
     void replaceAllMatchingText(final List<Pair<String, String>> toReplace);
 
+    String getContentString();
+
 }
