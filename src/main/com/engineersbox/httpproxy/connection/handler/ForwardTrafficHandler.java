@@ -1,7 +1,7 @@
 package com.engineersbox.httpproxy.connection.handler;
 
 import com.engineersbox.httpproxy.connection.stream.ContentCollector;
-import com.engineersbox.httpproxy.exceptions.SocketStreamReadError;
+import com.engineersbox.httpproxy.exceptions.socket.SocketStreamReadError;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
 import com.engineersbox.httpproxy.formatting.http.response.StandardResponses;

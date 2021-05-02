@@ -3,7 +3,7 @@ package com.engineersbox.httpproxy.resolver;
 import com.engineersbox.httpproxy.Proxy;
 import com.engineersbox.httpproxy.configuration.ConfigModule;
 import com.engineersbox.httpproxy.connection.ConnectionModule;
-import com.engineersbox.httpproxy.exceptions.ResourceEndpointMatcherException;
+import com.engineersbox.httpproxy.exceptions.resolver.ResourceEndpointMatcherException;
 import com.engineersbox.httpproxy.formatting.FormattingModule;
 import com.engineersbox.httpproxy.formatting.http.common.*;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
@@ -120,12 +120,17 @@ public class HandlerResolver implements ResourceResolver {
                 final List<String> patterns = Arrays.asList(m.getAnnotation(ContentType.class).value());
                 return matchHeaderToPatterns(contentTypeHeader.trim(), patterns).isPresent();
             });
-            logger.trace("Invoking method for message: " + message);
+            logger.trace(String.format(
+                    "Invoking method [%s] for message: %s",
+                    method.getName(),
+                    message
+            ));
             return (HTTPMessage<HTTPResponseStartLine>) method.invoke(
                     instantiateResource(method.getDeclaringClass()),
                     message
             );
         } catch (final ResourceEndpointMatcherException e) {
+            logger.trace(e.getMessage());
             return message;
         }  catch (final InvocationTargetException e) {
             try {
@@ -147,6 +152,11 @@ public class HandlerResolver implements ResourceResolver {
             }
             return Arrays.asList(m.getAnnotation(ExceptionHandler.class).value()).contains(targetException.getClass());
         });
+        logger.trace(String.format(
+                "Invoking method [%s] for resource exception: %s",
+                method.getName(),
+                targetException.getClass().getName()
+        ));
         return (HTTPMessage<HTTPResponseStartLine>) method.invoke(
                 instantiateResource(method.getDeclaringClass()),
                 targetException

@@ -1,4 +1,6 @@
-package com.engineersbox.httpproxy.exceptions;
+package com.engineersbox.httpproxy.exceptions.socket;
+
+import com.engineersbox.httpproxy.exceptions.socket.SocketException;
 
 public class FailedToCreateServerSocketException extends SocketException {
 

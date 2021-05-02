@@ -1,4 +1,4 @@
-package com.engineersbox.httpproxy.exceptions;
+package com.engineersbox.httpproxy.exceptions.resolver;
 
 public class ResourceEndpointMatcherException extends Exception {
 

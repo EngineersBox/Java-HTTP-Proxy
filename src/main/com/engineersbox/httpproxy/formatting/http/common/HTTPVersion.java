@@ -1,6 +1,6 @@
 package com.engineersbox.httpproxy.formatting.http.common;
 
-import com.engineersbox.httpproxy.exceptions.InvalidHTTPVersionException;
+import com.engineersbox.httpproxy.exceptions.http.InvalidHTTPVersionException;
 
 import java.util.regex.Pattern;
 

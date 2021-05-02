@@ -1,7 +1,8 @@
 package com.engineersbox.httpproxy.connection.stream;
 
 import com.engineersbox.httpproxy.configuration.Config;
-import com.engineersbox.httpproxy.exceptions.*;
+import com.engineersbox.httpproxy.exceptions.http.*;
+import com.engineersbox.httpproxy.exceptions.socket.SocketStreamReadError;
 import com.engineersbox.httpproxy.formatting.content.GZIPCompression;
 import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
@@ -134,7 +135,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
     }
 
     @Override
-    public HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError {
+    public HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError, HTTPMessageException {
         try {
             this.socket.setSoTimeout(this.config.servlet.connections.dropAfter);
         } catch (final SocketException e) {
@@ -148,11 +149,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
         } catch (final IOException e) {
             throw new SocketStreamReadError(e);
         }
-        try {
-            return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), bodyBytes, this.classOfT);
-        } catch (InvalidHTTPMessageFormatException | InvalidHTTPBodyException | InvalidHTTPHeaderException | InvalidStartLineFormatException | InvalidHTTPVersionException e) {
-            throw new SocketStreamReadError(e);
-        }
+        return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), bodyBytes, this.classOfT);
     }
     @Override
     public CompletableFuture<HTTPMessage<T>> futureReadAll() {

@@ -5,7 +5,7 @@ import com.engineersbox.httpproxy.configuration.domain.servlet.Connections;
 import com.engineersbox.httpproxy.connection.handler.BackwardTrafficHandler;
 import com.engineersbox.httpproxy.connection.handler.BaseTrafficHandler;
 import com.engineersbox.httpproxy.connection.handler.ForwardTrafficHandler;
-import com.engineersbox.httpproxy.exceptions.FailedToCreateServerSocketException;
+import com.engineersbox.httpproxy.exceptions.socket.FailedToCreateServerSocketException;
 import com.engineersbox.httpproxy.formatting.FormattingModule;
 import com.engineersbox.httpproxy.connection.socket.SingletonSocketFactory;
 import com.engineersbox.httpproxy.connection.threading.ThreadManager;

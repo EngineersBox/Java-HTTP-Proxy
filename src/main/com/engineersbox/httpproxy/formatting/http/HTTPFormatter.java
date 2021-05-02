@@ -1,7 +1,7 @@
 package com.engineersbox.httpproxy.formatting.http;
 
 import com.engineersbox.httpproxy.configuration.Config;
-import com.engineersbox.httpproxy.exceptions.*;
+import com.engineersbox.httpproxy.exceptions.http.*;
 import com.engineersbox.httpproxy.formatting.http.common.*;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
@@ -25,10 +25,10 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         this.config = config;
     }
 
-    private String[] formatSegmentedStartLine(final String raw) throws InvalidStartLineFormatException {
+    private String[] formatSegmentedStartLine(final String raw) throws InvalidHTTPStartLineFormatException {
         String[] segmentedRaw = raw.split(HTTPSymbols.START_LINE_DELIMITER);
         if (segmentedRaw.length < 3) {
-            throw new InvalidStartLineFormatException("Expected 3 segments in start line got " + segmentedRaw.length + " for value: " + raw);
+            throw new InvalidHTTPStartLineFormatException("Expected 3 segments in start line got " + segmentedRaw.length + " for value: " + raw);
         } else if (segmentedRaw.length > 3) {
             segmentedRaw = new String[]{
                     segmentedRaw[0],
@@ -41,7 +41,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @SuppressWarnings("unchecked")
-    private T parseRequestStartLine(final String raw) throws InvalidStartLineFormatException, InvalidHTTPVersionException {
+    private T parseRequestStartLine(final String raw) throws InvalidHTTPStartLineFormatException, InvalidHTTPVersionException {
         final String[] segmentedRaw = formatSegmentedStartLine(raw);
         return (T) new HTTPRequestStartLine(
                 HTTPMethod.valueOf(segmentedRaw[0]),
@@ -51,11 +51,11 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @SuppressWarnings("unchecked")
-    private T parseResponseStartLine(final String raw) throws InvalidStartLineFormatException, InvalidHTTPVersionException {
+    private T parseResponseStartLine(final String raw) throws InvalidHTTPStartLineFormatException, InvalidHTTPVersionException {
         final String[] segmentedRaw = formatSegmentedStartLine(raw);
         final int statusCode = Integer.parseInt(segmentedRaw[1]);
         if (statusCode < 100 || statusCode > 599) {
-            throw new InvalidStartLineFormatException("Invalid status code " + statusCode + ", required to be in range 100-599");
+            throw new InvalidHTTPStartLineFormatException("Invalid status code " + statusCode + ", required to be in range 100-599");
         }
         return (T) new HTTPResponseStartLine(
                 statusCode,
@@ -83,7 +83,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @Override
-    public HTTPMessage<T> fromRaw(final byte[] raw, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+    public HTTPMessage<T> fromRaw(final byte[] raw, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         return fromRawString(
             new String(raw, charset),
             classOfT
@@ -91,7 +91,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @Override
-    public HTTPMessage<T> fromRaw(final byte[] raw, final byte[] bodyBytes, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+    public HTTPMessage<T> fromRaw(final byte[] raw, final byte[] bodyBytes, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         return fromRawString(
                 new String(raw, charset),
                 bodyBytes,
@@ -100,7 +100,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @Override
-    public HTTPMessage<T> fromRawString(final String raw, final byte[] bodyBytes, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+    public HTTPMessage<T> fromRawString(final String raw, final byte[] bodyBytes, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         final HTTPMessage<T> message = fromRawString(raw, classOfT);
         message.withBodyBytes(bodyBytes);
         logger.trace("Added raw bytes to message");
@@ -108,7 +108,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     @Override
-    public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+    public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         final String[] splitMetadataBody = raw.split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER, 2);
         if (splitMetadataBody.length < 1) {
             throw new InvalidHTTPMessageFormatException("Expected two sections for HEADERS and BODY, got " + splitMetadataBody.length + " sections instead");
@@ -116,7 +116,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         logger.trace("Validated message HEADERS and BODY sections exists");
         final String[] segmentedRaw = splitMetadataBody[0].split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
         if (segmentedRaw.length < 1) {
-            throw new InvalidStartLineFormatException("Message segments was of count " + segmentedRaw.length + ", expected at least HTTP/0.9 compliant start line");
+            throw new InvalidHTTPStartLineFormatException("Message segments was of count " + segmentedRaw.length + ", expected at least HTTP/0.9 compliant start line");
         }
         logger.trace("Validated message HEADERS segment count");
         final T startLine;

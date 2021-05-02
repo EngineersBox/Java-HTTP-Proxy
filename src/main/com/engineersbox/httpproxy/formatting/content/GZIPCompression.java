@@ -12,7 +12,7 @@ public class GZIPCompression {
         final GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(bytes));
         byte[] buf = new byte[512];
         while((gzip.read(buf)) != -1) {
-            sb.append(new String(buf, StandardCharsets.UTF_8).trim());
+            sb.append(new String(buf, charset).trim());
             buf = new byte[512];
         }
         return sb.toString();

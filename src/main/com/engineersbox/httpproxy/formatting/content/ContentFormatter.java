@@ -3,7 +3,6 @@ package com.engineersbox.httpproxy.formatting.content;
 import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.configuration.domain.policies.TextReplacement;
 import com.google.inject.Inject;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -34,7 +33,7 @@ public class ContentFormatter implements BaseContentFormatter {
 
     @Override
     public void replaceMatchingText(final Pattern toMatch, final String replacement) {
-        Elements els = this.document.body().getAllElements();
+        final Elements els = this.document.body().getAllElements();
         for (final Element e : els) {
             final List<TextNode> textNodes = e.textNodes();
             for (final TextNode textNode : textNodes) {
@@ -46,7 +45,14 @@ public class ContentFormatter implements BaseContentFormatter {
 
     @Override
     public void replaceAllMatchingText(final List<TextReplacement> toReplace) {
-        toReplace.forEach(pair -> replaceMatchingText(pair.from, pair.to));
+        final Elements els = this.document.body().getAllElements();
+        for (final Element e : els) {
+            final List<TextNode> textNodes = e.textNodes();
+            for (final TextNode textNode : textNodes) {
+                final String current = textNode.text();
+                toReplace.forEach(pair -> textNode.text(pair.from.matcher(current).replaceAll(pair.to)));
+            }
+        }
     }
 
     @Override
