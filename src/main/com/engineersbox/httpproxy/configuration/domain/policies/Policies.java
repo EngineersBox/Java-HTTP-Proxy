@@ -7,10 +7,12 @@ import java.util.List;
 public class Policies {
     public final Enforcement enforcement;
     public final List<RuleSet> rulesets;
+    public List<TextReplacement> textReplacements;
 
-    public Policies(final Enforcement enforcement, final List<RuleSet> rulesets) {
+    public Policies(final Enforcement enforcement, final List<RuleSet> rulesets, final List<TextReplacement> textReplacements) {
         this.enforcement = enforcement;
         this.rulesets = rulesets;
+        this.textReplacements = textReplacements;
     }
 
     @Override

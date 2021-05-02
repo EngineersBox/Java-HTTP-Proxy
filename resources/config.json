@@ -36,6 +36,16 @@
 				"isWildcard": true,
 				"pattern": "http://console.[dev,prod].test.com/"
 			}
+		],
+		"textReplacements": [
+			{
+				"from": "(?i)Sydney",
+				"to": "New York"
+			},
+			{
+				"from": "(?i)Victoria",
+				"to": "Hokkaido"
+			}
 		]
 	},
 	"target": {

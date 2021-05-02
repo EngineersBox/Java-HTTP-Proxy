@@ -1,16 +1,17 @@
 package com.engineersbox.httpproxy.formatting.content;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.engineersbox.httpproxy.configuration.domain.policies.TextReplacement;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public interface BaseContentFormatter {
 
     void withContentString(final String contentString);
 
-    void replaceMatchingText(final String toMatch, final String replacement);
+    void replaceMatchingText(final Pattern toMatch, final String replacement);
 
-    void replaceAllMatchingText(final List<Pair<String, String>> toReplace);
+    void replaceAllMatchingText(final List<TextReplacement> toReplace);
 
     String getContentString();
 

@@ -124,6 +124,8 @@ public class HandlerResolver implements ResourceResolver {
                     instantiateResource(method.getDeclaringClass()),
                     message
             );
+        } catch (final ResourceEndpointMatcherException e) {
+            return message;
         }  catch (final InvocationTargetException e) {
             try {
                 return handleResourceException(e, e.getTargetException());
