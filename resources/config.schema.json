@@ -146,11 +146,47 @@
 							]
 						}
 					]
+				},
+				"textReplacements": {
+					"type": "array",
+					"items": [
+						{
+							"type": "object",
+							"properties": {
+								"from": {
+									"type": "string"
+								},
+								"to": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"from",
+								"to"
+							]
+						},
+						{
+							"type": "object",
+							"properties": {
+								"from": {
+									"type": "string"
+								},
+								"to": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"from",
+								"to"
+							]
+						}
+					]
 				}
 			},
 			"required": [
 				"enforcement",
-				"rulesets"
+				"rulesets",
+				"textReplacements"
 			]
 		},
 		"target": {

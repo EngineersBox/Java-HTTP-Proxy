@@ -1,19 +1,62 @@
 # Java-HTTP-Proxy
-A HTTP proxy written in C with link and ref reformatting
 
-## Overview
+HTTP proxy written in Java with link and ref reformatting
+
+## Maven Installation
+
+This project is managed via Maven, and built with the surefire plugin. In order to build the jar file
+you'll need to have maven installed.
+
+If you haven't already got it installed, then you can run one of the makefile targets depending on your environment:
+
+* Mac OS X: `$> make install_maven_darwin`
+* Linux (binary): `$> make install_maven_linux_binary`
+* Linux (apt): `$> make install_maven_linux_apt`
+
+*Note:* If you are using windows, then it's not as simple to install maven. I would suggest that you run this on a unix system,
+but if you want to install it on windows, a tutorial can be found here <https://www.javatpoint.com/how-to-install-maven>
+
 
 ## Building
 
+Once you have maven installed, run the following to build the project to a jar file:
+
+```shell
+$> make build_jar
+```
+
+Alternatively, if you want to build it manually then you can run the following:
+
+```shell
+$> mvn install
+$> mvn package
+$> mv target/HTTP-Proxy-0.1.0-shaded.jar HTTP-Proxy-0.1.0.jar
+```
+
 ## Usage
 
-### VM Arguments
+The jar can be run with the Makefile provided it was build with maven or the `build_jar` makefile target.
+By default, using the makefile target `run_jar` will use the config from `resources/config.json`. If you want
+to use a custom config, make sure to specify it when running the jar, see the _**Jar Arguments**_ section below for more information.
+
+Running the jar with the makefile target:
+
+```shell
+$> make run_jar
+```
+
+Running the jar via the java command directly (make sure the jar is in the top level directory and not in `target`):
+
+```shell
+$> java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml HTTP-Proxy-0.0.1-shaded.jar
+```
+
+### Jar Arguments
 
 * `-Dconfig.path=<PATH>`: Specify the path to the `config.json` file. Defaults to `./config.json`
+* `-Dlog4j.configurationFile=<PATH>`: Specify the path to the `logback.xml` file to configure log4j
 
 ## Tests
-
-## File structure
 
 ## Configuration
 
@@ -36,12 +79,12 @@ An example configuration file:
 		"connections": {
 			"acceptorQueueSize": 10,
 			"handlerQueueSize": 10,
-			"dropAfter": 30000,
+			"dropAfter": 1000,
 			"dropOnFailedDNSLookup": false,
 			"readerBufferSize": 1024
 		},
 		"messages": {
-			"maxBodySize": 65535,
+			"maxBodySize": 600000,
 			"dropOnMalformed": true
 		},
 		"binding": {
@@ -63,6 +106,16 @@ An example configuration file:
 				"type": "URL",
 				"isWildcard": true,
 				"pattern": "http://console.[dev,prod].test.com/"
+			}
+		],
+		"textReplacements": [
+			{
+				"from": "(?i)Sydney",
+				"to": "New York"
+			},
+			{
+				"from": "(?i)Perth",
+				"to": "Hokkaido"
 			}
 		]
 	},
@@ -224,11 +277,47 @@ JSON Schema describing the configuration file
 							]
 						}
 					]
+				},
+				"textReplacements": {
+					"type": "array",
+					"items": [
+						{
+							"type": "object",
+							"properties": {
+								"from": {
+									"type": "string"
+								},
+								"to": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"from",
+								"to"
+							]
+						},
+						{
+							"type": "object",
+							"properties": {
+								"from": {
+									"type": "string"
+								},
+								"to": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"from",
+								"to"
+							]
+						}
+					]
 				}
 			},
 			"required": [
 				"enforcement",
-				"rulesets"
+				"rulesets",
+				"textReplacements"
 			]
 		},
 		"target": {
