@@ -1,6 +1,5 @@
 package com.engineersbox.httpproxy.connection.stream;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 

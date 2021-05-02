@@ -15,17 +15,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.zip.GZIPInputStream;
 
 public class StreamCollector<T extends HTTPStartLine> implements ContentCollector<T> {
 
@@ -100,6 +96,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
             }
            if (!scp.passedHeaders || !scp.isCompressed || scp.hasTextEncoding) {
                sb.append(line);
+               read += line.getBytes().length;
            }
            if (!scp.passedHeaders && hasHeader(line, HTTPSymbols.CONTENT_TYPE_HEADER)) {
                 final String contentTypeHeader = splitHeader(line);
@@ -124,14 +121,14 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
             if (scp.isCompressed) {
                 bytes.addAll(lineBytes.getRight());
             }
-            read += line.getBytes().length;
         }
-        logger.debug("Read " + read + " bytes from "
-                + (this.classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? "client" : "server")
-                + " input stream");
         if (scp.isCompressed) {
             sb.append(GZIPCompression.unzip(Bytes.toArray(bytes), scp.charset));
+            logger.debug("Unzipped compressed body");
         }
+        logger.debug("Read " + (read + bytes.size()) + " bytes from "
+                + (this.classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? "client" : "server")
+                + " input stream");
         return Bytes.toArray(bytes);
     }
 

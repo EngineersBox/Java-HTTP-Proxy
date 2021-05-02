@@ -1,10 +1,8 @@
 package com.engineersbox.httpproxy.formatting.http.common;
 
-import java.nio.charset.Charset;
-
 public abstract class HTTPStartLine {
 
-    public HTTPVersion version;
+    public final HTTPVersion version;
 
     public HTTPStartLine(){
         this(HTTPVersion.HTTP11);

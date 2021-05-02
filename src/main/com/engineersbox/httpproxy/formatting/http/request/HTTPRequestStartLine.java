@@ -9,8 +9,8 @@ import java.nio.charset.StandardCharsets;
 
 public class HTTPRequestStartLine extends HTTPStartLine {
 
-    public HTTPMethod method;
-    public String target;
+    public final HTTPMethod method;
+    public final String target;
 
     public HTTPRequestStartLine(){
         this(HTTPMethod.GET, "/", HTTPVersion.HTTP11);

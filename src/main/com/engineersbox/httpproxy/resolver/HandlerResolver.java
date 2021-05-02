@@ -12,11 +12,14 @@ import com.engineersbox.httpproxy.resolver.annotation.ExceptionHandler;
 import com.engineersbox.httpproxy.resolver.annotation.Handler;
 import com.engineersbox.httpproxy.resolver.annotation.HandlerType;
 import com.engineersbox.httpproxy.servlet.ProxyModule;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -32,16 +35,23 @@ public class HandlerResolver implements ResourceResolver {
 
     private final Logger logger = LogManager.getLogger(HandlerResolver.class);
 
-    final Set<Class<?>> contentResources;
-    final Set<Class<?>> exceptionResources;
+    private static final Set<Module> injectables = ImmutableSet.of(
+            new ConfigModule(),
+            new FormattingModule(),
+            new ConnectionModule(),
+            new ProxyModule()
+    );
+
     final Set<URL> contentResourcesURLs;
     final Set<URL> exceptionResourcesURLs;
 
     public HandlerResolver() {
-        this.contentResources = resolveResourcesWithType(HandlerType.CONTENT);
-        this.exceptionResources = resolveResourcesWithType(HandlerType.EXCEPTION);
-        this.contentResourcesURLs = findResourceURLs(this.contentResources);
-        this.exceptionResourcesURLs = findResourceURLs(this.exceptionResources);
+        final Set<Class<?>> contentResources = resolveResourcesWithType(HandlerType.CONTENT);
+        logger.trace("Retrieved " + contentResources.size() + " content resources");
+        Set<Class<?>> exceptionResources = resolveResourcesWithType(HandlerType.EXCEPTION);
+        logger.trace("Retrieved " + exceptionResources.size() + " exception resources");
+        this.contentResourcesURLs = findResourceURLs(contentResources);
+        this.exceptionResourcesURLs = findResourceURLs(exceptionResources);
     }
 
     private Set<Class<?>> resolveResourcesWithType(final HandlerType type) {
@@ -58,12 +68,9 @@ public class HandlerResolver implements ResourceResolver {
     }
 
     public <T>  T instantiateResource(final Class<T> resource) {
-        final Injector injector = Guice.createInjector(
-                new ConfigModule(),
-                new FormattingModule(),
-                new ConnectionModule(),
-                new ProxyModule()
-        );
+        final Injector injector = Guice.createInjector(injectables);
+        logger.trace("Instantiated injector with modules: " + injectables.stream().map(i -> i.getClass().getName()));
+        logger.trace("Retrieved instance of " + resource.getName() + " from injector");
         return injector.getInstance(resource);
     }
 
@@ -87,12 +94,16 @@ public class HandlerResolver implements ResourceResolver {
     }
 
     private Method findMethod(final Set<URL> urls, final Predicate<Method> predicate) throws Exception {
-        final Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(urls));
+        final Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(urls)
+                .setScanners(new MethodAnnotationsScanner())
+        );
         Set<Method> resources = reflections.getMethodsAnnotatedWith(ContentType.class);
         final Optional<Method> potentialMethod = resources.stream().filter(predicate).findFirst();
         if (!potentialMethod.isPresent()) {
             throw new ResourceEndpointMatcherException("Could not find matching method");
         }
+        logger.trace("Found matching method for resource handling: " + potentialMethod.get().getName());
         return potentialMethod.get();
     }
 
@@ -106,8 +117,9 @@ public class HandlerResolver implements ResourceResolver {
                     return false;
                 }
                 final List<String> patterns = Arrays.asList(m.getAnnotation(ContentType.class).value());
-                return matchHeaderToPatterns(contentTypeHeader, patterns).isPresent();
+                return matchHeaderToPatterns(contentTypeHeader.trim(), patterns).isPresent();
             });
+            logger.trace("Invoking method for message: " + message);
             return (HTTPMessage<HTTPResponseStartLine>) method.invoke(
                     instantiateResource(method.getDeclaringClass()),
                     message

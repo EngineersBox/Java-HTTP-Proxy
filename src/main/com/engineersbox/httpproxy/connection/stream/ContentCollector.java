@@ -17,6 +17,6 @@ public interface ContentCollector<T extends HTTPStartLine> {
 
     HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError;
 
-    CompletableFuture<HTTPMessage<T>> futureReadAll() throws IOException;
+    CompletableFuture<HTTPMessage<T>> futureReadAll();
 
 }

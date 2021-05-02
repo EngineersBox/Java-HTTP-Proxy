@@ -16,9 +16,9 @@ public class HTTPMessage<T extends HTTPStartLine> {
 
     private final Logger logger = LogManager.getLogger(HTTPMessage.class);
 
-    public T startLine;
-    public Map<String, String> headers;
-    public String body;
+    public final T startLine;
+    public final Map<String, String> headers;
+    public final String body;
     public byte[] bodyBytes;
 
     public HTTPMessage(final T startLine) {
@@ -74,16 +74,12 @@ public class HTTPMessage<T extends HTTPStartLine> {
         if (body == null) {
             return new byte[0];
         }
-        if (!this.headers.containsKey(HTTPSymbols.CONTENT_ENCODING_HEADER)) {
-            return body.getBytes(getCharset());
-        }
-        if (!this.headers.get(HTTPSymbols.CONTENT_ENCODING_HEADER).contains(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)) {
+        if (!this.headers.containsKey(HTTPSymbols.CONTENT_ENCODING_HEADER)
+            || !this.headers.get(HTTPSymbols.CONTENT_ENCODING_HEADER).contains(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)) {
             return body.getBytes(getCharset());
         }
         try {
-            final byte[] bytes = GZIPCompression.zip(this.body, getCharset());
-            this.headers.put(HTTPSymbols.CONTENT_LENGTH_HEADER, String.valueOf(bytes.length));
-            return bytes;
+            return GZIPCompression.zip(this.body, getCharset());
         } catch (IOException e) {
             logger.error(e, e);
         }
@@ -91,17 +87,18 @@ public class HTTPMessage<T extends HTTPStartLine> {
     }
 
     public byte[] toRaw() {
+        final byte[] bb = getBody();
+        this.headers.put(HTTPSymbols.CONTENT_LENGTH_HEADER, String.valueOf(bb.length));
         return concatAll(
                 this.startLine.toRaw(),
                 headersToString(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
                         .getBytes(StandardCharsets.UTF_8),
-                getBody()
+                bb
         );
     }
 
-    public HTTPMessage<T> withBodyBytes(final byte[] bodyBytes) {
+    public void withBodyBytes(final byte[] bodyBytes) {
         this.bodyBytes = bodyBytes.clone();
-        return this;
     }
 
     @Override

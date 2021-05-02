@@ -4,13 +4,12 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPVersion;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class HTTPResponseStartLine extends HTTPStartLine {
 
-    public int statusCode;
-    public String statusMessage;
+    public final int statusCode;
+    public final String statusMessage;
 
     public HTTPResponseStartLine() {
         this(200, "Ok", HTTPVersion.HTTP11);

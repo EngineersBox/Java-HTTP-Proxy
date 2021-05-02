@@ -1,78 +1,54 @@
 package com.engineersbox.httpproxy.connection.handler;
 
 import com.engineersbox.httpproxy.connection.stream.ContentCollector;
-import com.engineersbox.httpproxy.formatting.content.BaseContentFormatter;
-import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
 import com.engineersbox.httpproxy.resolver.ResourceResolver;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 
 public class ForwardTrafficHandler extends BaseTrafficHandler {
 
     private final Logger logger = LogManager.getLogger(ForwardTrafficHandler.class);
 
-    private final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter;
-    private final BaseContentFormatter contentFormatter;
     private final ContentCollector<HTTPResponseStartLine> contentCollector;
     private final ResourceResolver resolver;
 
-    private InputStream inFromServer;
-    private OutputStream outToClient;
-    private Socket server;
-    private Socket client;
-
-    private byte[] response;
-    private int read;
-
-    private List<Pair<String, String>> toReplace = ImmutableList.of(
-            new ImmutablePair<>("Sydney", "New York"),
-            new ImmutablePair<>("sydney", "New York")
-    );
+    private final OutputStream outClient;
+    private final Socket server;
+    private final Socket client;
 
     @Inject
-    public ForwardTrafficHandler(final BaseHTTPFormatter<HTTPResponseStartLine> httpFormatter,
-                                 final BaseContentFormatter contentFormatter,
-                                 final ContentCollector<HTTPResponseStartLine> contentCollector,
+    public ForwardTrafficHandler(final ContentCollector<HTTPResponseStartLine> contentCollector,
                                  final ResourceResolver resolver,
                                  @Named("Server In") final InputStream inServer,
                                  @Named("Client Out") final OutputStream outClient,
                                  @Named("Server Socket") final Socket server,
                                  @Named("Client Socket") final Socket client) {
-        this.httpFormatter = httpFormatter;
-        this.contentFormatter = contentFormatter;
         this.contentCollector = contentCollector;
         this.resolver = resolver;
-        this.inFromServer = inServer;
-        this.outToClient = outClient;
+        this.outClient = outClient;
         this.server = server;
         this.client = client;
-        this.contentCollector.withStream(this.inFromServer);
+        this.contentCollector.withStream(inServer);
         this.contentCollector.withStartLine(HTTPResponseStartLine.class);
         this.contentCollector.withSocket(this.server);
     }
 
     @Override
     public void task() throws Exception {
-        HTTPMessage<HTTPResponseStartLine> message = this.contentCollector.synchronousReadAll();
-        final HTTPMessage<HTTPResponseStartLine> resolvedMessage = this.resolver.match(message);
-        this.response = message.toRaw();
-        this.read = this.response.length;
-//        contentFormatter.withContentString(new String(this.response, 0, this.read, StandardCharsets.UTF_8));
-//        contentFormatter.replaceAllMatchingText(this.toReplace);
-        outToClient.write(this.response);
-        logger.debug("Wrote " + this.read + " bytes to client output stream");
-        outToClient.flush();
+        final HTTPMessage<HTTPResponseStartLine> message = this.resolver.match(
+                this.contentCollector.synchronousReadAll()
+        );
+        final byte[] response = message.toRaw();
+        this.outClient.write(response);
+        logger.debug("Wrote " + response.length + " bytes to client output stream");
+        this.outClient.flush();
         logger.trace("Flushed client input stream");
     }
 

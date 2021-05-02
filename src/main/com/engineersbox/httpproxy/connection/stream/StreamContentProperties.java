@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 public class StreamContentProperties {
 
     public boolean passedHeaders;
-    public boolean hasContentLengthHeader;
+    public final boolean hasContentLengthHeader;
     public boolean hasTransferEncodingHeader;
     public boolean isCompressed;
     public boolean hasTextEncoding;

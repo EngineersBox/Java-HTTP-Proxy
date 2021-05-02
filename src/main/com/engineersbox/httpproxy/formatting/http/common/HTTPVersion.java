@@ -12,7 +12,7 @@ public enum HTTPVersion {
     HTTP30("HTTP/3.0");
 
     private static final Pattern VERSION_REGEX = Pattern.compile("HTTP/[0-3]\\.[019]");
-    public String version;
+    public final String version;
 
     HTTPVersion(final String version) {
         this.version = version;
