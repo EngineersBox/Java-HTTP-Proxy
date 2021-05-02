@@ -146,13 +146,11 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
         try {
             bodyBytes = sensitizedStreamRead(sb, retentiveLineReader);
         } catch (final IOException e) {
-            // TODO: Return an HTTP 500 error when this occurs
             throw new SocketStreamReadError(e);
         }
         try {
             return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), bodyBytes, this.classOfT);
         } catch (InvalidHTTPMessageFormatException | InvalidHTTPBodyException | InvalidHTTPHeaderException | InvalidStartLineFormatException | InvalidHTTPVersionException e) {
-            // TODO: Return an HTTP 500 error when this occurs
             throw new SocketStreamReadError(e);
         }
     }

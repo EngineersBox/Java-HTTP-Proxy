@@ -1,8 +1,10 @@
 package com.engineersbox.httpproxy.connection.handler;
 
 import com.engineersbox.httpproxy.connection.stream.ContentCollector;
+import com.engineersbox.httpproxy.exceptions.SocketStreamReadError;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
+import com.engineersbox.httpproxy.formatting.http.response.StandardResponses;
 import com.engineersbox.httpproxy.resolver.ResourceResolver;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -42,9 +44,14 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
 
     @Override
     public void task() throws Exception {
-        final HTTPMessage<HTTPResponseStartLine> message = this.resolver.match(
-                this.contentCollector.synchronousReadAll()
-        );
+        HTTPMessage<HTTPResponseStartLine> message;
+        try {
+            message = this.resolver.match(
+                    this.contentCollector.synchronousReadAll()
+            );
+        } catch (final SocketStreamReadError e) {
+            message = StandardResponses._500();
+        }
         final byte[] response = message.toRaw();
         this.outClient.write(response);
         logger.debug("Wrote " + response.length + " bytes to client output stream");

@@ -7,6 +7,7 @@ import com.engineersbox.httpproxy.exceptions.ResourceEndpointMatcherException;
 import com.engineersbox.httpproxy.formatting.FormattingModule;
 import com.engineersbox.httpproxy.formatting.http.common.*;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
+import com.engineersbox.httpproxy.formatting.http.response.StandardResponses;
 import com.engineersbox.httpproxy.resolver.annotation.ContentType;
 import com.engineersbox.httpproxy.resolver.annotation.ExceptionHandler;
 import com.engineersbox.httpproxy.resolver.annotation.Handler;
@@ -154,16 +155,6 @@ public class HandlerResolver implements ResourceResolver {
 
     public HTTPMessage<HTTPResponseStartLine> handleInternalException(final Exception exception) {
         logger.error(exception.getMessage(), exception);
-        final Map<String, String> headers = new HashMap<>();
-        headers.put("Connection", "close");
-        headers.put("Server", "HTTPProxy");
-        return new HTTPMessage<>(
-                new HTTPResponseStartLine(
-                        HTTPStatusCode._500.code,
-                        HTTPStatusCode._500.message,
-                        HTTPVersion.HTTP11
-                ),
-                headers
-        );
+        return StandardResponses._500();
     }
 }
