@@ -13,7 +13,7 @@ public class StreamContentProperties {
     public final boolean hasContentLengthHeader;
     public boolean hasTransferEncodingHeader;
     public boolean isCompressed;
-    public boolean hasContentEncoding;
+    public boolean isRaw;
     public Charset charset;
     private final Class<? extends HTTPStartLine> classOfT;
 
@@ -22,7 +22,7 @@ public class StreamContentProperties {
         this.hasContentLengthHeader = false;
         this.hasTransferEncodingHeader = false;
         this.isCompressed = false;
-        this.hasContentEncoding = false;
+        this.isRaw = false;
         this.charset = StandardCharsets.UTF_8;
         this.classOfT = classOfT;
     }

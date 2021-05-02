@@ -79,7 +79,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
             return new byte[0];
         }
         if (!this.headers.containsKey(HTTPSymbols.CONTENT_ENCODING_HEADER)
-            || !this.headers.get(HTTPSymbols.CONTENT_ENCODING_HEADER).contains(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)) {
+            || this.headers.get(HTTPSymbols.CONTENT_ENCODING_HEADER).contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY)) {
             return body.getBytes(getCharset());
         }
         try {

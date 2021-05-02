@@ -78,11 +78,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
             if (!scp.passedHeaders) {
                 if (!scp.isCompressed && hasHeader(line, HTTPSymbols.CONTENT_ENCODING_HEADER)) {
                     final String contentEncodingHeader = splitHeader(line);
-                    scp.isCompressed = contentEncodingHeader.equals(HTTPSymbols.CONTENT_ENCODING_GZIP_KEY)
-                            || contentEncodingHeader.equals(HTTPSymbols.CONTENT_ENCODING_X_GZIP_KEY);
-                    if (!contentEncodingHeader.contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY)) {
-                        scp.hasContentEncoding = true;
-                    }
+                    scp.isCompressed = !contentEncodingHeader.contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY);
                     logFoundHeader(
                         HTTPSymbols.CONTENT_ENCODING_HEADER,
                         splitHeader(line)
@@ -97,7 +93,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                     );
                 }
             }
-           if (!scp.passedHeaders || !scp.isCompressed || !scp.hasContentEncoding) {
+           if (!scp.passedHeaders || (!scp.isCompressed && !scp.isRaw)) {
                sb.append(line);
                read += line.getBytes().length;
            }
@@ -107,6 +103,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                     final String contentTypeCharset = contentTypeHeader.split(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)[1];
                     scp.charset = Charset.forName(StringUtils.removeEnd(contentTypeCharset, HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER));
                 }
+                scp.isRaw = HTTPSymbols.CONTENT_TYPE_IMAGE_REGEX.matcher(contentTypeHeader).find();
                 logFoundHeader(
                         HTTPSymbols.CONTENT_TYPE_HEADER,
                         splitHeader(line)
@@ -118,7 +115,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                 }
                 continue;
             }
-            if (scp.isCompressed) {
+            if (scp.isCompressed || scp.isRaw) {
                 bytes.addAll(lineBytes.getRight());
             }
         }
