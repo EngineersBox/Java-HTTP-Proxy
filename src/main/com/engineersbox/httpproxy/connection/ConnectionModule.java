@@ -9,6 +9,14 @@ import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 
+/**
+ * Module containing bindings for:
+ *
+ * <ul>
+ *     <li>{@link ContentCollector}</li>
+ *     <li>{@link ThreadManager}</li>
+ * </ul>
+ */
 public class ConnectionModule extends AbstractModule {
 
     @Override

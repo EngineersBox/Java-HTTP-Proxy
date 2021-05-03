@@ -76,12 +76,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return headers;
     }
 
-    private void validateBody(final String rawBody) throws InvalidHTTPBodyException {
-        if (rawBody.length() > this.config.servlet.messages.maxBodySize) {
-            throw new InvalidHTTPBodyException("Body is larger than configured maximum supported size: " + rawBody.length() + " > " + this.config.servlet.messages.maxBodySize);
-        }
-    }
-
     @Override
     public HTTPMessage<T> fromRaw(final byte[] raw, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         return fromRawString(
@@ -107,18 +101,25 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return message;
     }
 
-    @Override
-    public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+    private String[] parseMessageSegments(final String raw) {
         final String[] splitMetadataBody = raw.split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER, 2);
         if (splitMetadataBody.length < 1) {
             throw new InvalidHTTPMessageFormatException("Expected two sections for HEADERS and BODY, got " + splitMetadataBody.length + " sections instead");
         }
         logger.trace("Validated message HEADERS and BODY sections exists");
+        return splitMetadataBody;
+    }
+
+    private String[] parseHeadersSegment(final String[] splitMetadataBody) {
         final String[] segmentedRaw = splitMetadataBody[0].split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
         if (segmentedRaw.length < 1) {
             throw new InvalidHTTPStartLineFormatException("Message segments was of count " + segmentedRaw.length + ", expected at least HTTP/0.9 compliant start line");
         }
         logger.trace("Validated message HEADERS segment count");
+        return segmentedRaw;
+    }
+
+    private T parseResponseType(final String[] segmentedRaw, final Class<T> classOfT) {
         final T startLine;
         if (classOfT.isAssignableFrom(HTTPRequestStartLine.class)) {
             startLine = parseRequestStartLine(segmentedRaw[0]);
@@ -128,6 +129,22 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
             throw new InvalidHTTPMessageFormatException("Message was not a request or response: " + segmentedRaw[0]);
         }
         logger.trace("Validated message request/response type");
+        return startLine;
+    }
+
+    private String parseBody(final String rawBody) {
+        if (rawBody.length() > this.config.servlet.messages.maxBodySize) {
+            throw new InvalidHTTPBodyException("Body is larger than configured maximum supported size: " + rawBody.length() + " > " + this.config.servlet.messages.maxBodySize);
+        }
+        logger.trace("Validated message body");
+        return rawBody;
+    }
+
+    @Override
+    public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
+        final String[] splitMetadataBody = parseMessageSegments(raw);
+        final String[] segmentedRaw = parseHeadersSegment(splitMetadataBody);
+        final T startLine = parseResponseType(segmentedRaw, classOfT);
         if (startLine.version == HTTPVersion.HTTP09 || segmentedRaw.length == 1) {
             return new HTTPMessage<>(startLine);
         }
@@ -137,8 +154,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
             return new HTTPMessage<>(startLine, headers);
         }
 
-        final String body = splitMetadataBody[1];
-        validateBody(body);
+        final String body = parseBody(splitMetadataBody[1]);
 
         logger.debug("Successfully parsed message");
         return new HTTPMessage<>(startLine, headers, body);

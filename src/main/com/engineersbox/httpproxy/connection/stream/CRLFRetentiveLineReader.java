@@ -8,6 +8,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stream reader that can reads a line, terminating on any termination configuration of {@code CR (\r)} and/or {@code LF (\n)},
+ * retaining the termination in the read line string and raw bytes
+ */
 public class CRLFRetentiveLineReader {
 
     private final InputStream stream;
@@ -23,6 +27,7 @@ public class CRLFRetentiveLineReader {
 
     /**
      * Reads byte-by-byte from InputStream until it finds one of 3 line termination configurations:
+     *
      * <ol>
      *     <li>{@code CR (\r)}</li>
      *     <li>{@code LF (\n)}</li>
@@ -38,10 +43,15 @@ public class CRLFRetentiveLineReader {
      * This method exists to handle the issues with reading compressed data with a <code>BufferedReader</code>, in that
      * line reads have their terminators omitted from the returned string, which can malform/corrupt compressed body data.
      *
+     * <br/><br/>
+     *
      * Additionally, it is not possible to reconstruct these line endings as there is no way to tell which one of the
      * three possible endings was encountered
      *
-     * @return {@code Pair<String, List<Byte>>} Line as a string and raw line bytes
+     * <br/><br/>
+     *
+     * @return {@link org.apache.commons.lang3.tuple.Pair} with the {@link String} version of a read line and {@link List}
+     * containing raw {@link Byte} of the line read.
      * @throws IOException If an I/O error occurs
      */
     public Pair<String, List<Byte>> readLineBytes() throws IOException {

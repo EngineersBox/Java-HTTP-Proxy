@@ -14,6 +14,14 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Traffic handler to forward traffic from the Server socket to Client socket. Sockets
+ * are configured based on configuration.
+ *
+ * <br/><br/>
+ *
+ * @see com.engineersbox.httpproxy.configuration.Config
+ */
 public class ForwardTrafficHandler extends BaseTrafficHandler {
 
     private final Logger logger = LogManager.getLogger(ForwardTrafficHandler.class);
@@ -42,6 +50,29 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
         this.contentCollector.withSocket(this.server);
     }
 
+    /**
+     * Handles incoming requests from the socket bound to the server and forwards them
+     * to the client. Client and server sockets are defined by the sockets created according to the config
+     * file.
+     *
+     * <br/><br/>
+     *
+     * See: {@link com.engineersbox.httpproxy.configuration.Config}
+     *
+     * <br/><br/>
+     *
+     * If a {@link com.engineersbox.httpproxy.exceptions.socket.SocketStreamReadError} occurs during the reading of a
+     * response, a default HTTP/1.1 500 is returned.
+     *
+     * <br/><br/>
+     *
+     * Upon having read an incoming message, it is forwarded a {@link com.engineersbox.httpproxy.resolver.ResourceResolver}
+     * to be handled by any methods annotated to handle the given content type.
+     *
+     * <br/><br/>
+     *
+     * @throws Exception
+     */
     @Override
     public void task() throws Exception {
         HTTPMessage<HTTPResponseStartLine> message;
@@ -59,6 +90,15 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
         logger.trace("Flushed client input stream");
     }
 
+    /**
+     * To ensure the lifecycle of a socket is handled correctly, this method closes the server connection and then
+     * the client connection in that order.
+     *
+     * <br/><br/>
+     *
+     * Any exceptions that occur during this process will have no further handling done to the sockets. They will however
+     * be deallocated once the thread this handler is submitted to closes.
+     */
     @Override
     public void after() {
         try {
