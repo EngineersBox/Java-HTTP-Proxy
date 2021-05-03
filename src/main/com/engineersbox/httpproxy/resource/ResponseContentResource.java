@@ -32,7 +32,6 @@ public class ResponseContentResource {
         this.contentFormatter.withContentString(message.body);
         this.contentFormatter.replaceAllMatchingText(this.config.policies.textReplacements);
         message.setBody(this.contentFormatter.getContentString());
-        System.out.println(orig.equals(message.body));
         logger.info("Replaced all text values");
         return message;
     }

@@ -2,15 +2,16 @@ package com.engineersbox.httpproxy.formatting.content;
 
 import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.configuration.domain.policies.TextReplacement;
+import com.engineersbox.httpproxy.formatting.content.html.HTMLSymbols;
 import com.google.inject.Inject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ContentFormatter implements BaseContentFormatter {
 
@@ -31,14 +32,26 @@ public class ContentFormatter implements BaseContentFormatter {
         }
     }
 
+    private void replaceTextForElement(final TextNode textNode, final TextReplacement pair) {
+        final String current = textNode.text();
+        textNode.text(pair.from.matcher(current).replaceAll(pair.to));
+        final Node parent = textNode.parent();
+        if (parent.hasAttr(HTMLSymbols.TITLE_ATTRIBUTE)) {
+            final String currentAttrValue = parent.attr(HTMLSymbols.TITLE_ATTRIBUTE);
+            parent.attr(
+                    HTMLSymbols.TITLE_ATTRIBUTE,
+                    pair.from.matcher(currentAttrValue).replaceAll(pair.to)
+            );
+        }
+    }
+
     @Override
-    public void replaceMatchingText(final Pattern toMatch, final String replacement) {
+    public void replaceMatchingText(final TextReplacement toReplace) {
         final Elements els = this.document.body().getAllElements();
         for (final Element e : els) {
             final List<TextNode> textNodes = e.textNodes();
             for (final TextNode textNode : textNodes) {
-                final String current = textNode.text();
-                textNode.text(toMatch.matcher(current).replaceAll(replacement));
+                replaceTextForElement(textNode, toReplace);
             }
         }
     }
@@ -49,8 +62,7 @@ public class ContentFormatter implements BaseContentFormatter {
         for (final Element e : els) {
             final List<TextNode> textNodes = e.textNodes();
             for (final TextNode textNode : textNodes) {
-                final String current = textNode.text();
-                toReplace.forEach(pair -> textNode.text(pair.from.matcher(current).replaceAll(pair.to)));
+                toReplace.forEach(pair -> replaceTextForElement(textNode, pair));
             }
         }
     }
