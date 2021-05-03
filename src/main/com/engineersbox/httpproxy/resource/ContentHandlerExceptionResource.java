@@ -22,6 +22,15 @@ public class ContentHandlerExceptionResource {
         this.config = config;
     }
 
+    /**
+     * Handles exceptions during {@link java.net.Socket} connection. The returned HTTP 500 notifies of the host and port
+     * configuration supplied in the {@link Config}
+     *
+     * <br/><br/>
+     *
+     * @param socketException Exception thrown during {@link java.net.Socket} connection
+     * @return {@link StandardResponses#_500}
+     */
     @SuppressWarnings("unused")
     @ExceptionHandler(FailedToCreateServerSocketException.class)
     public HTTPMessage<HTTPResponseStartLine> handleSocketException(final FailedToCreateServerSocketException socketException) {
@@ -32,6 +41,15 @@ public class ContentHandlerExceptionResource {
         ));
     }
 
+    /**
+     * Handles exceptions thrown whilst reading from an open {@link java.io.InputStream} for a {@link java.net.Socket}.
+     * The returned HTTP 500 notifies of the error message of the thrown {@link SocketStreamReadError} exception.
+     *
+     * <br/><br/>
+     *
+     * @param streamReadError Exception thrown while reading from a {@link java.net.Socket}'s {@link java.io.InputStream}
+     * @return {@link StandardResponses#_500}
+     */
     @SuppressWarnings("unused")
     @ExceptionHandler(SocketStreamReadError.class)
     public HTTPMessage<HTTPResponseStartLine> handleSocketStreamReadException(final SocketStreamReadError streamReadError) {
@@ -41,6 +59,13 @@ public class ContentHandlerExceptionResource {
         ));
     }
 
+    /**
+     * Handles exceptions thrown while parsing a {@link HTTPMessage}. The returned HTTP 500 notifies of the error message
+     * of the thrown {@link HTTPMessageException}.
+     *
+     * @param messageException Exception thrown while parsing a {@link HTTPMessage}
+     * @return {@link StandardResponses#_500}
+     */
     @SuppressWarnings("unused")
     @ExceptionHandler(HTTPMessageException.class)
     public HTTPMessage<HTTPResponseStartLine> handleHTTPException(final HTTPMessageException messageException) {

@@ -4,7 +4,7 @@ import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.formatting.content.BaseContentFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine;
-import com.engineersbox.httpproxy.resolver.annotation.ContentType;
+import com.engineersbox.httpproxy.resolver.annotation.MediaType;
 import com.engineersbox.httpproxy.resolver.annotation.Handler;
 import com.engineersbox.httpproxy.resolver.annotation.HandlerType;
 import com.google.inject.Inject;
@@ -25,20 +25,23 @@ public class ResponseContentResource {
         this.contentFormatter = contentFormatter;
     }
 
+    /**
+     * Handler for {@code text/html} media types. This will reformat text and {@code link} attributes in HTML element
+     * of the message boyd based on replacement configs supplied in {@link Config}.
+     *
+     * <br/><br/>
+     *
+     * @param message {@link HTTPMessage} to format the body of
+     * @return Formatted {@link HTTPMessage} with replaced text and {@code link} attributes
+     */
     @SuppressWarnings("unused")
-    @ContentType("text/html")
+    @MediaType("text/html")
     public HTTPMessage<HTTPResponseStartLine> handleHTMLResponse(final HTTPMessage<HTTPResponseStartLine> message) {
         final String orig = message.body;
         this.contentFormatter.withContentString(message.body);
         this.contentFormatter.replaceAllMatchingText(this.config.policies.textReplacements);
         message.setBody(this.contentFormatter.getContentString());
         logger.info("Replaced all text values");
-        return message;
-    }
-
-    @SuppressWarnings("unused")
-    @ContentType("text/javascript")
-    public HTTPMessage<HTTPResponseStartLine> handleJavascriptResponse(final HTTPMessage<HTTPResponseStartLine> message) {
         return message;
     }
 

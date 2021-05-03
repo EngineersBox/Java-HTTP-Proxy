@@ -11,6 +11,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+/**
+ * Implementation of {@link AbstractServlet} to serve an HTTP/1.1 proxy over TCP via {@link java.net.Socket}'s
+ */
 public class ProxyServlet implements AbstractServlet {
 
     private final Logger logger = LogManager.getLogger(ProxyServlet.class.getCanonicalName());
@@ -23,6 +26,9 @@ public class ProxyServlet implements AbstractServlet {
 
     private ServerSocket serverSocket;
 
+    /**
+     * Create a new {@link ServerSocket} to handle connections to a binding specified via {@link Config}
+     */
     @Override
     public void init() {
         try {
@@ -37,6 +43,10 @@ public class ProxyServlet implements AbstractServlet {
         logger.info("Initialised ProxyServlet instance");
     }
 
+    /**
+     * Serve the proxy via an infinite loop waiting listening for a connection to the {@link ServerSocket}. Upon observing
+     * a connection a {@link ProxyConnectionAcceptor} is submitted to a {@link ThreadManager} as an acceptor.
+     */
     @Override
     public void serve() {
         logger.info(

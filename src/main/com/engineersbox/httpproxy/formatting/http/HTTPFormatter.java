@@ -14,6 +14,15 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Formatter implementation to convert a raw <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a>
+ * compliant HTTP message into an instance of {@link HTTPMessage} with the message type determined via the class type
+ * parameter {@code T}
+ *
+ * <br/><br/>
+ *
+ * @param <T> An instance of {@link HTTPStartLine} as either {@link HTTPRequestStartLine} or {@link HTTPResponseStartLine}
+ */
 public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter<T> {
 
     private final Logger logger = LogManager.getLogger(HTTPFormatter.class);
@@ -138,7 +147,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     @Override
     public HTTPMessage<T> fromRaw(final byte[] raw, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
@@ -162,7 +171,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     @Override
     public HTTPMessage<T> fromRaw(final byte[] raw, final byte[] bodyBytes, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
@@ -186,7 +195,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     @Override
     public HTTPMessage<T> fromRawString(final String raw, final byte[] bodyBytes, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
@@ -273,10 +282,13 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     }
 
     /**
+     * Validates the body does not exceed the configured max size supplied via the {@link Config}.
      *
-     * @param rawBody
-     * @return
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * <br/><br/>
+     *
+     * @param rawBody {@link String} formatted body
+     * @return {@link String} formatted body
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     private String parseBody(final String rawBody) throws InvalidHTTPBodyException {
         if (rawBody.length() > this.config.servlet.messages.maxBodySize) {
@@ -298,7 +310,7 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     @Override
     public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {

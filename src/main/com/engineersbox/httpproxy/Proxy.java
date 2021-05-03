@@ -4,7 +4,6 @@ import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.configuration.ConfigModule;
 import com.engineersbox.httpproxy.connection.ConnectionModule;
 import com.engineersbox.httpproxy.formatting.FormattingModule;
-import com.engineersbox.httpproxy.servlet.ProxyModule;
 import com.engineersbox.httpproxy.servlet.ProxyServlet;
 import com.engineersbox.httpproxy.connection.threading.PoolManager;
 import com.google.inject.Guice;
@@ -14,6 +13,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * Proxy initialiser and configurator
+ */
 public class Proxy {
 
     private static final Logger logger = LogManager.getLogger(Proxy.class);
@@ -25,6 +27,13 @@ public class Proxy {
     public static Config config;
     public static PoolManager poolManager;
 
+    /**
+     * Main proxy program, using {@link Injector} to instantiate {@link PoolManager} and {@link ProxyServlet} instances
+     *
+     * <br/><br/>
+     *
+     * @param args Array of {@link String} program arguments
+     */
     public static void main(String[] args) {
         try {
             final String cfgPath = CONFIG_FILE_PATH != null ? CONFIG_FILE_PATH : DEFAULT_CONFIG_PATH;
@@ -43,8 +52,7 @@ public class Proxy {
         injector = Guice.createInjector(
                 new ConfigModule(),
                 new FormattingModule(),
-                new ConnectionModule(),
-                new ProxyModule()
+                new ConnectionModule()
         );
         final ProxyServlet proxyServlet = injector.getInstance(ProxyServlet.class);
         proxyServlet.init();

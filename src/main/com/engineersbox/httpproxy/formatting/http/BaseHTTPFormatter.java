@@ -1,5 +1,6 @@
 package com.engineersbox.httpproxy.formatting.http;
 
+import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.exceptions.http.*;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
@@ -30,7 +31,7 @@ public interface BaseHTTPFormatter<T extends HTTPStartLine> {
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     HTTPMessage<T> fromRaw(final byte[] raw, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException;
 
@@ -49,7 +50,7 @@ public interface BaseHTTPFormatter<T extends HTTPStartLine> {
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     HTTPMessage<T> fromRaw(final byte[] raw, final byte[] bodyBytes, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException;
 
@@ -66,7 +67,7 @@ public interface BaseHTTPFormatter<T extends HTTPStartLine> {
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException;
 
@@ -84,7 +85,7 @@ public interface BaseHTTPFormatter<T extends HTTPStartLine> {
      * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
      * @throws InvalidHTTPVersionException Version is unsupported or invalid
      * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
-     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
      */
     HTTPMessage<T> fromRawString(final String raw, final byte[] bodyBytes, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException;
 
