@@ -25,6 +25,17 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         this.config = config;
     }
 
+    /**
+     * Convert a raw {@link String} format of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.1" target="_top">RFC 2616 Section 4.1</a>
+     * message start line into an instance of {@link HTTPStartLine}.
+     *
+     * <br/><br/>
+     *
+     * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.1" target="_top">RFC 2616 Section 4.1</a> start line
+     * @return An instance {@link HTTPStartLine} of as either {@link HTTPRequestStartLine} or {@link HTTPResponseStartLine}
+     *  depending on whether it is a request or response respectively
+     * @throws InvalidHTTPStartLineFormatException Division of headers and body is invalid
+     */
     private String[] formatSegmentedStartLine(final String raw) throws InvalidHTTPStartLineFormatException {
         String[] segmentedRaw = raw.split(HTTPSymbols.START_LINE_DELIMITER);
         if (segmentedRaw.length < 3) {
@@ -40,6 +51,17 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return segmentedRaw;
     }
 
+    /**
+     * Convert a raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1" target="_top">RFC 2616 Section 5.1</a>
+     *  message start line into an instance of {@link HTTPRequestStartLine}
+     *
+     * <br/><br/>
+     *
+     * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1" target="_top">RFC 2616 Section 5.1</a> start line
+     * @return An parsed instance of {@link HTTPRequestStartLine}
+     * @throws InvalidHTTPStartLineFormatException Division of headers and body is invalid
+     * @throws InvalidHTTPVersionException Version is unsupported or invalid
+     */
     @SuppressWarnings("unchecked")
     private T parseRequestStartLine(final String raw) throws InvalidHTTPStartLineFormatException, InvalidHTTPVersionException {
         final String[] segmentedRaw = formatSegmentedStartLine(raw);
@@ -50,6 +72,17 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         );
     }
 
+    /**
+     * Convert a raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1" target="_top">RFC 2616 Section 6.1</a>
+     *  message start line into an instance of {@link HTTPResponseStartLine}
+     *
+     * <br/><br/>
+     *
+     * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1" target="_top">RFC 2616 Section 6.1</a> start line
+     * @return An parsed instance of {@link HTTPResponseStartLine}
+     * @throws InvalidHTTPStartLineFormatException Start line is invalid
+     * @throws InvalidHTTPVersionException Version is unsupported or invalid
+     */
     @SuppressWarnings("unchecked")
     private T parseResponseStartLine(final String raw) throws InvalidHTTPStartLineFormatException, InvalidHTTPVersionException {
         final String[] segmentedRaw = formatSegmentedStartLine(raw);
@@ -64,6 +97,22 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         );
     }
 
+    /**
+     * Convert a {@code String[]} of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a>
+     * headers into a {@link Map} of {@link String} to {@link String} key, value pairs.
+     *
+     * <br/><br/>
+     *
+     * This will ensure that the headers match the {@link HTTPSymbols#HEADER_REGEX} in order to be compliant with the format
+     * of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a>
+     *
+     * <br/><br/>
+     *
+     * @param raw {@code String[]} of headers
+     * @return {@link Map} of {@link String} to {@link String} mappings of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a>
+     * compliant headers
+     * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
+     */
     private Map<String, String> parseHeaders(final String[] raw) throws InvalidHTTPHeaderException {
         final Map<String, String> headers = new HashMap<>();
         for (final String rawHeader : raw) {
@@ -76,6 +125,21 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return headers;
     }
 
+    /**
+     * See {@link BaseHTTPFormatter#fromRaw(byte[], Charset, Class)}
+     *
+     * <br/><br/>
+     *
+     * @param raw {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
+     * @param charset {@link Charset} to use as the encoding for the string representation of the body
+     * @param classOfT Instance of {@link HTTPStartLine} to indicate whether this is a request or response
+     * @return A {@link HTTPMessage}
+     * @throws InvalidHTTPMessageFormatException Division of headers and body is invalid
+     * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
+     * @throws InvalidHTTPVersionException Version is unsupported or invalid
+     * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
+     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     */
     @Override
     public HTTPMessage<T> fromRaw(final byte[] raw, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         return fromRawString(
@@ -84,6 +148,22 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         );
     }
 
+    /**
+     * See {@link BaseHTTPFormatter#fromRaw(byte[], byte[], Charset, Class)}
+     *
+     * <br/><br/>
+     *
+     * @param raw {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
+     * @param bodyBytes {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a> compliant message body
+     * @param charset {@link Charset} to use as the encoding for the string representation of the body
+     * @param classOfT Instance of {@link HTTPStartLine} to indicate whether this is a request or response
+     * @return A {@link HTTPMessage}
+     * @throws InvalidHTTPMessageFormatException Division of headers and body is invalid
+     * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
+     * @throws InvalidHTTPVersionException Version is unsupported or invalid
+     * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
+     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     */
     @Override
     public HTTPMessage<T> fromRaw(final byte[] raw, final byte[] bodyBytes, final Charset charset, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         return fromRawString(
@@ -93,6 +173,21 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         );
     }
 
+    /**
+     * See {@link BaseHTTPFormatter#fromRawString(String, byte[], Class)}
+     *
+     * <br/><br/>
+     *
+     * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
+     * @param bodyBytes {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a> compliant message body
+     * @param classOfT Instance of {@link HTTPStartLine} to indicate whether this is a request or response
+     * @return A {@link HTTPMessage}
+     * @throws InvalidHTTPMessageFormatException Division of headers and body is invalid
+     * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
+     * @throws InvalidHTTPVersionException Version is unsupported or invalid
+     * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
+     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     */
     @Override
     public HTTPMessage<T> fromRawString(final String raw, final byte[] bodyBytes, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         final HTTPMessage<T> message = fromRawString(raw, classOfT);
@@ -101,7 +196,22 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return message;
     }
 
-    private String[] parseMessageSegments(final String raw) {
+    /**
+     * Validate and convert a raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4" target="_top">RFC 2616 Section 4</a>
+     * HTTP message.
+     *
+     * <br/><br/>
+     *
+     * This will ensure that there is at least a header section and a body optionally depending on context.
+     *
+     * <br/><br/>
+     *
+     * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4" target="_top">RFC 2616 Section 4</a>
+     *                          HTTP message
+     * @return Split message containing either a header, header and body or header and multipart body
+     * @throws InvalidHTTPMessageFormatException Division of headers and body is invalid
+     */
+    private String[] parseMessageSegments(final String raw) throws InvalidHTTPMessageFormatException {
         final String[] splitMetadataBody = raw.split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER + HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER, 2);
         if (splitMetadataBody.length < 1) {
             throw new InvalidHTTPMessageFormatException("Expected two sections for HEADERS and BODY, got " + splitMetadataBody.length + " sections instead");
@@ -110,7 +220,21 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return splitMetadataBody;
     }
 
-    private String[] parseHeadersSegment(final String[] splitMetadataBody) {
+    /**
+     * Validate and convert a {@code String[]} of headers according to <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_top">RFC 2616 Section 4.2</a>.
+     * The headers will be split according to the standard delimiter {@link HTTPSymbols#HTTP_HEADER_NEWLINE_DELIMITER}.
+     *
+     * <br/><br/>
+     *
+     * If the headers are not compliant with at minimum HTTP/0.9 (single like method designation)
+     *
+     * <br/><br/>
+     *
+     * @param splitMetadataBody {@code String[]} of headers
+     * @return Headers split according to {@link HTTPSymbols#HTTP_HEADER_NEWLINE_DELIMITER}
+     * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
+     */
+    private String[] parseHeadersSegment(final String[] splitMetadataBody) throws InvalidHTTPStartLineFormatException {
         final String[] segmentedRaw = splitMetadataBody[0].split(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER);
         if (segmentedRaw.length < 1) {
             throw new InvalidHTTPStartLineFormatException("Message segments was of count " + segmentedRaw.length + ", expected at least HTTP/0.9 compliant start line");
@@ -119,7 +243,23 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return segmentedRaw;
     }
 
-    private T parseResponseType(final String[] segmentedRaw, final Class<T> classOfT) {
+    /**
+     * Validate and parse the response type, based on whether the class type parameter {@code T} is an instance of
+     * {@link HTTPRequestStartLine} or {@link HTTPResponseStartLine}. These will call {@link HTTPFormatter#parseRequestStartLine(String)}
+     * and  {@link HTTPFormatter#parseResponseStartLine(String)} respectively.
+     *
+     * <br/><br/>
+     *
+     * In the case that the message is neither a request nor response, this will throw an {@link InvalidHTTPMessageFormatException}
+     *
+     * <br/><br/>
+     *
+     * @param segmentedRaw {@code String[]} set of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_top">RFC 2616 Section 4.2</a> headers
+     * @param classOfT Instance of {@link HTTPStartLine} designating this message as a request or response
+     * @return {@link HTTPRequestStartLine} or {@link HTTPResponseStartLine} depending on the class of the class type parameter {@code T}
+     * @throws InvalidHTTPMessageFormatException Message is neither a valid request or response
+     */
+    private T parseResponseType(final String[] segmentedRaw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException {
         final T startLine;
         if (classOfT.isAssignableFrom(HTTPRequestStartLine.class)) {
             startLine = parseRequestStartLine(segmentedRaw[0]);
@@ -132,7 +272,13 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return startLine;
     }
 
-    private String parseBody(final String rawBody) {
+    /**
+     *
+     * @param rawBody
+     * @return
+     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     */
+    private String parseBody(final String rawBody) throws InvalidHTTPBodyException {
         if (rawBody.length() > this.config.servlet.messages.maxBodySize) {
             throw new InvalidHTTPBodyException("Body is larger than configured maximum supported size: " + rawBody.length() + " > " + this.config.servlet.messages.maxBodySize);
         }
@@ -140,6 +286,20 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
         return rawBody;
     }
 
+    /**
+     * See {@link BaseHTTPFormatter#fromRawString(String, Class)}
+     *
+     * <br/><br/>
+     *
+     * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
+     * @param classOfT Instance of {@link HTTPStartLine} to indicate whether this is a request or response
+     * @return A {@link HTTPMessage}
+     * @throws InvalidHTTPMessageFormatException Division of headers and body is invalid
+     * @throws InvalidHTTPStartLineFormatException Start line for the request or response is invalid
+     * @throws InvalidHTTPVersionException Version is unsupported or invalid
+     * @throws InvalidHTTPHeaderException Headers are invalid or of the wrong format
+     * @throws InvalidHTTPBodyException Body is malformed or contains illegal characters/encodings
+     */
     @Override
     public HTTPMessage<T> fromRawString(final String raw, final Class<T> classOfT) throws InvalidHTTPMessageFormatException, InvalidHTTPStartLineFormatException, InvalidHTTPVersionException, InvalidHTTPHeaderException, InvalidHTTPBodyException {
         final String[] splitMetadataBody = parseMessageSegments(raw);

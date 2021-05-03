@@ -220,7 +220,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
             }
         }
         if (scp.isCompressed) {
-            sb.append(GZIPCompression.unzip(Bytes.toArray(bytes), scp.charset));
+            sb.append(GZIPCompression.decompress(Bytes.toArray(bytes), scp.charset));
             logger.debug("Unzipped compressed body");
         }
         logger.debug("Read " + (read + bytes.size()) + " bytes from "

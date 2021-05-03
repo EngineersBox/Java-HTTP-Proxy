@@ -1,5 +1,9 @@
 package com.engineersbox.httpproxy.formatting.http.common;
 
+/**
+ * An base abstract class for HTTP start lines, both request and response.
+ * The overlap between the two is the member property {@link HTTPStartLine#version}
+ */
 public abstract class HTTPStartLine {
 
     public final HTTPVersion version;
@@ -12,6 +16,11 @@ public abstract class HTTPStartLine {
         this.version = version;
     }
 
+    /**
+     * Convert the start line to a {@code byte[]}
+     *
+     * @return {@code byte[]}
+     */
     public abstract byte[] toRaw();
 
 }

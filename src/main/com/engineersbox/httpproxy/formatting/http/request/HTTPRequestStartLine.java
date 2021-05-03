@@ -7,6 +7,10 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPVersion;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * An <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1" target="_top">RFC 2616 Section 5.1</a> compliant
+ * implementation of request line.
+ */
 public class HTTPRequestStartLine extends HTTPStartLine {
 
     public final HTTPMethod method;
@@ -22,6 +26,13 @@ public class HTTPRequestStartLine extends HTTPStartLine {
         this.target = target;
     }
 
+    /**
+     * See {@link HTTPStartLine#toRaw()}
+     *
+     * <br/><br/>
+     *
+     * @return {@code byte[]} format of request line
+     */
     @Override
     public byte[] toRaw() {
         return String.join(

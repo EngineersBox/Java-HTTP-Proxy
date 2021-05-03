@@ -2,6 +2,9 @@ package com.engineersbox.httpproxy.formatting.http.common;
 
 import java.util.regex.Pattern;
 
+/**
+ * Collection of HTTP symbols
+ */
 public class HTTPSymbols {
     public static final String HTTP_HEADER_NEWLINE_DELIMITER = "\r\n";
     public static final String START_LINE_DELIMITER = " ";

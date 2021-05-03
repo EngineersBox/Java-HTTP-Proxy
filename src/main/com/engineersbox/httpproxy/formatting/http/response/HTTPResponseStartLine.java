@@ -6,6 +6,10 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPVersion;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * An <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1" target="_top">RFC 2616 Section 6.1</a> compliant
+ * implementation of response line.
+ */
 public class HTTPResponseStartLine extends HTTPStartLine {
 
     public final int statusCode;
@@ -21,6 +25,13 @@ public class HTTPResponseStartLine extends HTTPStartLine {
         this.statusMessage = statusMessage;
     }
 
+    /**
+     * See {@link HTTPStartLine#toRaw()}
+     *
+     * <br/><br/>
+     *
+     * @return {@code byte[]} format of response line
+     */
     @Override
     public byte[] toRaw() {
         return String.join(
