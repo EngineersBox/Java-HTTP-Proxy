@@ -66,7 +66,7 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
      *
      * <br/><br/>
      *
-     * @throws Exception
+     * @throws Exception If any issues are encountered during the processing of a request
      */
     @Override
     public void task() throws Exception {

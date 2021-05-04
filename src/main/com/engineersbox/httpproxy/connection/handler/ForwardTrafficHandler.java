@@ -71,7 +71,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
      *
      * <br/><br/>
      *
-     * @throws Exception
+     * @throws Exception If any issues are encountered during the processing of a response
      */
     @Override
     public void task() throws Exception {
