@@ -109,14 +109,14 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
      */
     @Override
     public void task() throws Exception {
-        logger.info("Accepted client connection");
+        logger.debug("Accepted client connection");
         this.outClient = localSocket.getOutputStream();
         this.inClient = localSocket.getInputStream();
         try {
             this.server = new SingletonSocketFactory()
                     .withSocketConfigs(this.connectionsConfig)
                     .createSocket(host, port);
-            logger.info("Established connection to server");
+            logger.debug("Established connection to server");
         } catch (IOException e) {
             final PrintWriter out = new PrintWriter(new OutputStreamWriter(localSocket.getOutputStream()));
             out.flush();

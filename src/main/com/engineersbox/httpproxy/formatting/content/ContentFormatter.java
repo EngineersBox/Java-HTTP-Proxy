@@ -4,13 +4,14 @@ import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.configuration.domain.policies.Replacement;
 import com.engineersbox.httpproxy.formatting.content.html.HTMLSymbols;
 import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-import org.jsoup.select.Evaluator;
 
 import java.util.List;
 
@@ -19,6 +20,8 @@ import java.util.List;
  * attributes of HTML nodes/elements.
  */
 public class ContentFormatter implements BaseContentFormatter {
+
+    private final Logger logger = LogManager.getLogger(ContentFormatter.class);
 
     private final Config config;
     private String contentString;
@@ -57,18 +60,21 @@ public class ContentFormatter implements BaseContentFormatter {
      *
      * @param textNode Current {@link TextNode} to perform replacement on
      * @param pair Instance of {@link Replacement} to base replacement on
+     * @return {@code true} if a text change was made, {@code false} otherwise
      */
-    private void replaceTextForElement(final TextNode textNode, final Replacement pair) {
+    private boolean replaceTextForElement(final TextNode textNode, final Replacement pair) {
         final String current = textNode.text();
         textNode.text(pair.from.matcher(current).replaceAll(pair.to));
         final Node parent = textNode.parent();
+        String currentAttrValue = null;
         if (parent.hasAttr(HTMLSymbols.TITLE_ATTRIBUTE)) {
-            final String currentAttrValue = parent.attr(HTMLSymbols.TITLE_ATTRIBUTE);
+            currentAttrValue = parent.attr(HTMLSymbols.TITLE_ATTRIBUTE);
             parent.attr(
                     HTMLSymbols.TITLE_ATTRIBUTE,
                     pair.from.matcher(currentAttrValue).replaceAll(pair.to)
             );
         }
+        return !current.equals(textNode.text()) || (currentAttrValue !=  null && !currentAttrValue.equals(parent.attr(HTMLSymbols.TITLE_ATTRIBUTE)));
     }
 
     /**
@@ -81,12 +87,19 @@ public class ContentFormatter implements BaseContentFormatter {
     @Override
     public void replaceMatchingText(final Replacement toReplace) {
         final Elements els = this.document.body().getAllElements();
+        int changes = 0;
         for (final Element e : els) {
             final List<TextNode> textNodes = e.textNodes();
             for (final TextNode textNode : textNodes) {
-                replaceTextForElement(textNode, toReplace);
+                if (replaceTextForElement(textNode, toReplace)) {
+                    changes++;
+                }
             }
         }
+        logger.debug(String.format(
+                "Replaced %d matching text instances",
+                changes
+        ));
     }
 
     /**
@@ -99,12 +112,17 @@ public class ContentFormatter implements BaseContentFormatter {
     @Override
     public void replaceAllMatchingText(final List<Replacement> toReplace) {
         final Elements els = this.document.body().getAllElements();
+        int changes = 0;
         for (final Element e : els) {
             final List<TextNode> textNodes = e.textNodes();
             for (final TextNode textNode : textNodes) {
-                toReplace.forEach(pair -> replaceTextForElement(textNode, pair));
+                changes += toReplace.stream().filter(pair -> replaceTextForElement(textNode, pair)).count();
             }
         }
+        logger.debug(String.format(
+                "Replaced %d matching text instances",
+                changes
+        ));
     }
 
     /**
@@ -116,10 +134,12 @@ public class ContentFormatter implements BaseContentFormatter {
      * @param linkElement Current {@link Element} to perform replacement on
      * @param pair Instance of {@link Replacement} to base replacement on
      * @param attribute Attribute select to perform the replacement on
+     * @return {@code true} if a link change was made, {@code false} otherwise
      */
-    private void replaceLinkForElement(final Element linkElement, final Replacement pair, final String attribute) {
+    private boolean replaceLinkForElement(final Element linkElement, final Replacement pair, final String attribute) {
         final String currentAttrValue = linkElement.attr(attribute);
         linkElement.attr(attribute, pair.from.matcher(currentAttrValue).replaceAll(pair.to));
+        return !currentAttrValue.equals(linkElement.attr(attribute));
     }
 
     /**
@@ -131,20 +151,31 @@ public class ContentFormatter implements BaseContentFormatter {
      */
     @Override
     public void replaceMatchingLink(final Replacement toReplace) {
+        int changes = 0;
         final Elements links = this.document.select(HTMLSymbols.ANCHOR_LINK_CSS_SELECTOR);
         for (final Element link : links) {
-            replaceLinkForElement(link, toReplace, HTMLSymbols.SOURCE_ATTRIBUTE);
+            if (replaceLinkForElement(link, toReplace, HTMLSymbols.SOURCE_ATTRIBUTE)) {
+                changes ++;
+            }
         }
 
         final Elements media = this.document.select(HTMLSymbols.MEDIA_LINK_CSS_SELECTOR);
         for (final Element link : media) {
-            replaceLinkForElement(link, toReplace, HTMLSymbols.HREF_ATTRIBUTE);
+            if (replaceLinkForElement(link, toReplace, HTMLSymbols.HREF_ATTRIBUTE)) {
+                changes++;
+            }
         }
 
         final Elements imports = this.document.select(HTMLSymbols.IMPORT_LINK_CSS_SELECTOR);
         for (final Element link : imports) {
-            replaceLinkForElement(link, toReplace, HTMLSymbols.HREF_ATTRIBUTE);
+            if (replaceLinkForElement(link, toReplace, HTMLSymbols.HREF_ATTRIBUTE)) {
+                changes++;
+            }
         }
+        logger.debug(String.format(
+                "Replaced %d matching link instances",
+                changes
+        ));
     }
 
     /**
@@ -154,20 +185,25 @@ public class ContentFormatter implements BaseContentFormatter {
      */
     @Override
     public void replaceAllMatchingLinks(List<Replacement> toReplace) {
-        final Elements links = this.document.select(HTMLSymbols.ANCHOR_LINK_CSS_SELECTOR);
-        for (final Element link : links) {
-            toReplace.forEach(pair -> replaceLinkForElement(link, pair, HTMLSymbols.SOURCE_ATTRIBUTE));
+        int changes = 0;
+        final Elements anchors = this.document.select(HTMLSymbols.ANCHOR_LINK_CSS_SELECTOR);
+        for (final Element link : anchors) {
+            changes += toReplace.stream().filter(pair -> replaceLinkForElement(link, pair, HTMLSymbols.SOURCE_ATTRIBUTE)).count();
         }
 
         final Elements media = this.document.select(HTMLSymbols.MEDIA_LINK_CSS_SELECTOR);
         for (final Element link : media) {
-            toReplace.forEach(pair -> replaceLinkForElement(link, pair, HTMLSymbols.SOURCE_ATTRIBUTE));
+            changes += toReplace.stream().filter(pair -> replaceLinkForElement(link, pair, HTMLSymbols.HREF_ATTRIBUTE)).count();
         }
 
         final Elements imports = this.document.select(HTMLSymbols.IMPORT_LINK_CSS_SELECTOR);
         for (final Element link : imports) {
-            toReplace.forEach(pair -> replaceLinkForElement(link, pair, HTMLSymbols.SOURCE_ATTRIBUTE));
+            changes += toReplace.stream().filter(pair -> replaceLinkForElement(link, pair, HTMLSymbols.HREF_ATTRIBUTE)).count();
         }
+        logger.debug(String.format(
+                "Replaced %d matching link instances",
+                changes
+        ));
     }
 
     /**

@@ -71,10 +71,9 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
     @Override
     public void task() throws Exception {
         HTTPMessage<HTTPRequestStartLine> message = this.contentCollector.synchronousReadAll();
+        logger.info("[Client => Server] " + message.startLine.toDisplayableString());
         message.headers.replace("Host", this.config.target.host);
-//        message.headers.replace("User-Agent", "HTTPProxy");
         message.headers.put("Connection", "close");
-//        message.headers.remove("Accept-Encoding");
         final byte[] request = message.toRaw();
         this.outServer.write(request);
         logger.debug("Wrote " + request.length + " bytes to server output stream");

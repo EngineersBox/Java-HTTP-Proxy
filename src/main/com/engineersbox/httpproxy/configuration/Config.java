@@ -57,55 +57,55 @@ public class Config {
     }
 
     public void logConfig() {
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet > Threading] Pool sizes: [ACCEPTOR: %d] [HANDLER: %d]",
             this.servlet.threading.acceptorPoolSize,
             this.servlet.threading.handlerPoolSize
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet > Threading] Scheduling Policy: %s",
             this.servlet.threading.schedulingPolicy
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet > Connections] Queue Sizes: [ACCEPTOR: %d] [HANDLER: %d]",
             this.servlet.connections.acceptorQueueSize,
             this.servlet.connections.handlerQueueSize
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet > Connections] Connection Dropping: [AFTER DURATION (ms): %d] [FAILED DNS RESOLUTION: %s]",
             this.servlet.connections.dropAfter,
             this.servlet.connections.dropOnFailedDNSLookup
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet > Connections] Buffer Size: [SOCKET READER: %d]",
             this.servlet.connections.readerBufferSize
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet > Messages] Message Behaviour [MAX BODY SIZE: %d] [DROP ON MALFORMED: %s]",
             this.servlet.messages.maxBodySize,
             this.servlet.messages.dropOnMalformed
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet > Binding] Local Host [HOST: %s] [PORT: %d]",
             this.servlet.binding.host,
             this.servlet.binding.port
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Servlet] Cache [SIZE: %d]",
             this.servlet.cacheSize
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Policy > Enforcement] Behaviour: [IP: %s] [URL: %s]",
             this.policies.enforcement.whitelistBehaviour.ip,
                 this.policies.enforcement.whitelistBehaviour.url
         ));
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Policy > Rulesets] Imported %d rule sets",
             this.policies.rulesets.size()
         ));
         for (int i = 0; i < this.policies.rulesets.size(); i++) {
             final RuleSet ruleSet = this.policies.rulesets.get(i);
-            logger.debug(String.format(
+            logger.info(String.format(
                 "[CONFIG: Policy > Rulesets] Ruleset %d: [TYPE: %s] [WILDCARD: %s] [PATTERN: %s]",
                 i,
                 ruleSet.type,
@@ -113,33 +113,33 @@ public class Config {
                 ruleSet.pattern
             ));
         }
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Policy > Text Replacements] Imported %d text replacements",
             this.policies.textReplacements.size()
         ));
         for (int i = 0; i < this.policies.textReplacements.size(); i++) {
             final Replacement replacement = this.policies.textReplacements.get(i);
-            logger.debug(String.format(
+            logger.info(String.format(
                     "[CONFIG: Policy > Text Replacements] Text replacement %d: [FROM: /%s/] [TO: %s]",
                     i,
                     replacement.from.pattern(),
                     replacement.to
             ));
         }
-        logger.debug(String.format(
+        logger.info(String.format(
                 "[CONFIG: Policy > Link Replacements] Imported %d link replacements",
                 this.policies.linkReplacements.size()
         ));
         for (int i = 0; i < this.policies.linkReplacements.size(); i++) {
             final Replacement replacement = this.policies.linkReplacements.get(i);
-            logger.debug(String.format(
+            logger.info(String.format(
                     "[CONFIG: Policy > Link Replacements] Link replacement %d: [FROM: /%s/] [TO: %s]",
                     i,
                     replacement.from.pattern(),
                     replacement.to
             ));
         }
-        logger.debug(String.format(
+        logger.info(String.format(
             "[CONFIG: Target] Server Host: [HOST: %s] [PORT: %d]",
             this.target.host,
             this.target.port

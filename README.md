@@ -105,10 +105,10 @@ An example configuration file:
 			{
 				"type": "URL",
 				"isWildcard": true,
-				"pattern": "http://console.[dev,prod].test.com/"
+				"pattern": "(http(s)?://)?some\\.[(prod)|(dev)]\\.site\\.com:[3001-4200]/"
 			}
 		],
-		"replacements": [
+		"textReplacements": [
 			{
 				"from": "(?i)Sydney",
 				"to": "New York"
@@ -116,6 +116,12 @@ An example configuration file:
 			{
 				"from": "(?i)Perth",
 				"to": "Hokkaido"
+			}
+		],
+		"linkReplacements": [
+			{
+				"from": "www\\.bom\\.gov\\.au",
+				"to": "localhost:3000"
 			}
 		]
 	},
@@ -278,7 +284,7 @@ JSON Schema describing the configuration file
 						}
 					]
 				},
-				"replacements": {
+				"textReplacements": {
 					"type": "array",
 					"items": [
 						{
@@ -312,12 +318,33 @@ JSON Schema describing the configuration file
 							]
 						}
 					]
+				},
+				"linkReplacements": {
+					"type": "array",
+					"items": [
+						{
+							"type": "object",
+							"properties": {
+								"from": {
+									"type": "string"
+								},
+								"to": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"from",
+								"to"
+							]
+						}
+					]
 				}
 			},
 			"required": [
 				"enforcement",
 				"rulesets",
-				"replacements"
+				"textReplacements",
+				"linkReplacements"
 			]
 		},
 		"target": {
@@ -384,15 +411,11 @@ URLs and also inplace links.
 ##### Wildcard regex
 
 When specifying IPs or URLs, you can also use limited regex to encompass a range of values to avoid needless repetition.
-The available operators are:
-
-* Integer range: `[3-45]`
-* Enumerated set: `[over,z35,mailto]` (`~` is a special character indicating none or empty)
-* Any values: `*`
+You can use any standard Java regex operator syntax.
 
 You can use this at any point within an IP or URL, for example:
 
-* `http[~,s]://some.[prod,dev].site.com:[3001-4200]/`
+* `(http(s)?://)?some.[(prod)|(dev)].site.com:[3001-4200]/`
 * `52.3[0-12].102.*/*`
 
 ### Servlet Config
@@ -405,10 +428,32 @@ Todo
 
 Todo
 
-#### Packets
+#### Messages
 
 Todo
 
+#### Binding
+
 #### Cache
+
+Todo
+
+### Policies Config
+
+#### Enforcement
+
+Todo
+
+#### Rule sets
+
+Todo
+
+#### Text Replacements
+
+Todo
+
+#### Link Replacements
+
+### Target
 
 Todo

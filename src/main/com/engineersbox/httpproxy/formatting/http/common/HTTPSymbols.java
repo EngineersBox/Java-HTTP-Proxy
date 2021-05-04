@@ -16,14 +16,17 @@ public class HTTPSymbols {
 
     public static final String CONTENT_LENGTH_HEADER = "Content-Length";
     public static final String CONTENT_TYPE_HEADER = "Content-Type";
+    public static final String CONTENT_TYPE_HEADER_REGEX = "(?i)" + CONTENT_TYPE_HEADER;
     public static final String CONTENT_TYPE_CHARSET_KEY = "charset=";
     public static final Pattern CONTENT_TYPE_TEXT_TYPE_REGEX = Pattern.compile("text/\\w*");
     public static final Pattern CONTENT_TYPE_IMAGE_REGEX = Pattern.compile("image/\\w*");
 
     public static final String CONTENT_ENCODING_HEADER = "Content-Encoding";
+    public static final String CONTENT_ENCODING_HEADER_REGEX = "(?i)" + CONTENT_ENCODING_HEADER;
     public static final String CONTENT_ENCODING_IDENTITY = "identity";
 
     public static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
+    public static final String TRANSFER_ENCODING_HEADER_REGEX = "(?i)" + TRANSFER_ENCODING_HEADER;
     public static final String TRANSFER_ENCODING_IDENTITY = "identity";
     public static final Pattern TRANSFER_ENCODING_SIZE_REGEX = Pattern.compile("[0-9]+\r\n");
     public static final String TRANSFER_ENCODING_TERMINATION = "0" + HTTP_HEADER_NEWLINE_DELIMITER;

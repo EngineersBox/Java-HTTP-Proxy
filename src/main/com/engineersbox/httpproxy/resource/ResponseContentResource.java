@@ -37,11 +37,11 @@ public class ResponseContentResource {
     @SuppressWarnings("unused")
     @MediaType("text/html")
     public HTTPMessage<HTTPResponseStartLine> handleHTMLResponse(final HTTPMessage<HTTPResponseStartLine> message) {
-        final String orig = message.body;
         this.contentFormatter.withContentString(message.body);
         this.contentFormatter.replaceAllMatchingText(this.config.policies.textReplacements);
+        this.contentFormatter.replaceAllMatchingLinks(this.config.policies.linkReplacements);
         message.setBody(this.contentFormatter.getContentString());
-        logger.info("Replaced all text values");
+        logger.info("Replaced all text and link values");
         return message;
     }
 

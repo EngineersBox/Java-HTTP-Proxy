@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 /**
  * Socket stream reader used to construct HTTP messages received via a bound {@link java.net.Socket}'s {@link java.io.InputStream},
@@ -125,7 +126,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
      * {@code false} otherwise
      */
     private boolean hasHeader(final String line, final String header) {
-        return line.contains(header + HTTPSymbols.HEADER_KEY_VALUE_DELIMITER);
+        return Pattern.compile(header).matcher(line).find();
     }
 
     /**
@@ -176,19 +177,19 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
         while (scp.validateNextRead(line) && scp.validateLineRead((lineBytes = retentiveLineReader.readLineBytes()).getLeft())) {
             line = lineBytes.getLeft();
             if (!scp.pastHeaders) {
-                if (!scp.isCompressed && hasHeader(line, HTTPSymbols.CONTENT_ENCODING_HEADER)) {
+                if (!scp.isCompressed && hasHeader(line, HTTPSymbols.CONTENT_ENCODING_HEADER_REGEX)) {
                     final String contentEncodingHeader = splitHeader(line);
                     scp.isCompressed = !contentEncodingHeader.contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY);
                     logFoundHeader(
-                        HTTPSymbols.CONTENT_ENCODING_HEADER,
+                        HTTPSymbols.CONTENT_ENCODING_HEADER_REGEX,
                         splitHeader(line)
                     );
                 }
-                if (!scp.hasTransferEncodingHeader && hasHeader(line, HTTPSymbols.TRANSFER_ENCODING_HEADER)) {
+                if (!scp.hasTransferEncodingHeader && hasHeader(line, HTTPSymbols.TRANSFER_ENCODING_HEADER_REGEX)) {
                     final String transferEncodingHeader = splitHeader(line);
                     scp.hasTransferEncodingHeader = !transferEncodingHeader.equals(HTTPSymbols.TRANSFER_ENCODING_IDENTITY);
                     logFoundHeader(
-                        HTTPSymbols.TRANSFER_ENCODING_HEADER,
+                        HTTPSymbols.TRANSFER_ENCODING_HEADER_REGEX,
                         transferEncodingHeader
                     );
                 }
@@ -197,7 +198,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                sb.append(line);
                read += line.getBytes().length;
            }
-           if (!scp.pastHeaders && hasHeader(line, HTTPSymbols.CONTENT_TYPE_HEADER)) {
+           if (!scp.pastHeaders && hasHeader(line, HTTPSymbols.CONTENT_TYPE_HEADER_REGEX)) {
                 final String contentTypeHeader = splitHeader(line);
                 if (line.contains(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)) {
                     final String contentTypeCharset = contentTypeHeader.split(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)[1];
@@ -205,7 +206,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                 }
                 scp.isRaw = HTTPSymbols.CONTENT_TYPE_IMAGE_REGEX.matcher(contentTypeHeader).find();
                 logFoundHeader(
-                        HTTPSymbols.CONTENT_TYPE_HEADER,
+                        HTTPSymbols.CONTENT_TYPE_HEADER_REGEX,
                         splitHeader(line)
                 );
             }
@@ -257,6 +258,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
     public HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError, HTTPMessageException {
         try {
             this.socket.setSoTimeout(this.config.servlet.connections.dropAfter);
+            logger.debug("Set SO_TIMEOUT timeout based on config: " + this.config.servlet.connections.dropAfter);
         } catch (final SocketException e) {
             throw new SocketStreamReadError(e);
         }

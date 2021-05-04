@@ -113,10 +113,14 @@ public class HandlerResolver implements ResourceResolver {
      * @throws ResourceEndpointMatcherException If there was no {@code Content-Type} header in the {@link Map}
      */
     private String getContentTypeHeader(final Map<String, String> headers) throws ResourceEndpointMatcherException {
-        if (!headers.containsKey(HTTPSymbols.CONTENT_TYPE_HEADER)) {
-            throw new ResourceEndpointMatcherException("Could not find " + HTTPSymbols.CONTENT_TYPE_HEADER + " when trying to resolve resource endpoint");
+        final Optional<Map.Entry<String, String>> header = headers.entrySet()
+                .stream()
+                .filter(e -> Pattern.compile(HTTPSymbols.CONTENT_TYPE_HEADER_REGEX).matcher(e.getKey()).find())
+                .findFirst();
+        if (!header.isPresent()) {
+            throw new ResourceEndpointMatcherException("Could not find " + HTTPSymbols.CONTENT_TYPE_HEADER_REGEX + " when trying to resolve resource endpoint");
         }
-        final String contentTypeHeader = headers.get(HTTPSymbols.CONTENT_TYPE_HEADER);
+        final String contentTypeHeader = header.get().getValue();
         String typeValue = contentTypeHeader;
         if (contentTypeHeader.contains(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)) {
             final String contentTypeSplit = contentTypeHeader.split(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)[0];

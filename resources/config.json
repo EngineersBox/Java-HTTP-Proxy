@@ -34,7 +34,7 @@
 			{
 				"type": "URL",
 				"isWildcard": true,
-				"pattern": "http://console.[dev,prod].test.com/"
+				"pattern": "(http(s)?://)?some\\.[(prod)|(dev)]\\.site\\.com:[3001-4200]/"
 			}
 		],
 		"textReplacements": [

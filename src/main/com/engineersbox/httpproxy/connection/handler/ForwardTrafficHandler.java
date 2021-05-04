@@ -83,6 +83,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
         } catch (final SocketStreamReadError e) {
             message = StandardResponses._500();
         }
+        logger.info("[Client <= Server] " + message.startLine.toDisplayableString());
         final byte[] response = message.toRaw();
         this.outClient.write(response);
         logger.debug("Wrote " + response.length + " bytes to client output stream");
@@ -103,9 +104,9 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
     public void after() {
         try {
             server.close();
-            logger.info("Closed server connection");
+            logger.debug("Closed server connection");
             client.close();
-            logger.info("Closed client connection");
+            logger.debug("Closed client connection");
         } catch (final IOException e) {
             logger.error(e.getMessage(), e);
         }

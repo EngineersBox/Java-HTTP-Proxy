@@ -53,4 +53,14 @@ public class HTTPRequestStartLine extends HTTPStartLine {
             this.version.version
         );
     }
+
+    @Override
+    public String toDisplayableString() {
+        return String.format(
+            "%s %s %s",
+            this.method,
+            this.target,
+            this.version.version
+        );
+    }
 }

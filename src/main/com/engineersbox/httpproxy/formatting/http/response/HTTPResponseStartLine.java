@@ -53,4 +53,14 @@ public class HTTPResponseStartLine extends HTTPStartLine {
         );
     }
 
+    @Override
+    public String toDisplayableString() {
+        return String.format(
+                "%s %s %s",
+                this.version.version,
+                this.statusCode,
+                this.statusMessage
+        );
+    }
+
 }

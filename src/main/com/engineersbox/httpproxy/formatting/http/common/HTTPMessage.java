@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * An implementation of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4" target="_top">RFC 2616 Section 4</a> compliant HTTP message.
@@ -93,14 +95,17 @@ public class HTTPMessage<T extends HTTPStartLine> {
      * @return {@link Charset} if it exists, otherwise {@link StandardCharsets#UTF_8}
      */
     private Charset getCharset() {
-        if (!this.headers.containsKey(HTTPSymbols.CONTENT_TYPE_HEADER)) {
+        if (!this.headers.containsKey(HTTPSymbols.CONTENT_TYPE_HEADER_REGEX)) {
+            logger.trace("No " + HTTPSymbols.CONTENT_TYPE_HEADER + " present, defaulting to UTF-8");
             return StandardCharsets.UTF_8;
         }
-        final String contentTypeHeader = this.headers.get(HTTPSymbols.CONTENT_TYPE_HEADER);
+        final String contentTypeHeader = this.headers.get(HTTPSymbols.CONTENT_TYPE_HEADER_REGEX);
         if (!contentTypeHeader.contains(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)) {
+            logger.trace("No charset identifier present, defaulting to UTF-8");
             return StandardCharsets.UTF_8;
         }
         final String contentTypeCharset = contentTypeHeader.split(HTTPSymbols.CONTENT_TYPE_CHARSET_KEY)[1];
+        logger.trace("Charset identifier found: " + contentTypeCharset);
         return  Charset.forName(StringUtils.removeEnd(contentTypeCharset, HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER));
     }
 
@@ -129,22 +134,33 @@ public class HTTPMessage<T extends HTTPStartLine> {
      * @return {@code byte[]} containing an encoded body of compressed or uncompressed format
      */
     private byte[] getBody() {
-        final String contentTypeHeader = this.headers.get(HTTPSymbols.CONTENT_TYPE_HEADER);
-        if (contentTypeHeader != null && !HTTPSymbols.CONTENT_TYPE_TEXT_TYPE_REGEX.matcher(contentTypeHeader).find()) {
+        Optional<Map.Entry<String, String>> potentialHeader = this.headers.entrySet()
+                .stream()
+                .filter(e -> Pattern.compile(HTTPSymbols.CONTENT_TYPE_HEADER_REGEX).matcher(e.getKey()).find())
+                .findFirst();
+        if (potentialHeader.isPresent() && !HTTPSymbols.CONTENT_TYPE_TEXT_TYPE_REGEX.matcher(potentialHeader.get().getValue()).find()) {
+            logger.trace("Message body did not match pattern: " + HTTPSymbols.CONTENT_TYPE_TEXT_TYPE_REGEX.pattern() + ". Defaulting to raw bytes");
             return this.bodyBytes;
         }
         if (body == null) {
+            logger.trace("Message body was null, defaulting to empty byte array");
             return new byte[0];
         }
-        if (!this.headers.containsKey(HTTPSymbols.CONTENT_ENCODING_HEADER)
-            || this.headers.get(HTTPSymbols.CONTENT_ENCODING_HEADER).contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY)) {
+        potentialHeader = this.headers.entrySet()
+                .stream()
+                .filter(e -> Pattern.compile(HTTPSymbols.CONTENT_ENCODING_HEADER_REGEX).matcher(e.getKey()).find())
+                .findFirst();
+        if (!potentialHeader.isPresent() || potentialHeader.get().getValue().contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY)) {
+            logger.trace(HTTPSymbols.CONTENT_ENCODING_HEADER + " header is not present or contained '" + HTTPSymbols.CONTENT_ENCODING_IDENTITY + "' value");
             return body.getBytes(getCharset());
         }
         try {
+            logger.trace("Body requires compression");
             return GZIPCompression.compress(this.body, getCharset());
         } catch (IOException e) {
             logger.error(e, e);
         }
+        logger.trace("Body was determined to have no formatting requirements, defaulting to standard byte retrieval with charset");
         return body.getBytes(getCharset());
     }
 
@@ -163,6 +179,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
     public byte[] toRaw() {
         final byte[] bb = getBody();
         this.headers.put(HTTPSymbols.CONTENT_LENGTH_HEADER, String.valueOf(bb.length));
+        logger.trace("Added/updated " + HTTPSymbols.CONTENT_LENGTH_HEADER + " to reflect new body length: " + bb.length);
         return concatAll(
                 this.startLine.toRaw(),
                 headersToString(HTTPSymbols.HTTP_HEADER_NEWLINE_DELIMITER)
