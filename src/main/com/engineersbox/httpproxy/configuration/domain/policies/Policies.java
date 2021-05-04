@@ -7,12 +7,14 @@ import java.util.List;
 public class Policies {
     public final Enforcement enforcement;
     public final List<RuleSet> rulesets;
-    public List<TextReplacement> textReplacements;
+    public List<Replacement> textReplacements;
+    public List<Replacement> linkReplacements;
 
-    public Policies(final Enforcement enforcement, final List<RuleSet> rulesets, final List<TextReplacement> textReplacements) {
+    public Policies(final Enforcement enforcement, final List<RuleSet> rulesets, final List<Replacement> textReplacements, final List<Replacement> linkReplacements) {
         this.enforcement = enforcement;
         this.rulesets = rulesets;
         this.textReplacements = textReplacements;
+        this.linkReplacements = linkReplacements;
     }
 
     @Override
@@ -26,6 +28,8 @@ public class Policies {
         return new EqualsBuilder()
                 .append(enforcement, policies.enforcement)
                 .append(rulesets, policies.rulesets)
+                .append(textReplacements, policies.textReplacements)
+                .append(linkReplacements, policies.linkReplacements)
                 .isEquals();
     }
 }

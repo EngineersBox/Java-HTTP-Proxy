@@ -3,7 +3,7 @@ package com.engineersbox.httpproxy.configuration;
 import com.engineersbox.httpproxy.configuration.domain.Target;
 import com.engineersbox.httpproxy.configuration.domain.policies.Policies;
 import com.engineersbox.httpproxy.configuration.domain.policies.RuleSet;
-import com.engineersbox.httpproxy.configuration.domain.policies.TextReplacement;
+import com.engineersbox.httpproxy.configuration.domain.policies.Replacement;
 import com.engineersbox.httpproxy.configuration.domain.servlet.Servlet;
 import com.google.gson.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
@@ -119,9 +118,22 @@ public class Config {
             this.policies.textReplacements.size()
         ));
         for (int i = 0; i < this.policies.textReplacements.size(); i++) {
-            final TextReplacement replacement = this.policies.textReplacements.get(i);
+            final Replacement replacement = this.policies.textReplacements.get(i);
             logger.debug(String.format(
                     "[CONFIG: Policy > Text Replacements] Text replacement %d: [FROM: /%s/] [TO: %s]",
+                    i,
+                    replacement.from.pattern(),
+                    replacement.to
+            ));
+        }
+        logger.debug(String.format(
+                "[CONFIG: Policy > Link Replacements] Imported %d link replacements",
+                this.policies.linkReplacements.size()
+        ));
+        for (int i = 0; i < this.policies.linkReplacements.size(); i++) {
+            final Replacement replacement = this.policies.linkReplacements.get(i);
+            logger.debug(String.format(
+                    "[CONFIG: Policy > Link Replacements] Link replacement %d: [FROM: /%s/] [TO: %s]",
                     i,
                     replacement.from.pattern(),
                     replacement.to

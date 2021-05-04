@@ -46,6 +46,12 @@
 				"from": "(?i)Perth",
 				"to": "Hokkaido"
 			}
+		],
+		"linkReplacements": [
+			{
+				"from": "www\\.bom\\.gov\\.au",
+				"to": "localhost:3000"
+			}
 		]
 	},
 	"target": {

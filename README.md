@@ -108,7 +108,7 @@ An example configuration file:
 				"pattern": "http://console.[dev,prod].test.com/"
 			}
 		],
-		"textReplacements": [
+		"replacements": [
 			{
 				"from": "(?i)Sydney",
 				"to": "New York"
@@ -278,7 +278,7 @@ JSON Schema describing the configuration file
 						}
 					]
 				},
-				"textReplacements": {
+				"replacements": {
 					"type": "array",
 					"items": [
 						{
@@ -317,7 +317,7 @@ JSON Schema describing the configuration file
 			"required": [
 				"enforcement",
 				"rulesets",
-				"textReplacements"
+				"replacements"
 			]
 		},
 		"target": {

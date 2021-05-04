@@ -4,12 +4,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.regex.Pattern;
 
-public class TextReplacement {
+public class Replacement {
 
     public final Pattern from;
     public final String to;
 
-    public TextReplacement(final Pattern from, final String to) {
+    public Replacement(final Pattern from, final String to) {
         this.from = from;
         this.to = to;
     }
@@ -20,7 +20,7 @@ public class TextReplacement {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        final TextReplacement that = (TextReplacement) o;
+        final Replacement that = (Replacement) o;
 
         return new EqualsBuilder().append(from, that.from).append(to, that.to).isEquals();
     }
