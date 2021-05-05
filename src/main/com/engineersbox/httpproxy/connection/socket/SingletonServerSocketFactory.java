@@ -32,7 +32,7 @@ public class SingletonServerSocketFactory extends ServerSocketFactory {
             10,
             10,
             0,
-            false,
+            1024,
             1024
     );
 

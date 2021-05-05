@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.engineersbox</groupId>
-    <artifactId>HTTP-Proxy</artifactId>
+    <artifactId>http-proxy</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
 
-    <name>HTTP-Proxy</name>
+    <name>http-proxy</name>
 
     <properties>
         <!-- Dependency Versions -->

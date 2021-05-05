@@ -6,15 +6,15 @@ public class Connections {
     public final int acceptorQueueSize;
     public final int handlerQueueSize;
     public final int dropAfter;
-    public final boolean dropOnFailedDNSLookup;
     public final int readerBufferSize;
+    public final int writeBufferSize;
 
-    public Connections(final int acceptorQueueSize, final int handlerQueueSize, final int dropAfter, final boolean dropOnFailedDNSLookup, final int readerBufferSize) {
+    public Connections(final int acceptorQueueSize, final int handlerQueueSize, final int dropAfter, final int readerBufferSize, final int writeBufferSize) {
         this.acceptorQueueSize = acceptorQueueSize;
         this.handlerQueueSize = handlerQueueSize;
         this.dropAfter = dropAfter;
-        this.dropOnFailedDNSLookup = dropOnFailedDNSLookup;
         this.readerBufferSize = readerBufferSize;
+        this.writeBufferSize = writeBufferSize;
     }
 
     @Override
@@ -29,8 +29,8 @@ public class Connections {
                 .append(acceptorQueueSize, that.acceptorQueueSize)
                 .append(handlerQueueSize, that.handlerQueueSize)
                 .append(dropAfter, that.dropAfter)
-                .append(dropOnFailedDNSLookup, that.dropOnFailedDNSLookup)
                 .append(readerBufferSize, that.readerBufferSize)
+                .append(writeBufferSize, that.writeBufferSize)
                 .isEquals();
     }
 }

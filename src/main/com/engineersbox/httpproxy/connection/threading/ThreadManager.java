@@ -25,4 +25,9 @@ public interface ThreadManager {
      */
     void submitHandler(final BaseTrafficHandler task);
 
+    /**
+     * Schedule a shutdown operation for both the acceptor and handler thread pools
+     */
+    void shutdown();
+
 }

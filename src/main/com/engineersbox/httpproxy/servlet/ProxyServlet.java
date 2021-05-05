@@ -70,6 +70,7 @@ public class ProxyServlet implements AbstractServlet {
             }
         } catch (final IOException e) {
             logger.error(e.getMessage(), e);
+            this.poolManager.shutdown();
         }
     }
 }

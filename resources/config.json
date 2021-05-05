@@ -3,24 +3,22 @@
 		"threading": {
 			"acceptorPoolSize": 10,
 			"handlerPoolSize": 10,
-			"schedulingPolicy": "FIFO"
+			"schedulingPolicy": "ABORT"
 		},
 		"connections": {
 			"acceptorQueueSize": 10,
 			"handlerQueueSize": 10,
 			"dropAfter": 1000,
-			"dropOnFailedDNSLookup": false,
-			"readerBufferSize": 1024
+			"readerBufferSize": 1024,
+			"writeBufferSize": 1024
 		},
 		"messages": {
-			"maxBodySize": 600000,
-			"dropOnMalformed": true
+			"maxBodySize": 600000
 		},
 		"binding": {
 			"host": "localhost",
 			"port": 3000
-		},
-		"cacheSize": 25
+		}
 	},
 	"policies": {
 		"enforcement": {

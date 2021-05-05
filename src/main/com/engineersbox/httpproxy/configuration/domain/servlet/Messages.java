@@ -5,11 +5,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 public class Messages {
 
     public final int maxBodySize;
-    public final boolean dropOnMalformed;
 
-    public Messages(final int maxBodySize, final boolean dropOnMalformed) {
+    public Messages(final int maxBodySize) {
         this.maxBodySize = maxBodySize;
-        this.dropOnMalformed = dropOnMalformed;
     }
 
     @Override
@@ -22,7 +20,6 @@ public class Messages {
 
         return new EqualsBuilder()
                 .append(maxBodySize, messages.maxBodySize)
-                .append(dropOnMalformed, messages.dropOnMalformed)
                 .isEquals();
     }
 }

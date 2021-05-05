@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Ab abstract handler for directional traffic implemting the {@link java.lang.Runnable} functional interface
+ * An abstract handler for directional traffic implementing the {@link java.lang.Runnable} functional interface
  *
  * <br/><br/>
  *

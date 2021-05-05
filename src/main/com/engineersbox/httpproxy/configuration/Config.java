@@ -72,27 +72,17 @@ public class Config {
             this.servlet.connections.handlerQueueSize
         ));
         logger.info(String.format(
-            "[CONFIG: Servlet > Connections] Connection Dropping: [AFTER DURATION (ms): %d] [FAILED DNS RESOLUTION: %s]",
-            this.servlet.connections.dropAfter,
-            this.servlet.connections.dropOnFailedDNSLookup
-        ));
-        logger.info(String.format(
-            "[CONFIG: Servlet > Connections] Buffer Size: [SOCKET READER: %d]",
+            "[CONFIG: Servlet > Connections] Read Buffer Size: [SOCKET READER: %d]",
             this.servlet.connections.readerBufferSize
         ));
         logger.info(String.format(
-            "[CONFIG: Servlet > Messages] Message Behaviour [MAX BODY SIZE: %d] [DROP ON MALFORMED: %s]",
-            this.servlet.messages.maxBodySize,
-            this.servlet.messages.dropOnMalformed
+            "[CONFIG: Servlet > Connections] Send Buffer Size: [SOCKET WRITER: %d]",
+            this.servlet.connections.writeBufferSize
         ));
         logger.info(String.format(
             "[CONFIG: Servlet > Binding] Local Host [HOST: %s] [PORT: %d]",
             this.servlet.binding.host,
             this.servlet.binding.port
-        ));
-        logger.info(String.format(
-            "[CONFIG: Servlet] Cache [SIZE: %d]",
-            this.servlet.cacheSize
         ));
         logger.info(String.format(
             "[CONFIG: Policy > Enforcement] Behaviour: [IP: %s] [URL: %s]",

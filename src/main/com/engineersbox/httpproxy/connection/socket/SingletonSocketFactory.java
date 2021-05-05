@@ -32,7 +32,7 @@ public class SingletonSocketFactory extends SocketFactory {
             10,
             10,
             0,
-            false,
+            1024,
             1024
     );
 
@@ -77,6 +77,7 @@ public class SingletonSocketFactory extends SocketFactory {
         );
         socket.setSoTimeout(this.connectionsConfig.dropAfter);
         socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
+        socket.setSendBufferSize(this.connectionsConfig.writeBufferSize);
         return socket;
     }
 
@@ -118,6 +119,7 @@ public class SingletonSocketFactory extends SocketFactory {
         );
         socket.setSoTimeout(this.connectionsConfig.dropAfter);
         socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
+        socket.setSendBufferSize(this.connectionsConfig.writeBufferSize);
         return socket;
     }
 
@@ -148,6 +150,7 @@ public class SingletonSocketFactory extends SocketFactory {
         );
         socket.setSoTimeout(this.connectionsConfig.dropAfter);
         socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
+        socket.setSendBufferSize(this.connectionsConfig.writeBufferSize);
         return socket;
     }
 
@@ -188,6 +191,7 @@ public class SingletonSocketFactory extends SocketFactory {
         );
         socket.setSoTimeout(this.connectionsConfig.dropAfter);
         socket.setReceiveBufferSize(this.connectionsConfig.readerBufferSize);
+        socket.setSendBufferSize(this.connectionsConfig.writeBufferSize);
         return socket;
     }
 }
