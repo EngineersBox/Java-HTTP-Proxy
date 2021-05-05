@@ -146,18 +146,12 @@ The schema is broken down into 3 main sections:
 #### Enforcement
 
 Within the enforcement section, we detail how the proxy honours the rule sets. The configuration properties
-define whether to use the whitelist for IPs and/or URLs, and whether to block everything if it doesnt match.
-
-Note that in the case of making `block_otherwise` a `true` value, this causes the proxy to ignore the blacklists
-for IPs or URLs if they are `true`.
-
-The `allow_redirects` property specifies whether inplace redirects within URLs should be honoured or not. In the case
-that this is falsy, the proxy will not follow redirects from any connections.
+define whether to use the whitelist for IPs and/or URLs, and whether to block everything if it doesn't match.
 
 #### Whitelist and Blacklist
 
 The whitelist and blacklist behave the same in the way they act. Both have subfields `ip` and `url` allow a list of
-values to acknowledge when scrutinising given resources. These can be wildcarded to support limit regex statements.
+values to acknowledge when scrutinising given resources. These can be wildcarded with valid Java regexes.
 
 ##### IP Addresses
 
@@ -167,7 +161,7 @@ If a given rule is invalid then a log entry will be created at the DEBUG level.
 ##### URLs
 
 Creating a URL entry is done in standard format including schema. These rule sets will be applied to both the resource
-URLs and also inplace links.
+URLs and also in place links such as `<a href="...">`, `<img src="...">` or `<link src="...">`.
 
 ##### Wildcard regex
 
@@ -179,42 +173,45 @@ You can use this at any point within an IP or URL, for example:
 * `(http(s)?://)?some.[(prod)|(dev)].site.com:[3001-4200]/`
 * `52.3[0-12].102.*/*`
 
-### Servlet Config
+## Configuration Breakdown
 
-#### Threading
+Below is a list of each of the sections of the config file with a short description of each of them.
 
-Todo
-
-#### Connections
-
-Todo
-
-#### Messages
-
-Todo
-
-#### Binding
-
-#### Cache
-
-Todo
-
-### Policies Config
-
-#### Enforcement
-
-Todo
-
-#### Rule sets
-
-Todo
-
-#### Text Replacements
-
-Todo
-
-#### Link Replacements
-
-### Target
-
-Todo
+* `servlet`: Allows configuration of the behaviour of the servlet and the connections it establishes
+  * `threading`: Options regarding thread pooling and scheduling
+    * `acceptorPoolSize`: How many threads to allocate to the acceptor pool
+    * `handlerPoolSize`: How many threads to allocate to the handler pool
+    * `schedulingPolicy`: What type of scheduling policy to use for the thread pools. Can be one of ABORT, CALLER_RUNS, DISCARD_OLDEST or DISCARD
+  * `connections`: How connections are handled and what properties they can have in terms of liveness and buffering
+    * `acceptorQueueSize`: Size of the acceptor queue
+    * `handlerQueueSize`: Size of the handler queue
+    * `dropAfter`: How long in milliseconds a socket connection should be dropped after if idle and has not received an `EOT` (-1)
+    * `readerBufferSize`: Size of the read buffer for a socket
+    * `writeBufferSize`: Size of the write/send buffer for a socket
+  * `messages`: Properties of how HTTP(S) messages are handled
+    * `maxBodySize`: How large accepted HTTP(S) body sizes can be
+  * `binding`: Host configurations for th proxy
+    * `host`: Hostname to use on the local machine
+    * `port`: Port to use on the local machine
+* `policies`: Rules about how the proxy should behave with regards to data and URLs
+  * `enforcement`: How the proxy should go about enforcing behaviour
+    * `whitelistBehaviour`: What action set should be taken for whitelists
+      * `ip`: Whether to act as a whitelist or blacklist for IP rule set entries
+      * `url`: Whether to act as a whitelist or blacklist for URL rule set entries
+    * `allowRedirects`: Whether URL redirects should be allowed to happen away from the bound domain
+  * `rulesets`: A set of rules that describe how URL and IP entries are treated
+    * `rule set`: A rule for an UP or URL
+      * `type`: Whether this rule applies to an IP or URL
+      * `isWildcard`: Whether this rule should support regex patterns
+      * `pattern`: IP or URL pattern to action against
+  * `textReplacements`: A set of replacement schemas to enact on HTML text nodes
+    * `replacement`: The pattern that should be replaced with a given string
+      * `from`: Pattern to match against
+      * `to`: String to replace a match against the 'from' pattern
+  * `linkReplacements`: A set of replacement schemas to enact on HTML link nodes (<a> <img> <link>)
+    * `replacement`: The pattern that should be replaced with a given string
+      * `from`: Pattern to match against
+      * `to`: String to replace a match against the 'from' pattern
+* `target`: The target of the proxy to forward requests/responses to and from
+  * `host`: Hostname of the target
+  * `port`: Port of the target

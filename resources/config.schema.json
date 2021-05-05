@@ -207,7 +207,7 @@
 							"$id": "#/properties/servlet/properties/connections/properties/dropAfter",
 							"type": "integer",
 							"title": "The dropAfter schema",
-							"description": "How long in milliseconds a socket connection should be dropped after if idle and has not received an EOF (-1)",
+							"description": "How long in milliseconds a socket connection should be dropped after if idle and has not received an EOT (-1)",
 							"default": 0,
 							"examples": [
 								1000
@@ -469,7 +469,7 @@
 										"$id": "#/properties/policies/properties/rulesets/items/anyOf/0/properties/type",
 										"type": "string",
 										"title": "The type schema",
-										"description": "Whether this rule applies to IP or URL.",
+										"description": "Whether this rule applies to an IP or URL.",
 										"default": "",
 										"examples": [
 											"URL"
@@ -570,7 +570,7 @@
 					"$id": "#/properties/policies/properties/linkReplacements",
 					"type": "array",
 					"title": "The linkReplacements schema",
-					"description": "A set of replacement schemas to enact on HTML link  nodes (<a> <img> <link>).",
+					"description": "A set of replacement schemas to enact on HTML link nodes (<a> <img> <link>).",
 					"default": [],
 					"examples": [
 						[
@@ -634,7 +634,7 @@
 			"$id": "#/properties/target",
 			"type": "object",
 			"title": "The target schema",
-			"description": "The target of the proxy to forward requests to and from",
+			"description": "The target of the proxy to forward requests/responses to and from",
 			"default": {},
 			"examples": [
 				{
