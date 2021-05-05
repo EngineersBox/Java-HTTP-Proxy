@@ -74,24 +74,22 @@ An example configuration file:
 		"threading": {
 			"acceptorPoolSize": 10,
 			"handlerPoolSize": 10,
-			"schedulingPolicy": "FIFO"
+			"schedulingPolicy": "ABORT"
 		},
 		"connections": {
 			"acceptorQueueSize": 10,
 			"handlerQueueSize": 10,
 			"dropAfter": 1000,
-			"dropOnFailedDNSLookup": false,
-			"readerBufferSize": 1024
+			"readerBufferSize": 1024,
+			"writeBufferSize": 1024
 		},
 		"messages": {
-			"maxBodySize": 600000,
-			"dropOnMalformed": true
+			"maxBodySize": 600000
 		},
 		"binding": {
 			"host": "localhost",
 			"port": 3000
-		},
-		"cacheSize": 25
+		}
 	},
 	"policies": {
 		"enforcement": {
@@ -132,244 +130,7 @@ An example configuration file:
 }
 ```
 
-JSON Schema describing the configuration file
-
-```json
-{
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"type": "object",
-	"properties": {
-		"servlet": {
-			"type": "object",
-			"properties": {
-				"threading": {
-					"type": "object",
-					"properties": {
-						"acceptorPoolSize": {
-							"type": "integer"
-						},
-						"handlerPoolSize": {
-							"type": "integer"
-						},
-						"schedulingPolicy": {
-							"type": "string"
-						}
-					},
-					"required": [
-						"acceptorPoolSize",
-						"handlerPoolSize",
-						"schedulingPolicy"
-					]
-				},
-				"connections": {
-					"type": "object",
-					"properties": {
-						"acceptorQueueSize": {
-							"type": "integer"
-						},
-						"handlerQueueSize": {
-							"type": "integer"
-						},
-						"dropAfter": {
-							"type": "integer"
-						},
-						"dropOnFailedDNSLookup": {
-							"type": "boolean"
-						},
-						"readerBufferSize": {
-							"type": "integer"
-						}
-					},
-					"required": [
-						"acceptorQueueSize",
-						"handlerQueueSize",
-						"dropAfter",
-						"dropOnFailedDNSLookup",
-						"readerBufferSize"
-					]
-				},
-				"messages": {
-					"type": "object",
-					"properties": {
-						"maxBodySize": {
-							"type": "integer"
-						},
-						"dropOnMalformed": {
-							"type": "boolean"
-						}
-					},
-					"required": [
-						"maxBodySize",
-						"dropOnMalformed"
-					]
-				},
-				"binding": {
-					"type": "object",
-					"properties": {
-						"host": {
-							"type": "string"
-						},
-						"port": {
-							"type": "integer"
-						}
-					},
-					"required": [
-						"host",
-						"port"
-					]
-				},
-				"cacheSize": {
-					"type": "integer"
-				}
-			},
-			"required": [
-				"threading",
-				"connections",
-				"messages",
-				"binding",
-				"cacheSize"
-			]
-		},
-		"policies": {
-			"type": "object",
-			"properties": {
-				"enforcement": {
-					"type": "object",
-					"properties": {
-						"whitelistBehaviour": {
-							"type": "object",
-							"properties": {
-								"ip": {
-									"type": "string"
-								},
-								"url": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"ip",
-								"url"
-							]
-						},
-						"allowRedirects": {
-							"type": "boolean"
-						}
-					},
-					"required": [
-						"whitelistBehaviour",
-						"allowRedirects"
-					]
-				},
-				"rulesets": {
-					"type": "array",
-					"items": [
-						{
-							"type": "object",
-							"properties": {
-								"type": {
-									"type": "string"
-								},
-								"isWildcard": {
-									"type": "boolean"
-								},
-								"pattern": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"type",
-								"isWildcard",
-								"pattern"
-							]
-						}
-					]
-				},
-				"textReplacements": {
-					"type": "array",
-					"items": [
-						{
-							"type": "object",
-							"properties": {
-								"from": {
-									"type": "string"
-								},
-								"to": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"from",
-								"to"
-							]
-						},
-						{
-							"type": "object",
-							"properties": {
-								"from": {
-									"type": "string"
-								},
-								"to": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"from",
-								"to"
-							]
-						}
-					]
-				},
-				"linkReplacements": {
-					"type": "array",
-					"items": [
-						{
-							"type": "object",
-							"properties": {
-								"from": {
-									"type": "string"
-								},
-								"to": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"from",
-								"to"
-							]
-						}
-					]
-				}
-			},
-			"required": [
-				"enforcement",
-				"rulesets",
-				"textReplacements",
-				"linkReplacements"
-			]
-		},
-		"target": {
-			"type": "object",
-			"properties": {
-				"host": {
-					"type": "string"
-				},
-				"port": {
-					"type": "integer"
-				}
-			},
-			"required": [
-				"host",
-				"port"
-			]
-		}
-	},
-	"required": [
-		"servlet",
-		"policies",
-		"target"
-	]
-}
-```
+A JSON schema has been provided in `resources/config.schema.json` that follows the [JSON Schema draft 7](http://json-schema.org/draft-07/schema#) format.
 
 ### Policies
 

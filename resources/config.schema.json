@@ -1,234 +1,675 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$id": "https://github.com/EngineersBox/Java-HTTP-Proxy/blob/main/resources/config.schema.json",
 	"type": "object",
-	"properties": {
-		"servlet": {
-			"type": "object",
-			"properties": {
+	"title": "Configuration Schema",
+	"description": "com.engineersbox.httpproxy JSON configuration schema",
+	"default": {},
+	"examples": [
+		{
+			"servlet": {
 				"threading": {
-					"type": "object",
-					"properties": {
-						"acceptorPoolSize": {
-							"type": "integer"
-						},
-						"handlerPoolSize": {
-							"type": "integer"
-						},
-						"schedulingPolicy": {
-							"type": "string"
-						}
-					},
-					"required": [
-						"acceptorPoolSize",
-						"handlerPoolSize",
-						"schedulingPolicy"
-					]
+					"acceptorPoolSize": 10,
+					"handlerPoolSize": 10,
+					"schedulingPolicy": "ABORT"
 				},
 				"connections": {
-					"type": "object",
-					"properties": {
-						"acceptorQueueSize": {
-							"type": "integer"
-						},
-						"handlerQueueSize": {
-							"type": "integer"
-						},
-						"dropAfter": {
-							"type": "integer"
-						},
-						"dropOnFailedDNSLookup": {
-							"type": "boolean"
-						},
-						"readerBufferSize": {
-							"type": "integer"
-						}
-					},
-					"required": [
-						"acceptorQueueSize",
-						"handlerQueueSize",
-						"dropAfter",
-						"dropOnFailedDNSLookup",
-						"readerBufferSize"
-					]
+					"acceptorQueueSize": 10,
+					"handlerQueueSize": 10,
+					"dropAfter": 1000,
+					"readerBufferSize": 1024,
+					"writeBufferSize": 1024
 				},
 				"messages": {
-					"type": "object",
-					"properties": {
-						"maxBodySize": {
-							"type": "integer"
-						},
-						"dropOnMalformed": {
-							"type": "boolean"
-						}
-					},
-					"required": [
-						"maxBodySize",
-						"dropOnMalformed"
-					]
+					"maxBodySize": 600000
 				},
 				"binding": {
-					"type": "object",
-					"properties": {
-						"host": {
-							"type": "string"
-						},
-						"port": {
-							"type": "integer"
-						}
-					},
-					"required": [
-						"host",
-						"port"
-					]
-				},
-				"cacheSize": {
-					"type": "integer"
+					"host": "localhost",
+					"port": 3000
 				}
 			},
+			"policies": {
+				"enforcement": {
+					"whitelistBehaviour": {
+						"ip": "BLACKLIST",
+						"url": "WHITELIST"
+					},
+					"allowRedirects": true
+				},
+				"rulesets": [
+					{
+						"type": "URL",
+						"isWildcard": true,
+						"pattern": "(http(s)?://)?some\\.[(prod)|(dev)]\\.site\\.com:[3001-4200]/"
+					}
+				],
+				"textReplacements": [
+					{
+						"from": "(?i)Sydney",
+						"to": "New York"
+					},
+					{
+						"from": "(?i)Perth",
+						"to": "Hokkaido"
+					}
+				],
+				"linkReplacements": [
+					{
+						"from": "www\\.bom\\.gov\\.au",
+						"to": "localhost:3000"
+					}
+				]
+			},
+			"target": {
+				"host": "www.bom.gov.au",
+				"port": 80
+			}
+		}
+	],
+	"required": [
+		"servlet",
+		"policies",
+		"target"
+	],
+	"properties": {
+		"servlet": {
+			"$id": "#/properties/servlet",
+			"type": "object",
+			"title": "The servlet schema",
+			"description": "Allows configuration of the behaviour of the servlet and the connections it establishes",
+			"default": {},
+			"examples": [
+				{
+					"threading": {
+						"acceptorPoolSize": 10,
+						"handlerPoolSize": 10,
+						"schedulingPolicy": "ABORT"
+					},
+					"connections": {
+						"acceptorQueueSize": 10,
+						"handlerQueueSize": 10,
+						"dropAfter": 1000,
+						"readerBufferSize": 1024,
+						"writeBufferSize": 1024
+					},
+					"messages": {
+						"maxBodySize": 600000
+					},
+					"binding": {
+						"host": "localhost",
+						"port": 3000
+					}
+				}
+			],
 			"required": [
 				"threading",
 				"connections",
 				"messages",
-				"binding",
-				"cacheSize"
-			]
-		},
-		"policies": {
-			"type": "object",
+				"binding"
+			],
 			"properties": {
-				"enforcement": {
+				"threading": {
+					"$id": "#/properties/servlet/properties/threading",
 					"type": "object",
+					"title": "The threading schema",
+					"description": "Options regarding thread pooling and scheduling",
+					"default": {},
+					"examples": [
+						{
+							"acceptorPoolSize": 10,
+							"handlerPoolSize": 10,
+							"schedulingPolicy": "ABORT"
+						}
+					],
+					"required": [
+						"acceptorPoolSize",
+						"handlerPoolSize",
+						"schedulingPolicy"
+					],
 					"properties": {
-						"whitelistBehaviour": {
-							"type": "object",
-							"properties": {
-								"ip": {
-									"type": "string"
-								},
-								"url": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"ip",
-								"url"
+						"acceptorPoolSize": {
+							"$id": "#/properties/servlet/properties/threading/properties/acceptorPoolSize",
+							"type": "integer",
+							"title": "The acceptorPoolSize schema",
+							"description": "How many threads to allocate to the acceptor pool",
+							"default": 0,
+							"examples": [
+								10
 							]
 						},
-						"allowRedirects": {
-							"type": "boolean"
+						"handlerPoolSize": {
+							"$id": "#/properties/servlet/properties/threading/properties/handlerPoolSize",
+							"type": "integer",
+							"title": "The handlerPoolSize schema",
+							"description": "How many threads to allocate to the handler pool",
+							"default": 0,
+							"examples": [
+								10
+							]
+						},
+						"schedulingPolicy": {
+							"$id": "#/properties/servlet/properties/threading/properties/schedulingPolicy",
+							"type": "string",
+							"title": "The schedulingPolicy schema",
+							"description": "What type of scheduling policy to use for the thread pools. Can be one of ABORT, CALLER_RUNS, DISCARD_OLDEST or DISCARD.",
+							"default": "",
+							"examples": [
+								"ABORT"
+							]
 						}
 					},
-					"required": [
-						"whitelistBehaviour",
-						"allowRedirects"
-					]
+					"additionalProperties": true
 				},
-				"rulesets": {
-					"type": "array",
-					"items": [
+				"connections": {
+					"$id": "#/properties/servlet/properties/connections",
+					"type": "object",
+					"title": "The connections schema",
+					"description": "How connections are handled and what properties they can have in terms of liveness and buffering",
+					"default": {},
+					"examples": [
 						{
-							"type": "object",
-							"properties": {
-								"type": {
-									"type": "string"
-								},
-								"isWildcard": {
-									"type": "boolean"
-								},
-								"pattern": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"type",
-								"isWildcard",
-								"pattern"
-							]
+							"acceptorQueueSize": 10,
+							"handlerQueueSize": 10,
+							"dropAfter": 1000,
+							"readerBufferSize": 1024,
+							"writeBufferSize": 1024
 						}
-					]
-				},
-				"textReplacements": {
-					"type": "array",
-					"items": [
-						{
-							"type": "object",
-							"properties": {
-								"from": {
-									"type": "string"
-								},
-								"to": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"from",
-								"to"
+					],
+					"required": [
+						"acceptorQueueSize",
+						"handlerQueueSize",
+						"dropAfter",
+						"readerBufferSize",
+						"writeBufferSize"
+					],
+					"properties": {
+						"acceptorQueueSize": {
+							"$id": "#/properties/servlet/properties/connections/properties/acceptorQueueSize",
+							"type": "integer",
+							"title": "The acceptorQueueSize schema",
+							"description": "Size of the acceptor queue",
+							"default": 0,
+							"examples": [
+								10
 							]
 						},
-						{
-							"type": "object",
-							"properties": {
-								"from": {
-									"type": "string"
-								},
-								"to": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"from",
-								"to"
+						"handlerQueueSize": {
+							"$id": "#/properties/servlet/properties/connections/properties/handlerQueueSize",
+							"type": "integer",
+							"title": "The handlerQueueSize schema",
+							"description": "Size of the handler queue",
+							"default": 0,
+							"examples": [
+								10
+							]
+						},
+						"dropAfter": {
+							"$id": "#/properties/servlet/properties/connections/properties/dropAfter",
+							"type": "integer",
+							"title": "The dropAfter schema",
+							"description": "How long in milliseconds a socket connection should be dropped after if idle and has not received an EOF (-1)",
+							"default": 0,
+							"examples": [
+								1000
+							]
+						},
+						"readerBufferSize": {
+							"$id": "#/properties/servlet/properties/connections/properties/readerBufferSize",
+							"type": "integer",
+							"title": "The readerBufferSize schema",
+							"description": "Size of the read buffer for a socket",
+							"default": 0,
+							"examples": [
+								1024
+							]
+						},
+						"writeBufferSize": {
+							"$id": "#/properties/servlet/properties/connections/properties/writeBufferSize",
+							"type": "integer",
+							"title": "The writeBufferSize schema",
+							"description": "Size of the write/send buffer for a socket",
+							"default": 0,
+							"examples": [
+								1024
 							]
 						}
-					]
+					},
+					"additionalProperties": true
 				},
-				"linkReplacements": {
-					"type": "array",
-					"items": [
+				"messages": {
+					"$id": "#/properties/servlet/properties/messages",
+					"type": "object",
+					"title": "The messages schema",
+					"description": "Properties of how HTTP messages are handled",
+					"default": {},
+					"examples": [
 						{
-							"type": "object",
-							"properties": {
-								"from": {
-									"type": "string"
-								},
-								"to": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"from",
-								"to"
+							"maxBodySize": 600000
+						}
+					],
+					"required": [
+						"maxBodySize"
+					],
+					"properties": {
+						"maxBodySize": {
+							"$id": "#/properties/servlet/properties/messages/properties/maxBodySize",
+							"type": "integer",
+							"title": "The maxBodySize schema",
+							"description": "How large accepted HTTP(S) body sizes can be",
+							"default": 0,
+							"examples": [
+								600000
 							]
+						}
+					},
+					"additionalProperties": true
+				},
+				"binding": {
+					"$id": "#/properties/servlet/properties/binding",
+					"type": "object",
+					"title": "The binding schema",
+					"description": "Host configuration for the proxy",
+					"default": {},
+					"examples": [
+						{
+							"host": "localhost",
+							"port": 3000
+						}
+					],
+					"required": [
+						"host",
+						"port"
+					],
+					"properties": {
+						"host": {
+							"$id": "#/properties/servlet/properties/binding/properties/host",
+							"type": "string",
+							"title": "The host schema",
+							"description": "Hostname to use on the local machine",
+							"default": "",
+							"examples": [
+								"localhost"
+							]
+						},
+						"port": {
+							"$id": "#/properties/servlet/properties/binding/properties/port",
+							"type": "integer",
+							"title": "The port schema",
+							"description": "Port to use on the local machine",
+							"default": 0,
+							"examples": [
+								3000
+							]
+						}
+					},
+					"additionalProperties": true
+				}
+			},
+			"additionalProperties": true
+		},
+		"policies": {
+			"$id": "#/properties/policies",
+			"type": "object",
+			"title": "The policies schema",
+			"description": "Rules about how the proxy should behave with regards to data and URLs",
+			"default": {},
+			"examples": [
+				{
+					"enforcement": {
+						"whitelistBehaviour": {
+							"ip": "BLACKLIST",
+							"url": "WHITELIST"
+						},
+						"allowRedirects": true
+					},
+					"rulesets": [
+						{
+							"type": "URL",
+							"isWildcard": true,
+							"pattern": "(http(s)?://)?some\\.[(prod)|(dev)]\\.site\\.com:[3001-4200]/"
+						}
+					],
+					"textReplacements": [
+						{
+							"from": "(?i)Sydney",
+							"to": "New York"
+						},
+						{
+							"from": "(?i)Perth",
+							"to": "Hokkaido"
+						}
+					],
+					"linkReplacements": [
+						{
+							"from": "www\\.bom\\.gov\\.au",
+							"to": "localhost:3000"
 						}
 					]
 				}
-			},
+			],
 			"required": [
 				"enforcement",
 				"rulesets",
 				"textReplacements",
 				"linkReplacements"
-			]
-		},
-		"target": {
-			"type": "object",
+			],
 			"properties": {
-				"host": {
-					"type": "string"
+				"enforcement": {
+					"$id": "#/properties/policies/properties/enforcement",
+					"type": "object",
+					"title": "The enforcement schema",
+					"description": "How the proxy should go about enforcing behaviour",
+					"default": {},
+					"examples": [
+						{
+							"whitelistBehaviour": {
+								"ip": "BLACKLIST",
+								"url": "WHITELIST"
+							},
+							"allowRedirects": true
+						}
+					],
+					"required": [
+						"whitelistBehaviour",
+						"allowRedirects"
+					],
+					"properties": {
+						"whitelistBehaviour": {
+							"$id": "#/properties/policies/properties/enforcement/properties/whitelistBehaviour",
+							"type": "object",
+							"title": "The whitelistBehaviour schema",
+							"description": "What action set should be taken for whitelists",
+							"default": {},
+							"examples": [
+								{
+									"ip": "BLACKLIST",
+									"url": "WHITELIST"
+								}
+							],
+							"required": [
+								"ip",
+								"url"
+							],
+							"properties": {
+								"ip": {
+									"$id": "#/properties/policies/properties/enforcement/properties/whitelistBehaviour/properties/ip",
+									"type": "string",
+									"title": "The ip schema",
+									"description": "Whether to act as a whitelist or blacklist for IP rule set entries",
+									"default": "",
+									"examples": [
+										"BLACKLIST"
+									]
+								},
+								"url": {
+									"$id": "#/properties/policies/properties/enforcement/properties/whitelistBehaviour/properties/url",
+									"type": "string",
+									"title": "The url schema",
+									"description": "Whether to act as a whitelist or blacklist for URL rule set entries",
+									"default": "",
+									"examples": [
+										"WHITELIST"
+									]
+								}
+							},
+							"additionalProperties": true
+						},
+						"allowRedirects": {
+							"$id": "#/properties/policies/properties/enforcement/properties/allowRedirects",
+							"type": "boolean",
+							"title": "The allowRedirects schema",
+							"description": "Whether URL redirects should be allowed to happen away from the bound domain",
+							"default": false,
+							"examples": [
+								true
+							]
+						}
+					},
+					"additionalProperties": true
 				},
-				"port": {
-					"type": "integer"
+				"rulesets": {
+					"$id": "#/properties/policies/properties/rulesets",
+					"type": "array",
+					"title": "The rulesets schema",
+					"description": "A set of rules that describe how URL and IP entries are treated",
+					"default": [],
+					"examples": [
+						[
+							{
+								"type": "URL",
+								"isWildcard": true,
+								"pattern": "(http(s)?://)?some\\.[(prod)|(dev)]\\.site\\.com:[3001-4200]/"
+							}
+						]
+					],
+					"additionalItems": true,
+					"items": {
+						"$id": "#/properties/policies/properties/rulesets/items",
+						"anyOf": [
+							{
+								"$id": "#/properties/policies/properties/rulesets/items/anyOf/0",
+								"type": "object",
+								"title": "The rule set schema",
+								"description": "A rule for an IP or URL",
+								"default": {},
+								"examples": [
+									{
+										"type": "URL",
+										"isWildcard": true,
+										"pattern": "(http(s)?://)?some\\.[(prod)|(dev)]\\.site\\.com:[3001-4200]/"
+									}
+								],
+								"required": [
+									"type",
+									"isWildcard",
+									"pattern"
+								],
+								"properties": {
+									"type": {
+										"$id": "#/properties/policies/properties/rulesets/items/anyOf/0/properties/type",
+										"type": "string",
+										"title": "The type schema",
+										"description": "Whether this rule applies to IP or URL.",
+										"default": "",
+										"examples": [
+											"URL"
+										]
+									},
+									"isWildcard": {
+										"$id": "#/properties/policies/properties/rulesets/items/anyOf/0/properties/isWildcard",
+										"type": "boolean",
+										"title": "The isWildcard schema",
+										"description": "Whether this rule should support regex patterns",
+										"default": false,
+										"examples": [
+											true
+										]
+									},
+									"pattern": {
+										"$id": "#/properties/policies/properties/rulesets/items/anyOf/0/properties/pattern",
+										"type": "string",
+										"title": "The pattern schema",
+										"description": "IP or URL pattern to action against",
+										"default": "",
+										"examples": [
+											"(http(s)?://)?some\\.[(prod)|(dev)]\\.site\\.com:[3001-4200]/"
+										]
+									}
+								},
+								"additionalProperties": true
+							}
+						]
+					}
+				},
+				"textReplacements": {
+					"$id": "#/properties/policies/properties/textReplacements",
+					"type": "array",
+					"title": "The textReplacements schema",
+					"description": "A set of replacement schemas to enact on HTML text nodes",
+					"default": [],
+					"examples": [
+						[
+							{
+								"from": "(?i)Sydney",
+								"to": "New York"
+							},
+							{
+								"from": "(?i)Perth",
+								"to": "Hokkaido"
+							}
+						]
+					],
+					"additionalItems": true,
+					"items": {
+						"$id": "#/properties/policies/properties/textReplacements/items",
+						"anyOf": [
+							{
+								"$id": "#/properties/policies/properties/textReplacements/items/anyOf/0",
+								"type": "object",
+								"title": "The replacement schema",
+								"description": "The pattern that should be replaced with a given string",
+								"default": {},
+								"examples": [
+									{
+										"from": "(?i)Sydney",
+										"to": "New York"
+									}
+								],
+								"required": [
+									"from",
+									"to"
+								],
+								"properties": {
+									"from": {
+										"$id": "#/properties/policies/properties/textReplacements/items/anyOf/0/properties/from",
+										"type": "string",
+										"title": "The from schema",
+										"description": "Pattern to match against",
+										"default": "",
+										"examples": [
+											"(?i)Sydney"
+										]
+									},
+									"to": {
+										"$id": "#/properties/policies/properties/textReplacements/items/anyOf/0/properties/to",
+										"type": "string",
+										"title": "The to schema",
+										"description": "String to replace a match against the 'from' pattern",
+										"default": "",
+										"examples": [
+											"New York"
+										]
+									}
+								},
+								"additionalProperties": true
+							}
+						]
+					}
+				},
+				"linkReplacements": {
+					"$id": "#/properties/policies/properties/linkReplacements",
+					"type": "array",
+					"title": "The linkReplacements schema",
+					"description": "A set of replacement schemas to enact on HTML link  nodes (<a> <img> <link>).",
+					"default": [],
+					"examples": [
+						[
+							{
+								"from": "www\\.bom\\.gov\\.au",
+								"to": "localhost:3000"
+							}
+						]
+					],
+					"additionalItems": true,
+					"items": {
+						"$id": "#/properties/policies/properties/linkReplacements/items",
+						"anyOf": [
+							{
+								"$id": "#/properties/policies/properties/linkReplacements/items/anyOf/0",
+								"type": "object",
+								"title": "The first anyOf schema",
+								"description": "The pattern that should be replaced with a given string",
+								"default": {},
+								"examples": [
+									{
+										"from": "www\\.bom\\.gov\\.au",
+										"to": "localhost:3000"
+									}
+								],
+								"required": [
+									"from",
+									"to"
+								],
+								"properties": {
+									"from": {
+										"$id": "#/properties/policies/properties/linkReplacements/items/anyOf/0/properties/from",
+										"type": "string",
+										"title": "The from schema",
+										"description": "Pattern to match against",
+										"default": "",
+										"examples": [
+											"www\\.bom\\.gov\\.au"
+										]
+									},
+									"to": {
+										"$id": "#/properties/policies/properties/linkReplacements/items/anyOf/0/properties/to",
+										"type": "string",
+										"title": "The to schema",
+										"description": "String to replace a match against the 'from' pattern",
+										"default": "",
+										"examples": [
+											"localhost:3000"
+										]
+									}
+								},
+								"additionalProperties": true
+							}
+						]
+					}
 				}
 			},
+			"additionalProperties": true
+		},
+		"target": {
+			"$id": "#/properties/target",
+			"type": "object",
+			"title": "The target schema",
+			"description": "The target of the proxy to forward requests to and from",
+			"default": {},
+			"examples": [
+				{
+					"host": "www.bom.gov.au",
+					"port": 80
+				}
+			],
 			"required": [
 				"host",
 				"port"
-			]
+			],
+			"properties": {
+				"host": {
+					"$id": "#/properties/target/properties/host",
+					"type": "string",
+					"title": "The host schema",
+					"description": "Hostname of the target",
+					"default": "",
+					"examples": [
+						"www.bom.gov.au"
+					]
+				},
+				"port": {
+					"$id": "#/properties/target/properties/port",
+					"type": "integer",
+					"title": "The port schema",
+					"description": "Port of the target",
+					"default": 0,
+					"examples": [
+						80
+					]
+				}
+			},
+			"additionalProperties": true
 		}
 	},
-	"required": [
-		"servlet",
-		"policies",
-		"target"
-	]
+	"additionalProperties": true
 }
