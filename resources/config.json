@@ -37,12 +37,36 @@
 		],
 		"textReplacements": [
 			{
-				"from": "(?i)Sydney",
-				"to": "New York"
+				"from": "(?i)Adelaide",
+				"to": "Pripyat"
+			},
+			{
+				"from": "(?i)Brisbane",
+				"to": "Helsinki"
+			},
+			{
+				"from": "(?i)Canberra",
+				"to": "Cairo"
+			},
+			{
+				"from": "(?i)Darwin",
+				"to": "Istanbul"
+			},
+			{
+				"from": "(?i)Hobart",
+				"to": "Zagreb"
+			},
+			{
+				"from": "(?i)Melbourne",
+				"to": "Berlin"
 			},
 			{
 				"from": "(?i)Perth",
 				"to": "Hokkaido"
+			},
+			{
+				"from": "(?i)Sydney",
+				"to": "New York"
 			}
 		],
 		"linkReplacements": [

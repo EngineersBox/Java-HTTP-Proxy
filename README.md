@@ -56,7 +56,55 @@ $> java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logba
 * `-Dconfig.path=<PATH>`: Specify the path to the `config.json` file. Defaults to `./config.json`
 * `-Dlog4j.configurationFile=<PATH>`: Specify the path to the `logback.xml` file to configure log4j
 
-## Tests
+## Maven Dependencies
+
+This project relies on maven as the package manager and build system. There are several dependencies used for various
+functionality, ranging from compression to dependency injection. Below is a list of all of the dependencies, however more
+detail can be found in the `pom.xml` at the root of the project.
+
+| **Dependency**         	| **Summary**                                                	|
+|------------------------	|------------------------------------------------------------	|
+| JUnit Jupiter Engine   	| Testing framework                                          	|
+| Apache Commons Lang 3  	| Common utilities and QoL methods                           	|
+| Maven Shade            	| Single JAR packaging and naming resolution                 	|
+| Maven Commons Compress 	| Compression utilities                                      	|
+| Google GSON            	| JSON handler                                               	|
+| Google Guice           	| Dependency injection                                       	|
+| Google Reflections     	| Reflection utilities                                       	|
+| Google Brotli Dec      	| Brotli compression (Maven Commons Compress requirement)    	|
+| ZStd JNI               	| ZStandard compression (Maven Commons Compress requirement) 	|
+| Log4j                  	| Logging                                                    	|
+| JSoup                  	| HTML node serialiser and handler                           	|
+
+## Logging
+
+Logging is done via the `log4j` library which allow for asynchronous queue based log resolution. Loggers can are defined
+on a per class basis and present themselves alongside the thread they are bound to. Each of the log entries is timestamped
+according to UTC time.
+
+The logger format is defined in the `logback.xml` file as:
+
+```xml
+<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+```
+
+Resulting in a logging entry as such:
+
+```log
+23:51:36.646 [main] INFO  com.engineersbox.httpproxy.Proxy - An example logging entry
+```
+
+Here we attach this to a root logger, preset to the `INFO` level. There are a multitude of logging levels utilised in this
+project depending on the situation and visibility requirement. Each of the levels, going down, provides more detail into
+the functionality of the processes executing. In order to least to most detail the available logging levels used in this
+project are:
+
+* INFO
+* DEBUG
+* TRACE
+
+If you want to view a different logging level, this will need to be changed in the `logback.xml` under the root logger
+declaration. After doing so, the application wll need to be restarted.
 
 ## Configuration
 
