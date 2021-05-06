@@ -22,7 +22,7 @@ install_maven_linux_apt:
 build_jar:
 	@mvn install
 	@mvn package
-	@mv target/HTTP-Proxy-0.1.0-shaded.jar HTTP-Proxy-0.1.0.jar
+	@mv target/http-proxy-0.1.0-shaded.jar http-proxy-0.1.0.jar
 
 run_jar:
 	@java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml HTTP-Proxy-0.1.0-shaded.jar

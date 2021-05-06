@@ -38,11 +38,13 @@ import java.util.zip.DataFormatException;
  *
  * <ul>
  *     <li>{@code GZIP}: Lempel-Ziv coding (LZ77) with a 32 bit CRC (<a href="https://www.w3.org/Protocols/rfc1952/rfc1952.html" target="_top">RFC 1952</a>).</li>
- *     <li>{@code compress}: Adaptive Lempel-Ziv-Welch coding (LZW)</li>
+ *     <li>{@code compress}: Adaptive Lempel-Ziv-Welch coding (LZW) (<a href="https://tools.ietf.org/html/rfc7230" target="_top">RFC 7230</a>)</li>
  *     <li>
  *         {@code deflate}: zlib format (<a href="https://www.w3.org/Protocols/rfc1950/rfc1950.html" target="_top">RFC 1950</a>)
  *           with deflate compression mechanism (<a href="https://www.w3.org/Protocols/rfc1951/rfc1951.html" target="_top">RFC 1951</a>).
  *     </li>
+ *     <li>{@code zstd}: ZStandard compression standard (<a href="https://datatracker.ietf.org/doc/draft-kucherawy-rfc8478bis/05/" target="_top">RFC 8478</a>)</li>
+ *     <li>{@code br}: Brotli compression standard (<a href="https://tools.ietf.org/html/rfc7932" target="_top">RFC 7932</a>)</li>
  * </ul>
  *
  * @param <T> An implementation of abstract class {@link HTTPStartLine}
@@ -158,11 +160,13 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
      *
      * <ul>
      *     <li>{@code GZIP}: Lempel-Ziv coding (LZ77) with a 32 bit CRC (<a href="https://www.w3.org/Protocols/rfc1952/rfc1952.html" target="_top">RFC 1952</a>).</li>
-     *     <li>{@code compress}: Adaptive Lempel-Ziv-Welch coding (LZW)</li>
+     *     <li>{@code compress}: Adaptive Lempel-Ziv-Welch coding (LZW) (<a href="https://tools.ietf.org/html/rfc7230" target="_top">RFC 7230</a>)</li>
      *     <li>
      *         {@code deflate}: zlib format (<a href="https://www.w3.org/Protocols/rfc1950/rfc1950.html" target="_top">RFC 1950</a>)
-     *          with deflate compression mechanism (<a href="https://www.w3.org/Protocols/rfc1951/rfc1951.html" target="_top">RFC 1951</a>).
+     *           with deflate compression mechanism (<a href="https://www.w3.org/Protocols/rfc1951/rfc1951.html" target="_top">RFC 1951</a>).
      *     </li>
+     *     <li>{@code zstd}: ZStandard compression standard (<a href="https://datatracker.ietf.org/doc/draft-kucherawy-rfc8478bis/05/" target="_top">RFC 8478</a>)</li>
+     *     <li>{@code br}: Brotli compression standard (<a href="https://tools.ietf.org/html/rfc7932" target="_top">RFC 7932</a>)</li>
      * </ul>
      *
      * @param sb Instance of {@link StringBuilder} to construct the {@link HTTPMessage} string literal

@@ -108,15 +108,14 @@
 
     </dependencies>
 
-    <!-- Maven Surefire plugin to run tests -->
     <build>
         <plugins>
-            <!-- plugin to run test cases from maven -->
+            <!-- Surefire plugin to run tests-->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
             </plugin>
-            <!-- Maven plugin to use particular java version to compile code -->
+            <!-- Compiler for targeted version compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -126,6 +125,7 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+            <!-- Shade plugin for single JAR compilation and naming resolution -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

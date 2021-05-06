@@ -14,8 +14,7 @@ If you haven't already got it installed, then you can run one of the makefile ta
 * Linux (apt): `$> make install_maven_linux_apt`
 
 *Note:* If you are using windows, then it's not as simple to install maven. I would suggest that you run this on a unix system,
-but if you want to install it on windows, a tutorial can be found here <https://www.javatpoint.com/how-to-install-maven>
-
+but if you Do want to install it on Windows, a tutorial can be found here <https://www.javatpoint.com/how-to-install-maven>
 
 ## Building
 
@@ -30,7 +29,7 @@ Alternatively, if you want to build it manually then you can run the following:
 ```shell
 $> mvn install
 $> mvn package
-$> mv target/HTTP-Proxy-0.1.0-shaded.jar HTTP-Proxy-0.1.0.jar
+$> mv target/http-proxy-0.1.0-shaded.jar http-proxy-0.1.0.jar
 ```
 
 ## Usage
@@ -48,7 +47,7 @@ $> make run_jar
 Running the jar via the java command directly (make sure the jar is in the top level directory and not in `target`):
 
 ```shell
-$> java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml HTTP-Proxy-0.0.1-shaded.jar
+$> java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml http-proxy-0.1.0-shaded.jar
 ```
 
 ### Jar Arguments

@@ -130,7 +130,7 @@ public class HandlerResolver implements ResourceResolver {
     }
 
     /**
-     * Matches a given header against a {@link List} of valid Java regexes, returning the frist match. If no matches are
+     * Matches a given header against a {@link List} of valid Java regexes, returning the first match. If no matches are
      * found an empty {@link Optional} is returned
      *
      * <br/><br/>
