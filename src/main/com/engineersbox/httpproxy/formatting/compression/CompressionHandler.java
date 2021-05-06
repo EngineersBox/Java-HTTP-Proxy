@@ -45,7 +45,7 @@ public class CompressionHandler {
 
     /**
      * Decompress {@code byte[]} to {@link String} content using a given {@link Charset}. The {@code format} parameter
-     *      * will be used to determine the compression algorithm to use.
+     * will be used to determine the compression algorithm to use.
      *
      * <br/><br/>
      *
