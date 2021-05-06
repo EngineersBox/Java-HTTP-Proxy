@@ -1,5 +1,6 @@
 package com.engineersbox.httpproxy.connection.stream;
 
+import com.engineersbox.httpproxy.formatting.compression.CompressionFormat;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
@@ -19,14 +20,16 @@ public class StreamContentProperties {
     public boolean isCompressed;
     public boolean isRaw;
     public Charset charset;
+    public CompressionFormat compressionFormat;
     private final Class<? extends HTTPStartLine> classOfT;
 
     public StreamContentProperties(final Class<? extends HTTPStartLine> classOfT) {
         this.pastHeaders = false;
         this.hasContentLengthHeader = false;
         this.hasTransferEncodingHeader = false;
-        this.isCompressed = false;
+        this.compressionFormat = null;
         this.isRaw = false;
+        this.isCompressed = false;
         this.charset = StandardCharsets.UTF_8;
         this.classOfT = classOfT;
     }

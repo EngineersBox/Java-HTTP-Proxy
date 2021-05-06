@@ -96,7 +96,7 @@ public class ContentFormatter implements BaseContentFormatter {
                 }
             }
         }
-        logger.debug(String.format(
+        logger.info(String.format(
                 "Replaced %d matching text instances",
                 changes
         ));
@@ -119,7 +119,7 @@ public class ContentFormatter implements BaseContentFormatter {
                 changes += toReplace.stream().filter(pair -> replaceTextForElement(textNode, pair)).count();
             }
         }
-        logger.debug(String.format(
+        logger.info(String.format(
                 "Replaced %d matching text instances",
                 changes
         ));
@@ -172,7 +172,7 @@ public class ContentFormatter implements BaseContentFormatter {
                 changes++;
             }
         }
-        logger.debug(String.format(
+        logger.info(String.format(
                 "Replaced %d matching link instances",
                 changes
         ));
@@ -200,7 +200,7 @@ public class ContentFormatter implements BaseContentFormatter {
         for (final Element link : imports) {
             changes += toReplace.stream().filter(pair -> replaceLinkForElement(link, pair, HTMLSymbols.HREF_ATTRIBUTE)).count();
         }
-        logger.debug(String.format(
+        logger.info(String.format(
                 "Replaced %d matching link instances",
                 changes
         ));

@@ -1,6 +1,9 @@
 package com.engineersbox.httpproxy.formatting.http.common;
 
-import com.engineersbox.httpproxy.formatting.content.GZIPCompression;
+import com.engineersbox.httpproxy.exceptions.http.CompressionHandlerException;
+import com.engineersbox.httpproxy.formatting.compression.CompressionFormat;
+import com.engineersbox.httpproxy.formatting.compression.CompressionHandler;
+import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -156,8 +159,12 @@ public class HTTPMessage<T extends HTTPStartLine> {
         }
         try {
             logger.trace("Body requires compression");
-            return GZIPCompression.compress(this.body, getCharset());
-        } catch (IOException e) {
+            final CompressionFormat format = CompressionHandler.determineCompressionFormat(potentialHeader.get().getValue());
+            if (format == null) {
+                throw new CompressionHandlerException("Unknown compression format");
+            }
+            return CompressionHandler.compress(this.body, getCharset(), format);
+        } catch (IOException | CompressorException e) {
             logger.error(e, e);
         }
         logger.trace("Body was determined to have no formatting requirements, defaulting to standard byte retrieval with charset");

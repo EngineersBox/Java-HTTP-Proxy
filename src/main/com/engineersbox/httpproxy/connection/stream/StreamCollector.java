@@ -3,7 +3,8 @@ package com.engineersbox.httpproxy.connection.stream;
 import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.exceptions.http.*;
 import com.engineersbox.httpproxy.exceptions.socket.SocketStreamReadError;
-import com.engineersbox.httpproxy.formatting.content.GZIPCompression;
+import com.engineersbox.httpproxy.formatting.compression.CompressionFormat;
+import com.engineersbox.httpproxy.formatting.compression.CompressionHandler;
 import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPStartLine;
@@ -11,6 +12,7 @@ import com.engineersbox.httpproxy.formatting.http.common.HTTPSymbols;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
 import com.google.common.primitives.Bytes;
 import com.google.inject.Inject;
+import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
 
 /**
  * Socket stream reader used to construct HTTP messages received via a bound {@link java.net.Socket}'s {@link java.io.InputStream},
@@ -166,9 +169,10 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
      * @param retentiveLineReader Instance of {@link CRLFRetentiveLineReader} to read {@link InputStream} line-by-line
      *                            and keep lin terminators
      * @return A {@code byte[]} containing body data if body not in text format or is compressed in a valid <a href="https://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">RFC 2616</a> format
-     * @throws IOException if the {@link InputStream} or bound {@link Socket} was closed early or other read interruptions occured
+     * @throws IOException if the {@link InputStream} or bound {@link Socket} was closed early or other read interruptions occurred
+     * @throws CompressorException If the data could not be compressed or encounters an exception
      */
-    private byte[] sensitizedStreamRead(final StringBuilder sb, final CRLFRetentiveLineReader retentiveLineReader) throws IOException {
+    private byte[] sensitizedStreamRead(final StringBuilder sb, final CRLFRetentiveLineReader retentiveLineReader) throws IOException, CompressorException {
         int read = 0;
         String line = null;
         Pair<String, List<Byte>> lineBytes;
@@ -180,6 +184,9 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
                 if (!scp.isCompressed && hasHeader(line, HTTPSymbols.CONTENT_ENCODING_HEADER_REGEX)) {
                     final String contentEncodingHeader = splitHeader(line);
                     scp.isCompressed = !contentEncodingHeader.contains(HTTPSymbols.CONTENT_ENCODING_IDENTITY);
+                    if (scp.isCompressed) {
+                        scp.compressionFormat = CompressionHandler.determineCompressionFormat(contentEncodingHeader);
+                    }
                     logFoundHeader(
                         HTTPSymbols.CONTENT_ENCODING_HEADER_REGEX,
                         splitHeader(line)
@@ -221,12 +228,17 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
             }
         }
         if (scp.isCompressed) {
-            sb.append(GZIPCompression.decompress(Bytes.toArray(bytes), scp.charset));
-            logger.debug("Unzipped compressed body");
+            sb.append(CompressionHandler.decompress(Bytes.toArray(bytes), scp.charset, scp.compressionFormat));
+            logger.debug(String.format(
+                    "Unzipped compressed body with format: %s",
+                    scp.compressionFormat != null ? scp.compressionFormat.name() : "UNKNOWN"
+            ));
         }
-        logger.debug("Read " + (read + bytes.size()) + " bytes from "
-                + (this.classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? "client" : "server")
-                + " input stream");
+        logger.debug(String.format(
+                "Read %d bytes from %s input stream",
+                read + bytes.size(),
+                this.classOfT.isAssignableFrom(HTTPRequestStartLine.class) ? "client" : "server"
+        ));
         return Bytes.toArray(bytes);
     }
 
@@ -253,9 +265,10 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
      * @throws SocketStreamReadError Any exceptions encountered whilst reading from the {@link java.io.InputStream}
      * @throws HTTPMessageException Any formatting or initialisation exceptions encountered whilst constructing an instance
      *         of {@link com.engineersbox.httpproxy.formatting.http.common.HTTPMessage}
+     * @throws CompressionHandlerException Issues encountered whilst attempting to decompress a compressed body
      */
     @Override
-    public HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError, HTTPMessageException {
+    public HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError, HTTPMessageException, CompressionHandlerException {
         try {
             this.socket.setSoTimeout(this.config.servlet.connections.dropAfter);
             logger.debug("Set SO_TIMEOUT timeout based on config: " + this.config.servlet.connections.dropAfter);
@@ -269,6 +282,8 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
             bodyBytes = sensitizedStreamRead(sb, retentiveLineReader);
         } catch (final IOException e) {
             throw new SocketStreamReadError(e);
+        } catch (final CompressorException e) {
+            throw new CompressionHandlerException("An error occurred while decompressing body", e);
         }
         return this.httpFormatter.fromRawString(handlePaddedPrefix(sb), bodyBytes, this.classOfT);
     }

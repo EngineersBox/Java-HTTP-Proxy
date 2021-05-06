@@ -1,5 +1,6 @@
 package com.engineersbox.httpproxy.connection.stream;
 
+import com.engineersbox.httpproxy.exceptions.http.CompressionHandlerException;
 import com.engineersbox.httpproxy.exceptions.http.HTTPMessageException;
 import com.engineersbox.httpproxy.exceptions.socket.SocketStreamReadError;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
@@ -61,8 +62,9 @@ public interface ContentCollector<T extends HTTPStartLine> {
      * @throws SocketStreamReadError Any exceptions encountered whilst reading from the {@link java.io.InputStream}
      * @throws HTTPMessageException Any formatting or initialisation exceptions encountered whilst constructing an instance
      * of {@link com.engineersbox.httpproxy.formatting.http.common.HTTPMessage}
+     * @throws CompressionHandlerException Issues encountered whilst attempting to decompress a compressed body
      */
-    HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError, HTTPMessageException;
+    HTTPMessage<T> synchronousReadAll() throws SocketStreamReadError, HTTPMessageException, CompressionHandlerException;
 
 
     /**

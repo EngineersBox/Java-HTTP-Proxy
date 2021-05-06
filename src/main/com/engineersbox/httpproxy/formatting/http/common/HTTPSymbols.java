@@ -25,6 +25,12 @@ public class HTTPSymbols {
     public static final String CONTENT_ENCODING_HEADER_REGEX = "(?i)" + CONTENT_ENCODING_HEADER;
     public static final String CONTENT_ENCODING_IDENTITY = "identity";
 
+    public static final Pattern CONTENT_ENCODING_GZIP_REGEX = Pattern.compile("(?i)(x-)?gzip");
+    public static final Pattern CONTENT_ENCODING_COMPRESS_REGEX = Pattern.compile("(?i)(x-)?compress");
+    public static final Pattern CONTENT_ENCODING_BROTLI_REGEX = Pattern.compile("(?i)br");
+    public static final Pattern CONTENT_ENCODING_DEFLATE_REGEX = Pattern.compile("(?i)deflate");
+    public static final Pattern CONTENT_ENCODING_ZSTD_REGEX = Pattern.compile("(?i)zstd");
+
     public static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     public static final String TRANSFER_ENCODING_HEADER_REGEX = "(?i)" + TRANSFER_ENCODING_HEADER;
     public static final String TRANSFER_ENCODING_IDENTITY = "identity";
