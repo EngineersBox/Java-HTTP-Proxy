@@ -11,6 +11,7 @@
 				"threading": {
 					"acceptorPoolSize": 10,
 					"handlerPoolSize": 10,
+					"classMatcherPoolSize": 4,
 					"schedulingPolicy": "ABORT"
 				},
 				"connections": {
@@ -83,6 +84,7 @@
 					"threading": {
 						"acceptorPoolSize": 10,
 						"handlerPoolSize": 10,
+						"classMatcherPoolSize": 4,
 						"schedulingPolicy": "ABORT"
 					},
 					"connections": {
@@ -118,12 +120,14 @@
 						{
 							"acceptorPoolSize": 10,
 							"handlerPoolSize": 10,
+							"classMatcherPoolSize": 4,
 							"schedulingPolicy": "ABORT"
 						}
 					],
 					"required": [
 						"acceptorPoolSize",
 						"handlerPoolSize",
+						"classMatcherPoolSize",
 						"schedulingPolicy"
 					],
 					"properties": {
@@ -145,6 +149,16 @@
 							"default": 0,
 							"examples": [
 								10
+							]
+						},
+						"classMatcherPoolSize": {
+							"$id": "#/properties/servlet/properties/threading/properties/classMatcherPoolSize",
+							"type": "integer",
+							"title": "The classMatcherPoolSize schema",
+							"description": "How many threads to allocate to the matching classes in the HandlerResolver",
+							"default": 0,
+							"examples": [
+								4
 							]
 						},
 						"schedulingPolicy": {

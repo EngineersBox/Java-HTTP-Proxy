@@ -228,6 +228,7 @@ Below is a list of each of the sections of the config file with a short descript
   * `threading`: Options regarding thread pooling and scheduling
     * `acceptorPoolSize`: How many threads to allocate to the acceptor pool
     * `handlerPoolSize`: How many threads to allocate to the handler pool
+    * `classMatcherPoolSize`: How many threads to allocate to the matching classes in the HandlerResolver
     * `schedulingPolicy`: What type of scheduling policy to use for the thread pools. Can be one of ABORT, CALLER_RUNS, DISCARD_OLDEST or DISCARD
   * `connections`: How connections are handled and what properties they can have in terms of liveness and buffering
     * `acceptorQueueSize`: Size of the acceptor queue
@@ -262,3 +263,20 @@ Below is a list of each of the sections of the config file with a short descript
 * `target`: The target of the proxy to forward requests/responses to and from
   * `host`: Hostname of the target
   * `port`: Port of the target
+  
+## Resource Matching
+
+This proxy (and by reasonable extension, HTTP servlet) handles requests/responses based on how a given set of resources 
+and endpoints within, match against the HTTP message. There is however, the sequence of matching requests is important in
+that it determines how handlers are prioritised and invoked.
+
+The ordering is based on the structure of an HTTP message, from top down. This results in matching by the following
+ordering:
+
+1. Message type: Whether the message is a request or response
+1. Path: The first line of a message that is read, called the start line, contains the path. THis is the same regardless of it being a request or response
+2. Media type: In order of unique information present, the `Content-Type` header determines what type of data is being sent, and as such is second as a matcher as it is a header
+
+Note that for each of these matching stages, partial matches are included in valid matcher sequences. By partial matches,
+it means that regex based patterns or portions of a pattern (i.e. the start of a path) will be matched and included as
+a valid match if they come before a full match.

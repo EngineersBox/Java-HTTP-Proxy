@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Handler(HandlerType.CONTENT)
+@Handler(HandlerType.RESPONSE_CONTENT)
 public class ResponseContentResource {
 
     private final Logger logger = LogManager.getLogger(ResponseContentResource.class);

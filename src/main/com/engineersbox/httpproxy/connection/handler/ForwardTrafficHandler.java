@@ -77,7 +77,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
     public void task() throws Exception {
         HTTPMessage<HTTPResponseStartLine> message;
         try {
-            message = this.resolver.match(
+            message = this.resolver.matchResponse(
                     this.contentCollector.synchronousReadAll()
             );
         } catch (final SocketStreamReadError e) {

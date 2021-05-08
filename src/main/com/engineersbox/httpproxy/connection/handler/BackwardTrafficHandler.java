@@ -4,6 +4,7 @@ import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.connection.stream.ContentCollector;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
+import com.engineersbox.httpproxy.resolver.ResourceResolver;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
@@ -27,17 +28,20 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
 
     private final ContentCollector<HTTPRequestStartLine> contentCollector;
     private final Config config;
+    final ResourceResolver resolver;
 
     private final OutputStream outServer;
 
     @Inject
     public BackwardTrafficHandler(final Config config,
                                   final ContentCollector<HTTPRequestStartLine> contentCollector,
+                                  final ResourceResolver resolver,
                                   @Named("Client In") final InputStream inClient,
                                   @Named("Server Out") final OutputStream outServer,
                                   @Named("Client Socket") final Socket client) {
         this.config = config;
         this.contentCollector = contentCollector;
+        this.resolver = resolver;
         this.outServer = outServer;
         this.contentCollector.withStream(inClient);
         this.contentCollector.withStartLine(HTTPRequestStartLine.class);
@@ -70,10 +74,8 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
      */
     @Override
     public void task() throws Exception {
-        HTTPMessage<HTTPRequestStartLine> message = this.contentCollector.synchronousReadAll();
+        HTTPMessage<HTTPRequestStartLine> message = resolver.matchRequest(this.contentCollector.synchronousReadAll());
         logger.info("[Client => Server] " + message.startLine.toDisplayableString());
-        message.headers.replace("Host", this.config.target.host);
-        message.headers.put("Connection", "close");
         final byte[] request = message.toRaw();
         this.outServer.write(request);
         logger.debug("Wrote " + request.length + " bytes to server output stream");

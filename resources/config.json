@@ -3,6 +3,7 @@
 		"threading": {
 			"acceptorPoolSize": 10,
 			"handlerPoolSize": 10,
+			"classMatcherPoolSize": 4,
 			"schedulingPolicy": "ABORT"
 		},
 		"connections": {

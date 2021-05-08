@@ -5,11 +5,13 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 public class Threading {
     public final int acceptorPoolSize;
     public final int handlerPoolSize;
+    public final int classMatcherPoolSize;
     public final SchedulingPolicy schedulingPolicy;
 
-    public Threading(final int acceptorPoolSize, final int handlerPoolSize, final SchedulingPolicy schedulingPolicy) {
+    public Threading(final int acceptorPoolSize, final int handlerPoolSize, final int classMatcherPoolSize, final SchedulingPolicy schedulingPolicy) {
         this.acceptorPoolSize = acceptorPoolSize;
         this.handlerPoolSize = handlerPoolSize;
+        this.classMatcherPoolSize = classMatcherPoolSize;
         this.schedulingPolicy = schedulingPolicy;
     }
 
@@ -24,6 +26,7 @@ public class Threading {
         return new EqualsBuilder()
                 .append(acceptorPoolSize, threading.acceptorPoolSize)
                 .append(handlerPoolSize, threading.handlerPoolSize)
+                .append(classMatcherPoolSize, threading.classMatcherPoolSize)
                 .append(schedulingPolicy, threading.schedulingPolicy)
                 .isEquals();
     }
