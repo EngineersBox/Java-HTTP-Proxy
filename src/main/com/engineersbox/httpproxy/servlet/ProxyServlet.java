@@ -47,6 +47,7 @@ public class ProxyServlet implements AbstractServlet {
      * Serve the proxy via an infinite loop waiting listening for a connection to the {@link ServerSocket}. Upon observing
      * a connection a {@link ProxyConnectionAcceptor} is submitted to a {@link ThreadManager} as an acceptor.
      */
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void serve() {
         logger.info(

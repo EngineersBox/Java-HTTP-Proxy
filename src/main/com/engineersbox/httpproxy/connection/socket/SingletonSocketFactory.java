@@ -1,6 +1,7 @@
 package com.engineersbox.httpproxy.connection.socket;
 
 import com.engineersbox.httpproxy.configuration.domain.servlet.Connections;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,6 +26,7 @@ import java.net.Socket;
  * A custom {@link com.engineersbox.httpproxy.configuration.domain.servlet.Connections} configuration can be supplied via
  * the {@link SingletonSocketFactory#withSocketConfigs} method.
  */
+@Singleton
 public class SingletonSocketFactory extends SocketFactory {
 
     private static final Logger logger = LogManager.getLogger(SingletonSocketFactory.class);

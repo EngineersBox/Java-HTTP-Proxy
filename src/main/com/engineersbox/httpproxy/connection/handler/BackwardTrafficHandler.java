@@ -57,7 +57,7 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
      *
      * According to RFC-2616, requests MAY NOT include a {@code host} header, and as such will add the target
      * in order to ensure a 400 (Bad Request) with content {@code The requested URL "[no URL]", is invalid.} is
-     * not returned
+     * not returned (in the case of Apache server).
      *
      * In order to ensure that the socket InputStream is signalled with a termination correctly, the
      * {@code Connection: Close} header is added. This results in a {@code -1} being identified by the stream read.

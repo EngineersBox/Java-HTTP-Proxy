@@ -32,4 +32,5 @@ run_jar:
 
 generate_documentation:
 	@mkdir -p $(DOCUMENTATION_OUTPUT_DIR)
+	@rm -rf $(DOCUMENTATION_OUTPUT_DIR)/*
 	@find $(SOURCE_FILES_DIR) -type f -name "*.java" | xargs javadoc -d $(DOCUMENTATION_OUTPUT_DIR)
