@@ -11,5 +11,5 @@ public enum HTTPMethod {
     OPTIONS,
     HEAD,
     TRACE,
-    CONNECT;
+    CONNECT
 }

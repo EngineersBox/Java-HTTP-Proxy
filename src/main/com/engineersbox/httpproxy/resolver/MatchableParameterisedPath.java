@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 public class MatchableParameterisedPath {
 
     private static final String PATH_COMPONENT_DELIMITER = "/";
-    private static final Pattern RETRIEVABLE_PARAM_REGEX = Pattern.compile("\\{\\w*\\}");
-    private static final String REMOVE_ALL_BRACES_REGEX = "\\{|\\}";
+    private static final Pattern RETRIEVABLE_PARAM_REGEX = Pattern.compile("\\{\\w*}");
+    private static final String REMOVE_ALL_BRACES_REGEX = "[{}]";
 
     private Pattern matchablePath;
     private String path = "";

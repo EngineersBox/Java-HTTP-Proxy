@@ -3,7 +3,6 @@ package com.engineersbox.httpproxy.connection.stream;
 import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.exceptions.http.*;
 import com.engineersbox.httpproxy.exceptions.socket.SocketStreamReadError;
-import com.engineersbox.httpproxy.formatting.compression.CompressionFormat;
 import com.engineersbox.httpproxy.formatting.compression.CompressionHandler;
 import com.engineersbox.httpproxy.formatting.http.BaseHTTPFormatter;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
-import java.util.zip.DataFormatException;
 
 /**
  * Socket stream reader used to construct HTTP messages received via a bound {@link java.net.Socket}'s {@link java.io.InputStream},

@@ -60,5 +60,5 @@ public @interface PathParam {
      *
      * @return Path parameter as a {@link String}
      */
-    public String value();
+    String value();
 }

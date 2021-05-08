@@ -7,8 +7,8 @@ import java.util.List;
 public class Policies {
     public final Enforcement enforcement;
     public final List<RuleSet> rulesets;
-    public List<Replacement> textReplacements;
-    public List<Replacement> linkReplacements;
+    public final List<Replacement> textReplacements;
+    public final List<Replacement> linkReplacements;
 
     public Policies(final Enforcement enforcement, final List<RuleSet> rulesets, final List<Replacement> textReplacements, final List<Replacement> linkReplacements) {
         this.enforcement = enforcement;

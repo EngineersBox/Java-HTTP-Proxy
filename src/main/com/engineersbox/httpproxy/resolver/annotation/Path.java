@@ -41,5 +41,5 @@ public @interface Path {
      *
      * @return Path pattern as a {@link String}
      */
-    public String value();
+    String value();
 }

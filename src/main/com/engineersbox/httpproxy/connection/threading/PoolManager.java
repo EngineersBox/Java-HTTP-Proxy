@@ -1,7 +1,6 @@
 package com.engineersbox.httpproxy.connection.threading;
 
 import com.engineersbox.httpproxy.configuration.Config;
-import com.engineersbox.httpproxy.configuration.domain.servlet.SchedulingPolicy;
 import com.engineersbox.httpproxy.connection.handler.BaseTrafficHandler;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;

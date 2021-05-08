@@ -238,7 +238,7 @@ public class HandlerResolver implements ResourceResolver {
      */
     final boolean excludeResources(final String res, final Set<Class<?>> toFilter) {
         return toFilter.stream()
-                .noneMatch(clazz -> res.replaceAll("\\\\|/", ".").contains(clazz.getCanonicalName()));
+                .noneMatch(clazz -> res.replaceAll("[\\\\/]", ".").contains(clazz.getCanonicalName()));
     }
 
     /**
@@ -391,7 +391,6 @@ public class HandlerResolver implements ResourceResolver {
                 if (!m.getReturnType().isAssignableFrom(HTTPMessage.class)) {
                     return false;
                 }
-                System.out.println(m);
                 final List<String> patterns = Arrays.asList(m.getAnnotation(MediaType.class).value());
                 return matchHeaderToPatterns(contentTypeHeader.trim(), patterns).isPresent();
             });
