@@ -41,6 +41,11 @@ public class HTTPResponseStartLine extends HTTPStartLine {
         .getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * Display the start line in JSON format
+     *
+     * @return JSON format of start line
+     */
     @Override
     public String toString() {
         return String.format(
@@ -51,6 +56,11 @@ public class HTTPResponseStartLine extends HTTPStartLine {
         );
     }
 
+    /**
+     * Convert the start object into a loggable format.
+     *
+     * @return Loggable format of start line
+     */
     @Override
     public String toDisplayableString() {
         return String.format(

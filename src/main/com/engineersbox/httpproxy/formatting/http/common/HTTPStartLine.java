@@ -26,8 +26,6 @@ public abstract class HTTPStartLine {
     /**
      * Convert the start object into a loggable format.
      *
-     * <rb/><br/>
-     *
      * @return Loggable format of start line
      */
     public abstract String toDisplayableString();

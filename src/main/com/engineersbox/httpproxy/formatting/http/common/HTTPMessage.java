@@ -70,6 +70,12 @@ public class HTTPMessage<T extends HTTPStartLine> {
         return sb.append(delimiter).toString();
     }
 
+    /**
+     * Flatten a series of {@code byte[]} into a single {@code byte[]}
+     *
+     * @param bytes A series of {@code byte[]}
+     * @return A single, flattened {@code byte[]}
+     */
     private byte[] concatAll(final byte[] ...bytes) {
         if (bytes.length < 1) {
             return new byte[]{};
@@ -120,7 +126,7 @@ public class HTTPMessage<T extends HTTPStartLine> {
      * Note that this reader supports automatic compression of the following formats, done after having identified the {@code Content-Type} header
      *
      * <ul>
-     *     <li>{@code GZIP}: Lempel-Ziv coding (LZ77) with a 32 bit CRC (<a href="https://www.w3.org/Protocols/rfc1952/rfc1952.html" target="_top">RFC 1952</a>).</li>
+     *     <li>{@code gzip}: Lempel-Ziv coding (LZ77) with a 32 bit CRC (<a href="https://www.w3.org/Protocols/rfc1952/rfc1952.html" target="_top">RFC 1952</a>).</li>
      *     <li>{@code compress}: Adaptive Lempel-Ziv-Welch coding (LZW) (<a href="https://tools.ietf.org/html/rfc7230" target="_top">RFC 7230</a>)</li>
      *     <li>
      *         {@code deflate}: zlib format (<a href="https://www.w3.org/Protocols/rfc1950/rfc1950.html" target="_top">RFC 1950</a>)
