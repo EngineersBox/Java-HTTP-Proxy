@@ -51,6 +51,11 @@ public class CRLFRetentiveLineReader {
      * @return {@link org.apache.commons.lang3.tuple.Pair} with the {@link String} version of a read line and {@link List}
      * containing raw {@link Byte} of the line read.
      * @throws IOException If an I/O error occurs
+     *
+     * <br/><br/>
+     *
+     * This method is based around an implementation by a user <a href="https://stackoverflow.com/users/97248/pts" target="_top">pts</a>
+     * in this <a href="https://stackoverflow.com/a/4445786/11001270" target="_top">StackOverflow post</a>
      */
     public Pair<String, List<Byte>> readLineBytes() throws IOException {
         if (asciiLiteral == LINE_READ_EXCEEDED) {

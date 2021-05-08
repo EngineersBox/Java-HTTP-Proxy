@@ -4,7 +4,10 @@ MAVEN_TAR:=$(MAVEN_FULL_NAME)-bin.tar.gz
 MAVEN_TAR_URL:=https://apache.mirror.digitalpacific.com.au/maven/maven-3/$(MAVEN_VERSION)/binaries/$(MAVEN_TAR)
 M2_HOME:=/usr/local/apache-maven/$(MAVEN_FULL_NAME)
 
-.PHONY: build_jar run_jar install_maven_darwin install_maven_linux_binary install_maven_linux_apt
+SOURCE_FILES_DIR:=src/main
+DOCUMENTATION_OUTPUT_DIR:=documentation
+
+.PHONY: build_jar run_jar install_maven_darwin install_maven_linux_binary install_maven_linux_apt generate_documentation
 
 install_maven_darwin:
 	@brew install maven
@@ -26,3 +29,7 @@ build_jar:
 
 run_jar:
 	@java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml HTTP-Proxy-0.1.0-shaded.jar
+
+generate_documentation:
+	@mkdir -p $(DOCUMENTATION_OUTPUT_DIR)
+	@find $(SOURCE_FILES_DIR) -type f -name "*.java" | xargs javadoc -d $(DOCUMENTATION_OUTPUT_DIR)
