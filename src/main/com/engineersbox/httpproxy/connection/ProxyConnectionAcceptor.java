@@ -103,8 +103,6 @@ public class ProxyConnectionAcceptor extends BaseTrafficHandler {
      *
      * Handlers are created via a {@link Injector} using the {@link Injector#getInstance(Class)} method
      *
-     * <br/><br/>
-     *
      * @throws Exception Upon any exceptions encountered during thread lifecycle
      */
     @Override

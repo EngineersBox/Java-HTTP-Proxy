@@ -58,8 +58,6 @@ public @interface PathParam {
     /**
      * Path parameter in capture syntax (E.g. {@code {id}}), to be used to fill a designated parameter
      *
-     * <br/><br/>
-     *
      * @return Path parameter as a {@link String}
      */
     public String value();

@@ -39,8 +39,6 @@ public @interface Path {
     /**
      * Path pattern to match requests or responses against
      *
-     * <br/><br/>
-     *
      * @return Path pattern as a {@link String}
      */
     public String value();

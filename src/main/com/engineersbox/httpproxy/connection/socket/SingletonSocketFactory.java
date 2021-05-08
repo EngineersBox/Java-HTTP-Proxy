@@ -40,8 +40,6 @@ public class SingletonSocketFactory extends SocketFactory {
      * Supply a custom {@link com.engineersbox.httpproxy.configuration.domain.servlet.Connections} to use when creating
      * a {@link java.net.Socket}
      *
-     * <br/><br/>
-     *
      * @param connectionsConfig A custom configuration for the socket
      * @return {@link java.net.Socket}
      */
@@ -57,8 +55,6 @@ public class SingletonSocketFactory extends SocketFactory {
      *
      * Additionally sets the {@link java.net.SocketOptions#SO_TIMEOUT} and {@link java.net.SocketOptions#SO_RCVBUF} options
      * based on the set {@link SingletonSocketFactory#connectionsConfig}.
-     *
-     * <br/><br/>
      *
      * @param host the host name, or null for the loopback address.
      * @param port the port number.
@@ -90,9 +86,6 @@ public class SingletonSocketFactory extends SocketFactory {
      *
      * Additionally sets the {@link java.net.SocketOptions#SO_TIMEOUT} and {@link java.net.SocketOptions#SO_RCVBUF} options
      * based on the set {@link SingletonSocketFactory#connectionsConfig}.
-     *
-     * <br/><br/>
-     *
      *
      * @param host the name of the remote host, or null for the loopback address.
      * @param port the remote port
@@ -131,8 +124,6 @@ public class SingletonSocketFactory extends SocketFactory {
      * Additionally sets the {@link java.net.SocketOptions#SO_TIMEOUT} and {@link java.net.SocketOptions#SO_RCVBUF} options
      * based on the set {@link SingletonSocketFactory#connectionsConfig}.
      *
-     * <br/><br/>
-     *
      * @param host the IP address.
      * @param port the port number.
      * @return {@link java.net.ServerSocket}
@@ -162,9 +153,6 @@ public class SingletonSocketFactory extends SocketFactory {
      *
      * Additionally sets the {@link java.net.SocketOptions#SO_TIMEOUT} and {@link java.net.SocketOptions#SO_RCVBUF} options
      * based on the set {@link SingletonSocketFactory#connectionsConfig}.
-     *
-     * <br/><br/>
-     *
      *
      * @param host the remote address
      * @param port the remote port

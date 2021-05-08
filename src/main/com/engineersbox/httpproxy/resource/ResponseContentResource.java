@@ -29,8 +29,6 @@ public class ResponseContentResource {
      * Handler for {@code text/html} media types. This will reformat text and {@code link} attributes in HTML element
      * of the message boyd based on replacement configs supplied in {@link Config}.
      *
-     * <br/><br/>
-     *
      * @param message {@link HTTPMessage} to format the body of
      * @return Formatted {@link HTTPMessage} with replaced text and {@code link} attributes
      */

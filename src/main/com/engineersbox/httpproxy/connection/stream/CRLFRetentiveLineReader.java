@@ -48,8 +48,6 @@ public class CRLFRetentiveLineReader {
      * Additionally, it is not possible to reconstruct these line endings as there is no way to tell which one of the
      * three possible endings was encountered
      *
-     * <br/><br/>
-     *
      * @return {@link org.apache.commons.lang3.tuple.Pair} with the {@link String} version of a read line and {@link List}
      * containing raw {@link Byte} of the line read.
      * @throws IOException If an I/O error occurs

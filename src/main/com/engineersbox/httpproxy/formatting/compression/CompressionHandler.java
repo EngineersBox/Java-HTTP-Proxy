@@ -19,8 +19,6 @@ public class CompressionHandler {
      * values, returning {@link CompressionFormat} if a match is found. In the case that no matching compression method
      * is found, a {@code null} value is returned.
      *
-     * <br/><br/>
-     *
      * @param contentEncodingHeader Value of {@code Content-Encoding} header
      * @return {@link CompressionFormat} matching the encoding if found, {@code null} otherwise
      */
@@ -46,8 +44,6 @@ public class CompressionHandler {
     /**
      * Decompress {@code byte[]} to {@link String} content using a given {@link Charset}. The {@code format} parameter
      * will be used to determine the compression algorithm to use.
-     *
-     * <br/><br/>
      *
      * @param bytes Compressed <a href="https://www.w3.org/Protocols/rfc1952/rfc1952.html" target="_top">RFC 1952</a>
      *              compliant data
@@ -76,8 +72,6 @@ public class CompressionHandler {
     /**
      * Compress {@link String} content into {@code byte[]} using a given {@link Charset}. The {@code format} parameter
      * will be used to determine the compression algorithm to use.
-     *
-     * <br/><br/>
      *
      * @param str Content encoded with supplied {@link Charset}
      * @param charset Encoding used for content

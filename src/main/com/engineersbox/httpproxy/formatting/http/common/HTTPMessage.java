@@ -20,8 +20,6 @@ import java.util.regex.Pattern;
 /**
  * An implementation of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4" target="_top">RFC 2616 Section 4</a> compliant HTTP message.
  *
- * <br/><br/>
- *
  * @param <T> An instance of {@link HTTPStartLine} indicating whether the message is a request or response
  * @see com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine HTTPRequestStartLine
  * @see com.engineersbox.httpproxy.formatting.http.response.HTTPResponseStartLine HTTPResponseStartLine
@@ -61,8 +59,6 @@ public class HTTPMessage<T extends HTTPStartLine> {
      * Note that usage outside of the RFC is not included, though still possible. As such care will need to be taken
      * with the duplicate ending delimiter.
      *
-     * <br/><br/>
-     *
      * @param delimiter A string value used to separate headers
      * @return {@link String} containing delimited headers with duplicate delimiter at the end
      */
@@ -92,8 +88,6 @@ public class HTTPMessage<T extends HTTPStartLine> {
      * Retrieves the {@link Charset} from a {@code Content-Type} header if it exists. In the case that it is not present as a
      * part of the header key (Specified by {@link HTTPSymbols#CONTENT_TYPE_CHARSET_KEY}), this will default to
      * {@link StandardCharsets#UTF_8}
-     *
-     * <br/><br/>
      *
      * @return {@link Charset} if it exists, otherwise {@link StandardCharsets#UTF_8}
      */
@@ -181,8 +175,6 @@ public class HTTPMessage<T extends HTTPStartLine> {
      * The structure of the bytes will be directly equivalent to converting any <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_top">RFC 2616 Section 4.2</a>
      * compliant message.
      *
-     * <br/><br/>
-     *
      * @return {@code byte[]} representation of the current {@link HTTPMessage}
      */
     public byte[] toRaw() {
@@ -200,8 +192,6 @@ public class HTTPMessage<T extends HTTPStartLine> {
     /**
      * Set the current body raw bytes to a new value
      *
-     * <br/><br/>
-     *
      * @param bodyBytes {@code byte[]} representation of an <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_top">RFC 2616 Section 4.2</a>
      *                                compliant body
      */
@@ -211,8 +201,6 @@ public class HTTPMessage<T extends HTTPStartLine> {
 
     /**
      * Set the current string representation of body to a new value
-     *
-     * <br/><br/>
      *
      * @param newBody {@link String} representation of an <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_top">RFC 2616 Section 4.2</a>
      *                compliant body

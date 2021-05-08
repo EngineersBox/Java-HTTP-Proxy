@@ -12,16 +12,12 @@ public interface BaseContentFormatter {
     /**
      * Supplies the formatter with the string to perform actions on
      *
-     * <br/><br/>
-     *
      * @param contentString {@link String} format of content
      */
     void withContentString(final String contentString);
 
     /**
      * Replaces all instances a {@link java.util.regex.Pattern} with a {@link String} within text nodes
-     *
-     * <br/><br/>
      *
      * @param toReplace Instance of {@link Replacement} with matcher and replacement
      */
@@ -31,16 +27,12 @@ public interface BaseContentFormatter {
      * Replaces all instances a {@link java.util.regex.Pattern} with a {@link String} from a {@link List}
      * of {@link Replacement} within text nodes
      *
-     * <br/><br/>
-     *
      * @param toReplace {@link List} of {@link Replacement} to use for replacement matching
      */
     void replaceAllMatchingText(final List<Replacement> toReplace);
 
     /**
      * Replaces all instances a {@link java.util.regex.Pattern} with a {@link String}
-     *
-     * <br/><br/>
      *
      * @param toReplace Instance of {@link Replacement} with matcher and replacement within link attributes
      */
@@ -49,8 +41,6 @@ public interface BaseContentFormatter {
     /**
      * Replaces all instances a {@link java.util.regex.Pattern} with a {@link String} from a {@link List}
      * of {@link Replacement} within link attributes
-     *
-     * <br/><br/>
      *
      * @param toReplace {@link List} of {@link Replacement} to use for replacement matching
      */

@@ -28,8 +28,6 @@ public class HTTPResponseStartLine extends HTTPStartLine {
     /**
      * See {@link HTTPStartLine#toRaw()}
      *
-     * <br/><br/>
-     *
      * @return {@code byte[]} format of response line
      */
     @Override

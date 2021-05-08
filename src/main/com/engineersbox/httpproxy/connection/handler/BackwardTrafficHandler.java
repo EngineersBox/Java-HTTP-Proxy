@@ -18,8 +18,6 @@ import java.net.Socket;
  * Traffic handler to forward traffic from the Client socket to Server socket. Sockets
  * are configured based on configuration.
  *
- * <br/><br/>
- *
  * @see com.engineersbox.httpproxy.configuration.Config
  */
 public class BackwardTrafficHandler extends BaseTrafficHandler {
@@ -53,8 +51,6 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
      * to the server. Client and server sockets are defined by the sockets created according to the config
      * file.
      *
-     * <br/><br/>
-     *
      * See: {@link com.engineersbox.httpproxy.configuration.Config}
      *
      * <br/><br/>
@@ -63,12 +59,8 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
      * in order to ensure a 400 (Bad Request) with content {@code The requested URL "[no URL]", is invalid.} is
      * not returned
      *
-     * <br/><br/>
-     *
      * In order to ensure that the socket InputStream is signalled with a termination correctly, the
      * {@code Connection: Close} header is added. This results in a {@code -1} being identified by the stream read.
-     *
-     * <br/><br/>
      *
      * @throws Exception If any issues are encountered during the processing of a request
      */

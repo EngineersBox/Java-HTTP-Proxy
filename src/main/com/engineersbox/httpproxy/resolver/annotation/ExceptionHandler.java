@@ -15,8 +15,6 @@ public @interface ExceptionHandler {
     /**
      * Contains an array of {@link Throwable} to be handled by a the annotated method
      *
-     * <br/><br/>
-     *
      * @return An array of {@link Throwable}
      */
     Class<? extends Throwable>[] value();

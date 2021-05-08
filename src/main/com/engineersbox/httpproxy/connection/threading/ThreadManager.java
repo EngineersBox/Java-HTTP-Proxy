@@ -10,16 +10,12 @@ public interface ThreadManager {
     /**
      * Submit an acceptor task, to be handled by a thread pool
      *
-     * <br/><br/>
-     *
      * @param task Acceptor as an instance of {@link BaseTrafficHandler}
      */
     void submitAcceptor(final BaseTrafficHandler task);
 
     /**
      * Submit a handler task, to be handled by a thread pool
-     *
-     * <br/><br/>
      *
      * @param task Handler as an instance of {@link BaseTrafficHandler}
      */

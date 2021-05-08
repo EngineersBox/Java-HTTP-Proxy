@@ -32,8 +32,6 @@ public class MatchableParameterisedPath {
     /**
      * Formats the provided {@code newPath} to ensure it retains formatting requirements around component delimitation.
      *
-     * <br/><br/>
-     *
      * @param newPath HTTP target path as a {@link String}
      * @return Formatted path
      */
@@ -63,8 +61,6 @@ public class MatchableParameterisedPath {
 
     /**
      * Adds a path portion to the end of the current path, retaining formatting.
-     *
-     * <br/><br/>
      *
      * @param morePath Path portion to add
      */

@@ -17,8 +17,6 @@ public @interface MediaType {
      * Contains an array of Java regexes to match for media types to be handled within
      * the annotated method.
      *
-     * <br/><br/>
-     *
      * @return An array of Java regexes
      */
     String[] value();

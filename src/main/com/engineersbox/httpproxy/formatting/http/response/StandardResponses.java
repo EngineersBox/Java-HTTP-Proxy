@@ -15,8 +15,6 @@ public class StandardResponses {
     /**
      * Create an HTTP 200 (Ok) response with a custom body
      *
-     * <br/><br/>
-     *
      * @param body Content to use as the body of the response
      * @return HTTP 200 formatted {@link HTTPMessage}
      */
@@ -28,8 +26,6 @@ public class StandardResponses {
 
     /**
      * Create an HTTP 200 (Ok) response
-     *
-     * <br/><br/>
      *
      * @return HTTP 200 formatted {@link HTTPMessage}
      */
@@ -50,8 +46,6 @@ public class StandardResponses {
     /**
      * Create an HTTP 404 (Not Found) response with a custom body
      *
-     * <br/><br/>
-     *
      * @param body Content to use as the body of the response
      * @return HTTP 404 formatted {@link HTTPMessage}
      */
@@ -63,8 +57,6 @@ public class StandardResponses {
 
     /**
      * Create an HTTP 404 (Not found) response
-     *
-     * <br/><br/>
      *
      * @return HTTP 404 formatted {@link HTTPMessage}
      */
@@ -85,8 +77,6 @@ public class StandardResponses {
     /**
      * Create an HTTP 500 (Internal server error) response with a custom body
      *
-     * <br/><br/>
-     *
      * @param body Content to use as the body of the response
      * @return HTTP 500 formatted {@link HTTPMessage}
      */
@@ -98,8 +88,6 @@ public class StandardResponses {
 
     /**
      * Create an HTTP 500 (Internal server error) response
-     *
-     * <br/><br/>
      *
      * @return HTTP 500 formatted {@link HTTPMessage}
      */

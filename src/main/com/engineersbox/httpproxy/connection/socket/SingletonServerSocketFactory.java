@@ -42,8 +42,6 @@ public class SingletonServerSocketFactory extends ServerSocketFactory {
      * Supply a custom {@link com.engineersbox.httpproxy.configuration.domain.servlet.Connections} to use when creating
      * a {@link java.net.ServerSocket}
      *
-     * <br/><br/>
-     *
      * @param connectionsConfig A custom configuration for the socket
      * @return {@link java.net.ServerSocket}
      */
@@ -56,8 +54,6 @@ public class SingletonServerSocketFactory extends ServerSocketFactory {
      * Validates a given queue size against the configured maximum ({@link SingletonServerSocketFactory#MAX_ACCEPTOR_QUEUE_SIZE}).
      * In the case that it exceeds this value or is below {@code 0}, the maximum is returned. Otherwise the supplied
      * queue size is returned.
-     *
-     * <br/><br/>
      *
      * @param queueSize A socket backlog queue size
      * @return {@link SingletonServerSocketFactory#MAX_ACCEPTOR_QUEUE_SIZE} if the {@code queueSize} is larger than
@@ -84,8 +80,6 @@ public class SingletonServerSocketFactory extends ServerSocketFactory {
      * Additionally sets the {@link java.net.SocketOptions#SO_TIMEOUT} and {@link java.net.SocketOptions#SO_RCVBUF} options
      * based on the set {@link SingletonServerSocketFactory#connectionsConfig}.
      *
-     * <br/><br/>
-     *
      * @param port the port number, or 0 to use a port number that is automatically allocated
      * @return {@link java.net.ServerSocket}
      * @throws IOException If an I/O exception occurs whilst opening the socket
@@ -110,8 +104,6 @@ public class SingletonServerSocketFactory extends ServerSocketFactory {
      *
      * Additionally sets the {@link java.net.SocketOptions#SO_TIMEOUT} and {@link java.net.SocketOptions#SO_RCVBUF} options
      * based on the set {@link SingletonServerSocketFactory#connectionsConfig}.
-     *
-     * <br/><br/>
      *
      * @param port the port number, or 0 to use a port number that is automatically allocated
      * @return {@link java.net.ServerSocket}
@@ -140,8 +132,6 @@ public class SingletonServerSocketFactory extends ServerSocketFactory {
      *
      * Additionally sets the {@link java.net.SocketOptions#SO_TIMEOUT} and {@link java.net.SocketOptions#SO_RCVBUF} options
      * based on the set {@link SingletonServerSocketFactory#connectionsConfig}.
-     *
-     * <br/><br/>
      *
      * @param port the port number, or 0 to use a port number that is automatically allocated
      * @return {@link java.net.ServerSocket}

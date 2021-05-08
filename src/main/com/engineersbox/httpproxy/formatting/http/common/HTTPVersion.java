@@ -24,8 +24,6 @@ public enum HTTPVersion {
     /**
      * Convert a {@link String} representation of an HTTP version enum to the accepted message format
      *
-     * <br/><br/>
-     *
      * @param value Raw {@link String} of {@link HTTPVersion} entry
      * @return RFC compliant HTTP version format
      */
@@ -37,8 +35,6 @@ public enum HTTPVersion {
 
     /**
      * Convert a raw RFC compliant HTTP version to a {@link HTTPVersion} entry
-     *
-     * <br/><br/>
      *
      * @param value {@link String} of RFC compliant HTTP version
      * @return Equivalent {@link HTTPVersion} entry

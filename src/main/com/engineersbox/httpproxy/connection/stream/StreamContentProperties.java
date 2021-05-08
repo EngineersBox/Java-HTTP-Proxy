@@ -39,8 +39,6 @@ public class StreamContentProperties {
      * a double <a href="https://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">RFC 2616</a> compliant line
      * terminator ({@code \r\n\r\n}).
      *
-     * <br/><br/>
-     *
      * @return {@code true} is a request and past headers, {@code false} otherwise
      */
     private boolean validateRequestTermination() {
@@ -49,8 +47,6 @@ public class StreamContentProperties {
 
     /**
      * Check if the previously read line contained a {@link HTTPSymbols#HEADER_KEY_VALUE_DELIMITER} and is a request.
-     *
-     * <br/><br/>
      *
      * @param line Previously read line
      * @return {@code true} if is a request and has a {@link HTTPSymbols#HEADER_KEY_VALUE_DELIMITER}, {@code false} otherwise
@@ -65,8 +61,6 @@ public class StreamContentProperties {
     /**
      * Check if the body is chunked ({@code Content-Encoding: chunked}), and if the current line contains the chunked
      * body terminator ({@link HTTPSymbols#TRANSFER_ENCODING_TERMINATION})
-     *
-     * <br/><br/>
      *
      * @param line Currently read line
      * @return {@code false} if not chunked, null or not past chunked terminator, {@code true} otherwise

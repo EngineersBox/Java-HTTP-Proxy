@@ -22,10 +22,6 @@ import org.apache.logging.log4j.Logger;
  * The {@link BaseTrafficHandler#after} method will run irrespective of any exceptions
  * thrown during the {@link BaseTrafficHandler#task} call. As such it is advised that it handles any
  * contextual exceptions.
- *
- * <br/><br/>
- *
- *
  */
 public abstract class BaseTrafficHandler implements Runnable {
 

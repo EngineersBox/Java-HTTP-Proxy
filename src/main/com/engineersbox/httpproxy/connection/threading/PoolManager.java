@@ -44,8 +44,6 @@ public class PoolManager implements ThreadManager {
      * This will default to no timeout for idle threads with a{@code keepAliveTime} of {@code 0L} milliseconds. Additionally,
      * a {@link LinkedBlockingQueue} will be used for the queue implementation
      *
-     * <br/><br/>
-     *
      * @param threads Amount of threads for the {@code corePoolSize} and {@code maxPoolSize}
      * @return A {@link ThreadPoolExecutor} with provided threads and {@link RejectedExecutionHandler} from {@link Config}
      */
@@ -62,8 +60,6 @@ public class PoolManager implements ThreadManager {
 
     /**
      * Submits an acceptor task to the acceptor executor service ({@link PoolManager#acceptorExecutorService})
-     *
-     * <br/><br/>
      *
      * @param task Acceptor as an instance of {@link BaseTrafficHandler}
      */
@@ -82,8 +78,6 @@ public class PoolManager implements ThreadManager {
 
     /**
      * Submits a handler task to the handler executor service ({@link PoolManager#handlerExecutorService})
-     *
-     * <br/><br/>
      *
      * @param task Handler as an instance of {@link BaseTrafficHandler}
      */

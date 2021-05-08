@@ -30,8 +30,6 @@ public class Proxy {
     /**
      * Main proxy program, using {@link Injector} to instantiate {@link PoolManager} and {@link ProxyServlet} instances
      *
-     * <br/><br/>
-     *
      * @param args Array of {@link String} program arguments
      */
     public static void main(String[] args) {

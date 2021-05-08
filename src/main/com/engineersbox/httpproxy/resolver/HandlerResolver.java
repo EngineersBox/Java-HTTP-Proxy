@@ -89,8 +89,6 @@ public class HandlerResolver implements ResourceResolver {
      * Find classes annotated with {@link Handler} for a given {@link HandlerType} within the
      * project package {@code com.engineersbox.httpproxy.*}
      *
-     * <br/><br/>
-     *
      * @param type {@link HandlerType} to find classes for
      * @return A {@link Set} of classes matching the given {@link HandlerType}. This is an empty set if none are found
      */
@@ -104,8 +102,6 @@ public class HandlerResolver implements ResourceResolver {
     /**
      * Resolves the class path URLs ({@link URL}) for a given {@link Set} of resource classes
      *
-     * <br/><br/>
-     *
      * @param resources {@link Set} of resource classes
      * @return A {@link Set} of {@link URL} for the class paths each resource
      */
@@ -117,8 +113,6 @@ public class HandlerResolver implements ResourceResolver {
 
     /**
      * Creates an instantiation of a given resource via an {@link Injector} using modules within {@link HandlerResolver#injectables}
-     *
-     * <br/><br/>
      *
      * @param resource Class of resource
      * @param <T> Type of resource
@@ -161,8 +155,6 @@ public class HandlerResolver implements ResourceResolver {
     /**
      * Matches a given header against a {@link List} of valid Java regexes, returning the first match. If no matches are
      * found an empty {@link Optional} is returned
-     *
-     * <br/><br/>
      *
      * @param contentTypeHeader A valid <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_top">RFC 2616 Section 4.2</a> header
      * @param patterns {@link List} of valid Java regexes
@@ -240,8 +232,6 @@ public class HandlerResolver implements ResourceResolver {
      * Determine whether a {@link Set} of {@link Class} has a particular {@link Class} contained within. This operates
      * on the canonical names of {@link Class} to ensure that package-level differences are captured.
      *
-     * <br/><br/>
-     *
      * @param res A particular {@link Class} canonical name to check if should be excluded
      * @param toFilter A {@link Set} of {@link Class} to base exclusion on
      * @return {@code true} if {@code toFiler} contains the class, {@code false} otherwise
@@ -263,8 +253,6 @@ public class HandlerResolver implements ResourceResolver {
      * <br/><br/>
      *
      * If no matching methods are found {@link ResourceEndpointMatcherException} is thrown
-     *
-     * <br/><br/>
      *
      * @param urls A {@link Set} of resource {@link URL}s
      * @param predicate A {@link Predicate} to match against method signatures
@@ -297,8 +285,6 @@ public class HandlerResolver implements ResourceResolver {
      *
      * Note that this will <strong>NOT</strong> use injection, since the parameters should be within the content of an
      * {@link HTTPMessage} only.
-     *
-     * <br/><br/>
      *
      * @param method A {@link Method} to instantiate all required parameters for
      * @param message Instance of {@link HTTPStartLine} to use in parameters
@@ -349,8 +335,6 @@ public class HandlerResolver implements ResourceResolver {
      * Matches the given {@link HTTPMessage} to resources based on the {@link MediaType} contained in the
      * {@code Content-Type} header.
      *
-     * <br/><br/>
-     *
      * @param message {@link HTTPMessage} to handle within a given resource
      * @return {@link HTTPMessage} handled by a matching {@link MediaType} method
      */
@@ -391,8 +375,6 @@ public class HandlerResolver implements ResourceResolver {
     /**
      * Matches the given {@link HTTPMessage} to resources based on the {@link MediaType} contained in the
      * {@code Content-Type} header.
-     *
-     * <br/><br/>
      *
      * @param message {@link HTTPMessage} to handle within a given resource
      * @return {@link HTTPMessage} handled by a matching {@link MediaType} method
@@ -444,8 +426,6 @@ public class HandlerResolver implements ResourceResolver {
      *
      * A matching handler method will except an instance of {@code targetException} or any superclass of it.
      *
-     * <br/><br/>
-     *
      * @param exception {@link Exception} used to catch {@link Throwable} from method invocation
      * @param targetException {@link Throwable} generated during method invocation
      * @return {@link HTTPMessage} formatted relative to the exception thrown
@@ -476,8 +456,6 @@ public class HandlerResolver implements ResourceResolver {
 
     /**
      * Handles any errors that occur out of the scope of the a resource method.
-     *
-     * <br/><br/>
      *
      * @param exception Instance of {@link Exception} thrown out of scope
      * @return An instance of {@link StandardResponses#_500()}

@@ -18,8 +18,6 @@ import java.net.Socket;
  * Traffic handler to forward traffic from the Server socket to Client socket. Sockets
  * are configured based on configuration.
  *
- * <br/><br/>
- *
  * @see com.engineersbox.httpproxy.configuration.Config
  */
 public class ForwardTrafficHandler extends BaseTrafficHandler {
@@ -68,8 +66,6 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
      *
      * Upon having read an incoming message, it is forwarded a {@link com.engineersbox.httpproxy.resolver.ResourceResolver}
      * to be handled by any methods annotated to handle the given content type.
-     *
-     * <br/><br/>
      *
      * @throws Exception If any issues are encountered during the processing of a response
      */

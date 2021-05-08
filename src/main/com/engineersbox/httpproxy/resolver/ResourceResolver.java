@@ -12,8 +12,6 @@ public interface ResourceResolver {
     /**
      * Matches the given {@link HTTPMessage} request to a resource handler based on the chosen delimiter
      *
-     * <br/><br/>
-     *
      * @param message {@link HTTPMessage} to handle within a given resource
      * @return Handle {@link HTTPMessage}
      */
@@ -21,8 +19,6 @@ public interface ResourceResolver {
 
     /**
      * Matches the given {@link HTTPMessage} response to a resource handler based on the chosen delimiter
-     *
-     * <br/><br/>
      *
      * @param message {@link HTTPMessage} to handle within a given resource
      * @return Handle {@link HTTPMessage}

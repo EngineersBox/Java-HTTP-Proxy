@@ -69,8 +69,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
     /**
      * See {@link ContentCollector#withStream(InputStream)}
      *
-     * <br/><br/>
-     *
      * @param stream Stream bound to an open {@link java.net.Socket}
      */
     @Override
@@ -81,8 +79,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
     /**
      * See {@link ContentCollector#withStartLine(Class)}
      *
-     * <br/><br/>
-     *
      * @param classOfT The class of implementation of {@link HTTPStartLine}
      */
     @Override
@@ -92,8 +88,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
 
     /**
      * See {@link ContentCollector#withSocket(Socket)}
-     *
-     * <br/><br/>
      *
      * @param socket A bound and open {@link java.net.Socket} instance
      */
@@ -110,8 +104,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
      *
      * Note that the result is also trimmed, to remove excessive non-data characters. See {@link String#trim()}
      *
-     * <br/><br/>
-     *
      * @param header {@link String} value in the <a href="https://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">RFC 2616</a> compliant format: <br/>
      * {@code <HEADER KEY>[: <HEADER VALUE>[;<HEADER VALUE>]]}
      * @return Key value of the {@code header} containing one or more values separated by {@link HTTPSymbols#HEADER_VALUE_LIST_DELIMITER}
@@ -122,8 +114,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
 
     /**
      * Verifies whether a given line contains a given header key followed by the {@link HTTPSymbols#HEADER_KEY_VALUE_DELIMITER}
-     *
-     * <br/><br/>
      *
      * @param line Potential header
      * @param header Key value to check for
@@ -137,8 +127,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
     /**
      * Logs a message to the internal log4j instance to indicate a given header has been found. The message in the format: <br/>
      * {@code "Found " + header + " header with value " + value}
-     *
-     * <br/><br/>
      *
      * @param header Header key
      * @param value Header value
@@ -249,8 +237,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
     /**
      * Removes a null byte ({@code \0}) from the start of a given {@link StringBuilder} instance.
      *
-     * <br/><br/>
-     *
      * @param sb {@link StringBuilder} with a potential leading null byte
      * @return The unaltered {@code sb} instance as a {@link String} if no null byte leads the content or a substring
      * of the {@code sb} instance starting from index {@code 1}.
@@ -261,8 +247,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
 
     /**
      * See {@link ContentCollector#synchronousReadAll()}
-     *
-     * <br/><br/>
      *
      * @return Instance of {@link com.engineersbox.httpproxy.formatting.http.common.HTTPMessage} constructed from stream
      *         result of reading from stream
@@ -294,8 +278,6 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
 
     /**
      * See {@link ContentCollector#futureReadAll()}
-     *
-     * <br/><br/>
      *
      * @return A {@link java.util.concurrent.CompletableFuture} containing an instance of {@link com.engineersbox.httpproxy.formatting.http.common.HTTPMessage}
      */

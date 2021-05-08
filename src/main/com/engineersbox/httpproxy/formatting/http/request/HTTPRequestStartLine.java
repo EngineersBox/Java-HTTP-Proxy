@@ -29,8 +29,6 @@ public class HTTPRequestStartLine extends HTTPStartLine {
     /**
      * See {@link HTTPStartLine#toRaw()}
      *
-     * <br/><br/>
-     *
      * @return {@code byte[]} format of request line
      */
     @Override

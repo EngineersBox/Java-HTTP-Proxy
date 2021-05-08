@@ -35,8 +35,6 @@ public class ContentFormatter implements BaseContentFormatter {
     /**
      * See {@link BaseContentFormatter#withContentString(String)}
      *
-     * <br/><br/>
-     *
      * @param contentString {@link String} format of content
      */
     @Override
@@ -55,8 +53,6 @@ public class ContentFormatter implements BaseContentFormatter {
      *
      * Additionally, replace any text matching the matcher for the content of the {@link HTMLSymbols#TITLE_ATTRIBUTE}
      * if it exists on the parent of the text node ({@link TextNode#parent()});
-     *
-     * <br/><br/>
      *
      * @param textNode Current {@link TextNode} to perform replacement on
      * @param pair Instance of {@link Replacement} to base replacement on
@@ -79,8 +75,6 @@ public class ContentFormatter implements BaseContentFormatter {
 
     /**
      * See {@link BaseContentFormatter#replaceMatchingText(Replacement)}
-     *
-     * <br/><br/>
      *
      * @param toReplace Instance of {@link Replacement} with matcher and replacement
      */
@@ -105,8 +99,6 @@ public class ContentFormatter implements BaseContentFormatter {
     /**
      * See {@link BaseContentFormatter#replaceAllMatchingText(List)}
      *
-     * <br/><br/>
-     *
      * @param toReplace {@link List} of {@link Replacement} to use for replacement matching
      */
     @Override
@@ -129,8 +121,6 @@ public class ContentFormatter implements BaseContentFormatter {
      * Replace any occurrence of the matcher in {@code pair} for the {@link Element#attr(String)} (specifically against
      * the supplied {@code attribute}) value with the replacement defined in the {@code pair}
      *
-     * <br/><br/>
-     *
      * @param linkElement Current {@link Element} to perform replacement on
      * @param pair Instance of {@link Replacement} to base replacement on
      * @param attribute Attribute select to perform the replacement on
@@ -144,8 +134,6 @@ public class ContentFormatter implements BaseContentFormatter {
 
     /**
      * See {@link BaseContentFormatter#replaceMatchingLink(Replacement)}
-     *
-     * <br/><br/>
      *
      * @param toReplace Instance of {@link Replacement} with matcher and replacement
      */
@@ -208,8 +196,6 @@ public class ContentFormatter implements BaseContentFormatter {
 
     /**
      * See {@link BaseContentFormatter#getContentString()}
-     *
-     * <br/><br/>
      *
      * @return Formatted content {@link String}
      */

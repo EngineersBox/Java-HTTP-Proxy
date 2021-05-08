@@ -19,8 +19,6 @@ import java.util.Map;
  * compliant HTTP message into an instance of {@link HTTPMessage} with the message type determined via the class type
  * parameter {@code T}
  *
- * <br/><br/>
- *
  * @param <T> An instance of {@link HTTPStartLine} as either {@link HTTPRequestStartLine} or {@link HTTPResponseStartLine}
  */
 public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter<T> {
@@ -37,8 +35,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     /**
      * Convert a raw {@link String} format of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.1" target="_top">RFC 2616 Section 4.1</a>
      * message start line into an instance of {@link HTTPStartLine}.
-     *
-     * <br/><br/>
      *
      * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.1" target="_top">RFC 2616 Section 4.1</a> start line
      * @return An instance {@link HTTPStartLine} of as either {@link HTTPRequestStartLine} or {@link HTTPResponseStartLine}
@@ -64,8 +60,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      * Convert a raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1" target="_top">RFC 2616 Section 5.1</a>
      *  message start line into an instance of {@link HTTPRequestStartLine}
      *
-     * <br/><br/>
-     *
      * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1" target="_top">RFC 2616 Section 5.1</a> start line
      * @return An parsed instance of {@link HTTPRequestStartLine}
      * @throws InvalidHTTPStartLineFormatException Division of headers and body is invalid
@@ -84,8 +78,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     /**
      * Convert a raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1" target="_top">RFC 2616 Section 6.1</a>
      *  message start line into an instance of {@link HTTPResponseStartLine}
-     *
-     * <br/><br/>
      *
      * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1" target="_top">RFC 2616 Section 6.1</a> start line
      * @return An parsed instance of {@link HTTPResponseStartLine}
@@ -115,8 +107,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      * This will ensure that the headers match the {@link HTTPSymbols#HEADER_REGEX} in order to be compliant with the format
      * of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a>
      *
-     * <br/><br/>
-     *
      * @param raw {@code String[]} of headers
      * @return {@link Map} of {@link String} to {@link String} mappings of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a>
      * compliant headers
@@ -136,8 +126,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
 
     /**
      * See {@link BaseHTTPFormatter#fromRaw(byte[], Charset, Class)}
-     *
-     * <br/><br/>
      *
      * @param raw {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
      * @param charset {@link Charset} to use as the encoding for the string representation of the body
@@ -159,8 +147,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
 
     /**
      * See {@link BaseHTTPFormatter#fromRaw(byte[], byte[], Charset, Class)}
-     *
-     * <br/><br/>
      *
      * @param raw {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
      * @param bodyBytes {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a> compliant message body
@@ -184,8 +170,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
 
     /**
      * See {@link BaseHTTPFormatter#fromRawString(String, byte[], Class)}
-     *
-     * <br/><br/>
      *
      * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
      * @param bodyBytes {@code byte[]} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3" target="_top">RFC 2616 Section 4.3</a> compliant message body
@@ -213,8 +197,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      *
      * This will ensure that there is at least a header section and a body optionally depending on context.
      *
-     * <br/><br/>
-     *
      * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4" target="_top">RFC 2616 Section 4</a>
      *                          HTTP message
      * @return Split message containing either a header, header and body or header and multipart body
@@ -236,8 +218,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      * <br/><br/>
      *
      * If the headers are not compliant with at minimum HTTP/0.9 (single like method designation)
-     *
-     * <br/><br/>
      *
      * @param splitMetadataBody {@code String[]} of headers
      * @return Headers split according to {@link HTTPSymbols#HTTP_HEADER_NEWLINE_DELIMITER}
@@ -261,8 +241,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
      *
      * In the case that the message is neither a request nor response, this will throw an {@link InvalidHTTPMessageFormatException}
      *
-     * <br/><br/>
-     *
      * @param segmentedRaw {@code String[]} set of <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_top">RFC 2616 Section 4.2</a> headers
      * @param classOfT Instance of {@link HTTPStartLine} designating this message as a request or response
      * @return {@link HTTPRequestStartLine} or {@link HTTPResponseStartLine} depending on the class of the class type parameter {@code T}
@@ -284,8 +262,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
     /**
      * Validates the body does not exceed the configured max size supplied via the {@link Config}.
      *
-     * <br/><br/>
-     *
      * @param rawBody {@link String} formatted body
      * @return {@link String} formatted body
      * @throws InvalidHTTPBodyException Body exceeds the max size relative to configuration supplies in a {@link Config}
@@ -300,8 +276,6 @@ public class HTTPFormatter<T extends HTTPStartLine> implements BaseHTTPFormatter
 
     /**
      * See {@link BaseHTTPFormatter#fromRawString(String, Class)}
-     *
-     * <br/><br/>
      *
      * @param raw {@link String} representation of a <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html" target="_top">RFC 2616 Section 4</a> compliant message
      * @param classOfT Instance of {@link HTTPStartLine} to indicate whether this is a request or response
