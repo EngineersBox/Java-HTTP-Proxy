@@ -5,7 +5,7 @@ MAVEN_TAR_URL:=https://apache.mirror.digitalpacific.com.au/maven/maven-3/$(MAVEN
 M2_HOME:=/usr/local/apache-maven/$(MAVEN_FULL_NAME)
 
 SOURCE_FILES_DIR:=src/main
-DOCUMENTATION_OUTPUT_DIR:=documentation
+DOCUMENTATION_OUTPUT_DIR:=docs
 
 .PHONY: build_jar run_jar install_maven_darwin install_maven_linux_binary install_maven_linux_apt generate_documentation
 
