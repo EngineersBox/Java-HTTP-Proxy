@@ -248,7 +248,7 @@ public class StreamCollector<T extends HTTPStartLine> implements ContentCollecto
      *
      * @return Instance of {@link com.engineersbox.httpproxy.formatting.http.common.HTTPMessage} constructed from stream
      *         result of reading from stream
-     * @throws SocketStreamReadError Any exceptions encountered whilst reading from the {@link java.io.InputStream}
+     * @throws SocketStreamReadError Any exceptions encountered whilst reading from the {@link java.io.InputStream} including request timeouts
      * @throws HTTPMessageException Any formatting or initialisation exceptions encountered whilst constructing an instance
      *         of {@link com.engineersbox.httpproxy.formatting.http.common.HTTPMessage}
      * @throws CompressionHandlerException Issues encountered whilst attempting to decompress a compressed body

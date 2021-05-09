@@ -57,10 +57,12 @@ public class Config {
     }
 
     public void logConfig() {
+        logger.info("---- [CONFIG] ----");
         logger.info(String.format(
-            "[CONFIG: Servlet > Threading] Pool sizes: [ACCEPTOR: %d] [HANDLER: %d]",
+            "[CONFIG: Servlet > Threading] Pool sizes: [ACCEPTOR: %d] [HANDLER: %d] [CLASS MATCHER %d]",
             this.servlet.threading.acceptorPoolSize,
-            this.servlet.threading.handlerPoolSize
+            this.servlet.threading.handlerPoolSize,
+            this.servlet.threading.classMatcherPoolSize
         ));
         logger.info(String.format(
             "[CONFIG: Servlet > Threading] Scheduling Policy: %s",
@@ -72,12 +74,17 @@ public class Config {
             this.servlet.connections.handlerQueueSize
         ));
         logger.info(String.format(
-            "[CONFIG: Servlet > Connections] Read Buffer Size: [SOCKET READER: %d]",
+            "[CONFIG: Servlet > Connections] Buffer Size: [SEND: %d] [RECEIVE: %d]",
+            this.servlet.connections.writeBufferSize,
             this.servlet.connections.readerBufferSize
         ));
         logger.info(String.format(
-            "[CONFIG: Servlet > Connections] Send Buffer Size: [SOCKET WRITER: %d]",
-            this.servlet.connections.writeBufferSize
+            "[CONFIG: Servlet > Connections] Drop After: %d",
+            this.servlet.connections.dropAfter
+        ));
+        logger.info(String.format(
+            "[CONFIG: Servlet > Messages] Max Body Size: %d",
+            this.servlet.messages.maxBodySize
         ));
         logger.info(String.format(
             "[CONFIG: Servlet > Binding] Local Host [HOST: %s] [PORT: %d]",
@@ -87,11 +94,16 @@ public class Config {
         logger.info(String.format(
             "[CONFIG: Policy > Enforcement] Behaviour: [IP: %s] [URL: %s]",
             this.policies.enforcement.whitelistBehaviour.ip,
-                this.policies.enforcement.whitelistBehaviour.url
+            this.policies.enforcement.whitelistBehaviour.url
         ));
         logger.info(String.format(
-            "[CONFIG: Policy > Rulesets] Imported %d rule sets",
-            this.policies.rulesets.size()
+            "[CONFIG: Policy > Enforcement] Allow Redirects: %s",
+            this.policies.enforcement.allowRedirects
+        ));
+        logger.info(String.format(
+            "[CONFIG: Policy > Rulesets] Imported %d rule set%s",
+            this.policies.rulesets.size(),
+            this.policies.rulesets.size() > 1 ? "s" : ""
         ));
         for (int i = 0; i < this.policies.rulesets.size(); i++) {
             final RuleSet ruleSet = this.policies.rulesets.get(i);
@@ -104,8 +116,9 @@ public class Config {
             ));
         }
         logger.info(String.format(
-            "[CONFIG: Policy > Text Replacements] Imported %d text replacements",
-            this.policies.textReplacements.size()
+            "[CONFIG: Policy > Text Replacements] Imported %d text replacement%s",
+            this.policies.textReplacements.size(),
+            this.policies.textReplacements.size() > 1 ? "s" : ""
         ));
         for (int i = 0; i < this.policies.textReplacements.size(); i++) {
             final Replacement replacement = this.policies.textReplacements.get(i);
@@ -117,8 +130,9 @@ public class Config {
             ));
         }
         logger.info(String.format(
-                "[CONFIG: Policy > Link Replacements] Imported %d link replacements",
-                this.policies.linkReplacements.size()
+            "[CONFIG: Policy > Link Replacements] Imported %d link replacement%s",
+            this.policies.linkReplacements.size(),
+            this.policies.linkReplacements.size() > 1 ? "s" : ""
         ));
         for (int i = 0; i < this.policies.linkReplacements.size(); i++) {
             final Replacement replacement = this.policies.linkReplacements.get(i);
@@ -134,5 +148,6 @@ public class Config {
             this.target.host,
             this.target.port
         ));
+        logger.info("---- [CONFIG] ----");
     }
 }

@@ -4,6 +4,8 @@ MAVEN_TAR:=$(MAVEN_FULL_NAME)-bin.tar.gz
 MAVEN_TAR_URL:=https://apache.mirror.digitalpacific.com.au/maven/maven-3/$(MAVEN_VERSION)/binaries/$(MAVEN_TAR)
 M2_HOME:=/usr/local/apache-maven/$(MAVEN_FULL_NAME)
 
+BUILD_JAR_NAME:=http-proxy-0.1.0
+
 SOURCE_FILES_DIR:=src/main
 DOCUMENTATION_OUTPUT_DIR:=docs
 
@@ -23,12 +25,13 @@ install_maven_linux_apt:
 	@sudo apt install maven
 
 build_jar:
-	@mvn install
-	@mvn package
-	@mv target/http-proxy-0.1.0-shaded.jar http-proxy-0.1.0.jar
+	@rm -rf target
+	@rm -rf $(BUILD_JAR_NAME).jar
+	@mvn -am install package
+	@mv target/$(BUILD_JAR_NAME)-shaded.jar $(BUILD_JAR_NAME).jar
 
 run_jar:
-	@java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml HTTP-Proxy-0.1.0-shaded.jar
+	@java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml $(BUILD_JAR_NAME).jar com.engineersbox.httpproxy.Main
 
 generate_documentation:
 	@mkdir -p $(DOCUMENTATION_OUTPUT_DIR)

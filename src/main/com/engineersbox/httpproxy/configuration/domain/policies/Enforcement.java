@@ -4,11 +4,11 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public class Enforcement {
     public final WhitelistBehaviour whitelistBehaviour;
-    public final boolean allow_redirects;
+    public final boolean allowRedirects;
 
-    public Enforcement(final WhitelistBehaviour whitelistBehaviour, final boolean allow_redirects) {
+    public Enforcement(final WhitelistBehaviour whitelistBehaviour, final boolean allowRedirects) {
         this.whitelistBehaviour = whitelistBehaviour;
-        this.allow_redirects = allow_redirects;
+        this.allowRedirects = allowRedirects;
     }
 
     @Override
@@ -20,7 +20,7 @@ public class Enforcement {
         Enforcement that = (Enforcement) o;
 
         return new EqualsBuilder()
-                .append(allow_redirects, that.allow_redirects)
+                .append(allowRedirects, that.allowRedirects)
                 .append(whitelistBehaviour, that.whitelistBehaviour)
                 .isEquals();
     }

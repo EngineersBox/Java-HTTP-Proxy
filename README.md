@@ -9,9 +9,9 @@ you'll need to have maven installed.
 
 If you haven't already got it installed, then you can run one of the makefile targets depending on your environment:
 
-* Mac OS X: `$> make install_maven_darwin`
+* Mac OS X: `$> brew install maven` or `$> make install_maven_darwin`
 * Linux (binary): `$> make install_maven_linux_binary`
-* Linux (apt): `$> make install_maven_linux_apt`
+* Linux (apt): `$> sudo apt install maven` or `$> make install_maven_linux_apt`
 
 *Note:* If you are using windows, then it's not as simple to install maven. I would suggest that you run this on a unix system,
 but if you Do want to install it on Windows, a tutorial can be found here <https://www.javatpoint.com/how-to-install-maven>
@@ -27,8 +27,9 @@ $> make build_jar
 Alternatively, if you want to build it manually then you can run the following:
 
 ```shell
-$> mvn install
-$> mvn package
+$> rm -rf target
+$> rm -rf http-proxy-0.1.0.jar
+$> mvn -am install package
 $> mv target/http-proxy-0.1.0-shaded.jar http-proxy-0.1.0.jar
 ```
 
@@ -47,7 +48,7 @@ $> make run_jar
 Running the jar via the java command directly (make sure the jar is in the top level directory and not in `target`):
 
 ```shell
-$> java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml http-proxy-0.1.0-shaded.jar
+$> java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logback.xml http-proxy-0.1.0.jar
 ```
 
 ### Jar Arguments
@@ -99,6 +100,7 @@ the functionality of the processes executing. In order to least to most detail t
 project are:
 
 * INFO
+* WARN
 * DEBUG
 * TRACE
 
@@ -229,7 +231,7 @@ Below is a list of each of the sections of the config file with a short descript
     * `acceptorPoolSize`: How many threads to allocate to the acceptor pool
     * `handlerPoolSize`: How many threads to allocate to the handler pool
     * `classMatcherPoolSize`: How many threads to allocate to the matching classes in the HandlerResolver
-    * `schedulingPolicy`: What type of scheduling policy to use for the thread pools. Can be one of ABORT, CALLER_RUNS, DISCARD_OLDEST or DISCARD
+    * `schedulingPolicy`: What type of scheduling policy to use for the thread pools. Can be one of `ABORT`, `CALLER_RUNS`, `DISCARD_OLDEST` or `DISCARD`
   * `connections`: How connections are handled and what properties they can have in terms of liveness and buffering
     * `acceptorQueueSize`: Size of the acceptor queue
     * `handlerQueueSize`: Size of the handler queue
@@ -256,7 +258,7 @@ Below is a list of each of the sections of the config file with a short descript
     * `replacement`: The pattern that should be replaced with a given string
       * `from`: Pattern to match against
       * `to`: String to replace a match against the 'from' pattern
-  * `linkReplacements`: A set of replacement schemas to enact on HTML link nodes (<a> <img> <link>)
+  * `linkReplacements`: A set of replacement schemas to enact on HTML link nodes (`<a>`, `<img>`, `<link>`, etc.)
     * `replacement`: The pattern that should be replaced with a given string
       * `from`: Pattern to match against
       * `to`: String to replace a match against the 'from' pattern
@@ -264,6 +266,19 @@ Below is a list of each of the sections of the config file with a short descript
   * `host`: Hostname of the target
   * `port`: Port of the target
   
+### Scheduling Policy
+
+To expand on the enum values that the `servlet.threading.schedulingPolicy` config field can take... these are Java's
+built-in scheduling methodologies that can be used out of the box with executors. Below is an explanation of what each
+of them mean in terms of use in a thread pool executor.
+
+| **Policy**         	| **Summary**                                                                                                                                                                                                                                                                                                                                                                 |
+|--------------------	|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| `ABORT`            	| A handler for rejected tasks that throws a RejectedExecutionException.                                                                                                                                                                                                                                                                                                      |
+| `CALLER_RUNS`      	| A handler for rejected tasks that runs the rejected task directly in the calling thread of the execute method, unless the executor has been shut down, in which case the task is discarded.<br>You may be familiar with this use of this policy with models such as eat-what-you-kill in libraries such as Jetty (See more here <https://webtide.com/eat-what-you-kill/>). 	|
+| `DISCARDED_OLDEST` 	| A handler for rejected tasks that discards the oldest unhandled request and then retries execute, unless the executor is shut down, in which case the task is discarded.                                                                                                                                                                                                    |
+| `DISCARD`          	| A handler for rejected tasks that silently discards the rejected task.                                                                                                                                                                                                                                                                                                      |
+
 ## Resource Matching
 
 This proxy (and by reasonable extension, HTTP servlet) handles requests/responses based on how a given set of resources 

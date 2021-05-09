@@ -2,6 +2,7 @@ package com.engineersbox.httpproxy.connection.handler;
 
 import com.engineersbox.httpproxy.configuration.Config;
 import com.engineersbox.httpproxy.connection.stream.ContentCollector;
+import com.engineersbox.httpproxy.exceptions.socket.SocketStreamReadError;
 import com.engineersbox.httpproxy.formatting.http.common.HTTPMessage;
 import com.engineersbox.httpproxy.formatting.http.request.HTTPRequestStartLine;
 import com.engineersbox.httpproxy.resolver.ResourceResolver;
@@ -66,7 +67,16 @@ public class BackwardTrafficHandler extends BaseTrafficHandler {
      */
     @Override
     public void task() throws Exception {
-        HTTPMessage<HTTPRequestStartLine> message = resolver.matchRequest(this.contentCollector.synchronousReadAll());
+        HTTPMessage<HTTPRequestStartLine> message;
+        try {
+            message = this.resolver.matchRequest(
+                    this.contentCollector.synchronousReadAll()
+            );
+        } catch (final SocketStreamReadError e) {
+            logger.error(e.getMessage(), e);
+            this.outServer.close();
+            return;
+        }
         logger.info("[Client => Server] " + message.startLine.toDisplayableString());
         final byte[] request = message.toRaw();
         this.outServer.write(request);

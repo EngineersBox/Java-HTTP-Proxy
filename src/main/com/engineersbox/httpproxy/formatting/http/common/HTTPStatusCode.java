@@ -6,6 +6,7 @@ package com.engineersbox.httpproxy.formatting.http.common;
 public enum HTTPStatusCode {
     _200(200, "Ok"),
     _404(404, "Not found"),
+    _408(408, "Request Timeout"),
     _500(500, "Internal server error");
 
     public final int code;

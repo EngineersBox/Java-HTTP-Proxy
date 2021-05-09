@@ -75,6 +75,37 @@ public class StandardResponses {
     }
 
     /**
+     * Create an HTTP 408 (Request Timeout) response with a custom body
+     *
+     * @param body Content to use as the body of the response
+     * @return HTTP 408 formatted {@link HTTPMessage}
+     */
+    public static HTTPMessage<HTTPResponseStartLine> _408(final String body) {
+        final HTTPMessage<HTTPResponseStartLine> message = StandardResponses._408();
+        message.body = body;
+        return message;
+    }
+
+    /**
+     * Create an HTTP 408 (Request Timeout) response
+     *
+     * @return HTTP 408 formatted {@link HTTPMessage}
+     */
+    public static HTTPMessage<HTTPResponseStartLine> _408() {
+        final Map<String, String> headers = new HashMap<>();
+        headers.put("Connection", "close");
+        headers.put("Server", "HTTPProxy");
+        return new HTTPMessage<>(
+                new HTTPResponseStartLine(
+                        HTTPStatusCode._408.code,
+                        HTTPStatusCode._408.message,
+                        HTTPVersion.HTTP11
+                ),
+                headers
+        );
+    }
+
+    /**
      * Create an HTTP 500 (Internal server error) response with a custom body
      *
      * @param body Content to use as the body of the response

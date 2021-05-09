@@ -9,7 +9,7 @@
 		"connections": {
 			"acceptorQueueSize": 10,
 			"handlerQueueSize": 10,
-			"dropAfter": 1000,
+			"dropAfter": 5000,
 			"readerBufferSize": 1024,
 			"writeBufferSize": 1024
 		},

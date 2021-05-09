@@ -77,7 +77,7 @@ public class ForwardTrafficHandler extends BaseTrafficHandler {
                     this.contentCollector.synchronousReadAll()
             );
         } catch (final SocketStreamReadError e) {
-            message = StandardResponses._500();
+            message = StandardResponses._408(e.getMessage());
         }
         logger.info("[Client <= Server] " + message.startLine.toDisplayableString());
         final byte[] response = message.toRaw();
