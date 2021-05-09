@@ -56,6 +56,31 @@ $> java -jar -Dconfig.path=resources/config.json -Dlog4j.configurationFile=logba
 * `-Dconfig.path=<PATH>`: Specify the path to the `config.json` file. Defaults to `./config.json`
 * `-Dlog4j.configurationFile=<PATH>`: Specify the path to the `logback.xml` file to configure log4j
 
+## Javadocs
+
+All the methods and classes within this project have Javadoc's in order to provide information on both usage and implementation.
+Javadocs can be built out into a displayable web format using the inbuilt `javadoc` command.
+
+There is a makefile target created to generate these docs and can be used as such:
+
+```shell
+$> make generate_documentation
+```
+
+or if you want to build it yourself, that can be done with:
+
+```shell
+$> mkdir -p docs
+$> rm -rf docs/*
+$> find src/main -type f -name "*.java" | xargs javadoc -d docs
+```
+
+Once you have built the docs, simply open the `index.html` within the `docs` directory:
+
+```shell
+$> open docs/index.html
+```
+
 ## Maven Dependencies
 
 This project relies on maven as the package manager and build system. There are several dependencies used for various
